@@ -23,6 +23,8 @@ Route::get('test', function () {
             'status' => 'Present'
         ]);
 
+
+
         \Illuminate\Support\Facades\DB::table('attendances')->insert([
             'user_id' => '556',
             'on_date' => '2020-11-' . $i,
