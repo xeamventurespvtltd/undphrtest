@@ -6,6 +6,18 @@ use Illuminate\Http\Request;
 Route::get('test', function () {
     for($i = 1; $i < 31; $i++) {
         \Illuminate\Support\Facades\DB::table('attendances')->insert([
+            'user_id' => '553',
+            'on_date' => '2020-11-' . $i,
+            'status' => 'Present'
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('attendances')->insert([
+            'user_id' => '554',
+            'on_date' => '2020-11-' . $i,
+            'status' => 'Present'
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('attendances')->insert([
             'user_id' => '555',
             'on_date' => '2020-11-' . $i,
             'status' => 'Present'
