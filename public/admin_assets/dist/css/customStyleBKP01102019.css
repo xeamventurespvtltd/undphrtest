@@ -1,0 +1,4428 @@
+body
+
+{
+
+    font-size: 13px;
+
+}
+
+
+
+#docs1,#docs2{
+
+  margin-top: 31px;
+
+}
+
+
+
+.error,.dateErrors,.timeErrors,.noDayErrors,.birthDateErrors,.marriageDateErrors{
+
+    color: #f00;
+
+}
+
+/* late comming 12/09/2019 */
+a.fc-day-grid-event.fc-h-event.fc-event.fc-start.fc-end.fc-draggable.calender-day-check-in.late {
+    border: 3px solid #f00 !important;
+}
+
+div.languageCheckboxes{
+
+    margin-left: 39%;
+
+}
+
+
+
+.leaveMessageList{
+
+    font-size: 13px;
+
+}
+
+
+
+a.cursorDefault{
+
+    cursor: default;
+
+}
+
+/*changes by pankaj 10/may/2019*/
+
+input#birthDate {
+
+    background-color: white;
+
+}
+
+
+
+/*changes by pankaj 03/june/2019*/
+
+.table.table.table-bordered.table-striped.dataTable{
+
+    width: 100% !important;
+
+}
+
+/* 13/09/2019*/
+.constants-container{
+    display: flex;
+    justify-content: center;
+}
+.constants{
+    width: 900px;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: -15%;
+}
+.constants .item{
+    margin-right: 10px;
+    height: 20px;
+    padding: 0px 7px;
+}
+/* 13/09/2019*/
+
+.modal-header {
+
+    background-color: #3c8dbc;
+
+    color: #fff;
+
+}
+
+
+
+input#marriageDate {
+
+    background-color: white;
+
+}
+
+
+
+input#joiningDate {
+
+    background-color: white;
+
+}
+
+
+
+input#fromDate {
+
+    background-color: white;
+
+}
+
+
+
+input#toDate {
+
+    background-color: white;
+
+}
+
+
+
+input#ddDate {
+
+    background-color: white;
+
+}
+
+
+
+input#contractSignedDate {
+
+    background-color: white;
+
+}
+
+
+
+input#insuranceExpiryDate {
+
+    background-color: white;
+
+}
+
+
+
+/*end here*/
+
+
+
+
+
+                                            /*changes on 4th April*/
+
+
+
+
+
+.row.field-changes-below {
+
+    margin-bottom: 15px;
+
+}
+
+.form-sidechange
+
+{
+
+    padding: 0px 20px;
+
+}
+
+.col-md-1.salu-change {
+
+    padding-right: 0px;
+
+    padding-left: 13px;
+
+}
+
+.col-md-3.first-name-basic {
+
+    padding: 0px 5px;
+
+}
+
+.col-md-3.middle-name-basic {
+
+    padding: 0px 5px 0px 0px;
+
+}
+
+.col-md-3.last-name-basic {
+
+    padding: 0px 20px 0px 0px;
+
+}
+
+.col-md-6.basic-detail-left {
+
+    padding-right: 5px;
+
+}
+
+.col-md-6.basic-detail-right {
+
+    padding-left: 5px;
+
+}
+
+label.col-md-4.control-label.basic-detail-label {
+
+    padding-right: 5px;
+
+    padding-top: 4px;
+
+}
+
+label.col-md-2.control-label.basic-detail-label {
+
+    padding-right: 0px;
+
+    padding-top: 4px;
+
+}
+
+.basic-detail-input-style
+
+{
+
+    border-radius: 4px;
+
+    box-shadow: 0px 1px 2px lightgrey;
+
+}
+
+select.form-control.input-sm.basic-detail-input-style {
+
+    padding-left: 5px;
+
+}
+
+.basic-input-left
+
+{
+
+    padding-left: 7px;
+
+}
+
+.basic-input-right
+
+{
+
+    padding-left: 7px;
+
+}
+
+span.col-md-4.control-label.radio.basic-detail-label {
+
+    padding: 0px 4px 0px 0px;
+
+}
+
+.radio-style-basic {
+
+    margin-top: 7px !important;
+
+    position: absolute;
+
+    left: 0px;
+
+    top: -3px;
+
+}
+
+.radio-style-basic2 {
+
+    margin-top: 7px !important;
+
+    position: absolute;
+
+    left: 4px;
+
+    top: -3px;
+
+}
+
+label.basicradio {
+
+    position: relative;
+
+    padding: 0px 0px 0px 17px;
+
+}
+
+label.basicradio2 {
+
+    position: relative;
+
+    padding: 0px 0px 0px 20px;
+
+}
+
+.col-sm-2.salu-changes-edit {
+
+    padding-right: 0px;
+
+    padding-left: 10px;
+
+}
+
+.col-sm-8.first-name-basic {
+
+    padding-left: 5px;
+
+}
+
+label.checkbox-inline.check-align-3rd {
+
+    margin-left: 0px;
+
+}
+
+input#optionsRadios3 {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+input#optionsRadios4 {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+
+
+/*6th April starts here*/
+
+
+
+span.col-md-4.control-label.radio.basic-detail-label.contract-alignment {
+
+    padding-top: 2px;
+
+}
+
+
+
+.apply-leaves-results {
+
+    /*margin: auto;
+
+    margin-top: 10px;*/
+
+    margin: 10px 75px 0px 75px;
+
+}
+
+.row.apply-leave-addrow-left {
+
+    padding-right: 10px;
+
+}
+
+.row.apply-leave-addrow-right {
+
+    padding-left: 10px;
+
+}
+
+.apply-leave-time {
+
+    display: inline;
+
+}
+
+.apply-leave-time-section
+
+{
+
+    padding-bottom: 10px;
+
+}
+
+.apply-leave-checkbox1#optionsRadios1 {
+
+    position: relative;
+
+    top: 10px;
+
+}
+
+input#optionsRadios1 {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+input#optionsRadios2 {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+.input-group-addon.time-icon {
+
+    border-radius: 0px 4px 4px 0px;
+
+    border: 1px solid #3c8dbc;
+
+    background-color: #3c8dbc;
+
+    color: white;
+
+    box-shadow: 0px 1px 2px lightgrey;
+
+}
+
+.input-style-icon
+
+{
+
+    border-radius: 4px 0px 0px 4px;
+
+}
+
+/*6th April ends here*/
+
+
+
+
+
+
+
+/*changes on 16april, 2019 starts here*/
+
+.apply-leave-btn {
+
+    padding-bottom: 15px;
+
+    border-top: none;
+
+}
+
+.add-compensatory-btn
+
+{
+
+    padding-bottom: 15px;
+
+    border-top: none;
+
+}
+
+.form-decor {
+
+    padding-top: 10px;
+
+}
+
+.apply-leave-btn-all {
+
+    padding: 0px 0px 12px 0px;
+
+}
+
+.col-sm-10.leave-remove-sides {
+
+    padding-left: 0px;
+
+    padding-right: 0px;
+
+}
+
+.leaves1
+
+{
+
+    text-align: center;
+
+}
+
+.leaves2
+
+{
+
+    text-align: center;
+
+}
+
+.leaves3
+
+{
+
+    text-align: center;
+
+}
+
+.leaves4
+
+{
+
+    text-align: center;
+
+}
+
+.leaves5
+
+{
+
+    text-align: center;
+
+}
+
+.row.leave-type1 {
+
+    margin-top: 15px;
+
+}
+
+.row.leave-type2 {
+
+    margin-left: 23%;
+
+    margin-right: 23%;
+
+}
+
+.leave-heading {
+
+    padding: 5px 10px;
+
+}
+
+.leave-content {
+
+    padding: 5px;
+
+}
+
+.leave-type-sectn {
+
+    margin-bottom: 10px;
+
+}
+
+
+
+table#listAppliedLeaves {
+
+    margin-left: 0px;
+
+}
+
+table#listLeaveApproval {
+
+    margin-left: 0px;
+
+}
+
+
+
+/*changes on 16april, 2019 ends here*/
+
+
+
+
+
+/*Changes made on 18th April, 2019 stats here*/
+
+
+
+hr.progress-line {
+
+    border: 1px solid #3c8dbc;
+
+    margin: 0px 0px;
+
+    position: relative;
+
+    top: 16px;
+
+    width: 97%;
+
+    /*margin-left: 11px;*/
+
+    margin-right: 70px;
+
+}
+
+.approved-dot:before {
+
+    content: ' \25CF';
+
+    font-size: 33px;
+
+    position: relative;
+
+    left: 35%;
+
+    top: -11px;
+
+    color: #398439;
+
+}
+
+.disapproved-dot:before {
+
+    content: ' \25CF';
+
+    font-size: 33px;
+
+    position: relative;
+
+    left: 35%;
+
+    top: -11px;
+
+    color: #d81b60;
+
+}
+
+.rejected-dot:before {
+
+    content: ' \25CF';
+
+    font-size: 33px;
+
+    position: relative;
+
+    left: 35%;
+
+    top: -11px;
+
+    color: #dd4b39;
+
+}
+
+.none-dot:before {
+
+    content: ' \25CF';
+
+    font-size: 33px;
+
+    position: relative;
+
+    left: 35%;
+
+    top: -11px;
+
+    color: #d6bc26;
+
+}
+
+.progress-manager {
+
+    display: inherit;
+
+}
+
+.progress-hr {
+
+    display: inline-block;
+
+}
+
+h6.progress-line-type {
+
+    text-align: center;
+
+    margin-top: 0px;
+
+    margin-bottom: 0px;
+
+}
+
+/*Changes made on 18th April, 2019 ends here*/
+
+
+
+
+
+/*Changes made on 22th April, 2019 starts here*/
+
+.box-header.with-border.leave-form-title-bg {
+
+    background-color: #3c8dbc;
+
+    color: white;
+
+}
+
+.leave-form-title-bg
+
+{
+
+    background-color: #3c8dbc;
+
+    color: white;
+
+}
+
+
+
+/*Changes made on 22th April, 2019 ends here*/
+
+
+
+
+
+/*Changes made on 24th April, 2019 starts here*/
+
+.mastertables-heading {
+
+    background-color: #3c8dbc;
+
+    color: white;
+
+}
+
+.mastertbl-perk-lbl {
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 13%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-department-lbl {
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 14%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 18%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 18%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 87%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 86%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 82%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 82%;
+
+}
+
+.mastertbl-country-lbl {
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 27%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-country-input {
+
+    width: 73%;
+
+}
+
+.mastertbl-editdepart-lbl {
+
+    padding-right: 0px;
+
+    padding-top: 7px;
+
+    width: 25%;
+
+    display: inline-grid;
+
+    text-align: left;
+
+    margin-right: 15px;
+
+}
+
+.mastertbl-editdepartment-input {
+
+    width: 75%;
+
+}
+
+.add-perk-form
+
+{
+
+    display: flex;
+
+}
+
+.add-city-form
+
+{
+
+    display: flex;
+
+}
+
+.add-country-form
+
+{
+
+    display: flex;
+
+}
+
+.add-editdepartment-form
+
+{
+
+    display: flex;
+
+}
+
+.add-department-form
+
+{
+
+    display: flex;
+
+}
+
+.add-financial-form
+
+{
+
+    display: flex;
+
+}
+
+.table-heading-style {
+
+    background-color: #00728e;
+
+    color: white;
+
+}
+
+.holidays-desc-inputs {
+
+    margin-left: 3.2%;
+
+}
+
+
+
+
+
+.compen-label-space {
+
+    padding: 0px;
+
+}
+
+.compen-label-style {
+
+    padding-top: 7px;
+
+}
+
+
+
+/*26 April, 2019 starts here*/
+
+.holiday-descr-input {
+
+    padding-left: 5.5%;
+
+}
+
+label.holiday-label {
+
+    padding-top: 5px;
+
+}
+
+span.apply-leave-checkbox1 {
+
+    margin-right: 10px;
+
+}
+
+.apply-leave-label
+
+{
+
+    padding-top: 5px;
+
+}
+
+.salaryCycle-place {
+
+    padding-left: 12px !important;
+
+}
+
+/*26 April, 2019 ends here*/
+
+
+
+/*Changes on 01 May, 2019 starts here*/
+
+
+
+ul.nav.nav-tabs.edit-nav-styling {
+
+    background-color: #3c8dbc;
+
+    border-bottom: 2px solid #3c8dbc;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li {
+
+    border-top: none;
+
+    margin-right: 0px;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li > a{
+
+    color: white;
+
+    border: none;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li:hover {
+
+    background-color: #367fa9;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li > a:hover {
+
+    color: #fff;
+
+    border: none;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li.active > a{
+
+    background-color: #286090;
+
+    color: white;
+
+    border: none;
+
+    font-weight: 600;
+
+}
+
+.nav-tabs-custom > .nav-tabs > li.active > a:hover{
+
+    background-color: #286090;
+
+    color: white;
+
+    border: none;
+
+}
+
+.basic-radio-label {
+
+    padding-top: 5px !important;
+
+}
+
+.basic-lang-label {
+
+    margin-right: 18px;
+
+    position: relative;
+
+    top: 5px;
+
+}
+
+.hr-details-contract {
+
+    padding-top: 2px !important;
+
+}
+
+.col-md-8.basic-detail-mob-right {
+
+    padding-left: 0px;
+
+}
+
+.col-md-3.edit-std-space {
+
+    padding: 0px;
+
+}
+
+
+
+/*Changes on 02 May, 2019 starts here*/
+
+input#nomineeType3 {
+
+    position: absolute;
+
+    top: 0px;
+
+    left: 4px;
+
+}
+
+label.basicradio3 {
+
+    position: relative;
+
+    padding: 0px 0px 0px 20px;
+
+}
+
+.basicradio2-gender {
+
+    
+
+}
+
+
+
+
+
+/*Changes on 02 May, 2019 ends here*/
+
+
+
+.apply-leave-input {
+
+    font-size: 12px;
+
+    padding: 5px 10px !important;
+
+    height: 30px;
+
+}
+
+.leave-label-box {
+
+    text-align: right;
+
+    padding-right: 0px;
+
+}
+
+.leave-input-box {
+
+    padding-left: 12px;
+
+}
+
+.leave-input-box-right {
+
+    padding-right: 5px;
+
+    padding-left: 12px;
+
+}
+
+.leave-label-tr {
+
+    padding-left: 0px;
+
+}
+
+.leave-absence-left {
+
+    padding-left: 12px;
+
+    padding-right: 0px;
+
+}
+
+.leave-absence-right{
+
+    padding-left: 5px;
+
+}
+
+.leave-duties {
+
+    padding-left: 12px;
+
+}
+
+.leave-file-input
+
+{
+
+    padding-left: 12px;
+
+}
+
+.col-sm-8.langright {
+
+    text-align: center;
+
+}
+
+.callout.callout-danger.apply-lv-alert {
+
+    margin-bottom: 0;
+
+    background-color: #bd1d0a !important;
+
+    padding: 7px;
+
+    border-color: #6d0c00;
+
+}
+
+.apply-lv-file {
+
+    border: none;
+
+    padding: 0px;
+
+}
+
+.time-icon-width {
+
+    padding-left: 10px;
+
+    padding-right: 11px;
+
+}
+
+.leave-report-total {
+
+    padding: 0px 10px;
+
+}
+
+.leave-type-sectn-report {
+
+    margin-bottom: 0px;
+
+}
+
+img.leave-info-profile-img {
+
+    width: 60px;
+
+    height: 60px;
+
+    border: 2px solid #00728e;
+
+    padding: 3px;
+
+    border-radius: 50%;
+
+    display: -webkit-inline-box;
+
+    margin-right: 5px;
+
+}
+
+.report-info-img-sec {
+
+    padding: 5px 10px;
+
+    display: flex;
+
+    justify-content: center;
+
+    border-top: 1px solid lightgrey;
+
+    border-bottom: 1px solid lightgrey;
+
+}
+
+span.alri-employee-name {
+
+    position: relative;
+
+    top: 10px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+}
+
+/*span.alri-employee-code {
+
+    position: relative;
+
+    right: 125px;
+
+    top: 30px;
+
+}*/
+
+.alri-employee-detail {
+
+    border-left: 2px solid #d2d6de;
+
+    padding-left: 5px;
+
+    display: grid;
+
+}
+
+.box-header.alri-heading {
+
+    text-align: center;
+
+}
+
+.all-progress {
+
+    margin-bottom: 10px;
+
+    padding: 0px;
+
+    border-top: 1px solid lightgrey;
+
+    border-bottom: 1px solid lightgrey;
+
+}
+
+h5.all-progress-heading {
+
+    margin: 0px;
+
+    padding: 10px;
+
+    display: -webkit-inline-box;
+
+    margin-left: 10px;
+
+}
+
+img.all-circle-error {
+
+    width: 13px;
+
+    padding-bottom: 3px;
+
+}
+
+span.all-span-leave {
+
+    margin-right: 10px;
+
+}
+
+
+
+
+
+
+
+p.salary-heading-type {
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+
+    text-decoration: underline;
+
+}
+
+.form-group.jrf-radio-sec {
+
+    margin-bottom: 0px;
+
+}
+
+.range_container, .fixed_container_deduction, .fixed_container_addition {
+
+    text-align: center;
+
+}
+
+.col-xs-6.plus-minus {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 5px;
+
+}
+
+.jrf-plus-btn {
+
+    font-size: 18px;
+
+    padding: 0px 8px;
+
+    border-radius: 16px;
+
+    margin: 0px 2px;
+
+}
+
+.jrf-minus-btn {
+
+    font-size: 18px;
+
+    padding: 0px 10px;
+
+    border-radius: 16px;
+
+    margin: 0px 2px;
+
+}
+
+div#man_container_salary {
+
+    padding-left: 0px;
+
+    padding-right: 0px;
+
+}
+
+div#man_container_ded {
+
+    padding-left: 0px;
+
+    padding-right: 0px;
+
+}
+
+.col-xs-6.jrf-exp-left {
+
+    padding-right: 5px;
+
+}
+
+.col-xs-6.jrf-exp-right {
+
+    padding-left: 3px;
+
+}
+
+.col-md-2.label-left-sec {
+
+    text-align: right;
+
+    font-size: 12px;
+
+    padding: 6px 0px 0px 0px;
+
+}
+
+.col-md-10.jrp-job-desc {
+
+    padding: 0px 0px 0px 18px;
+
+}
+
+.col-xs-4.jrf-salary-left {
+
+    padding: 0px 2px 0px 0px;
+
+}
+
+.col-xs-4.jrf-salary-center {
+
+    padding: 0px 2px 0px 5px;
+
+}
+
+.col-xs-4.jrf-salary-right {
+
+    padding: 0px 0px 0px 5px;
+
+}
+
+select.an-salary-dur {
+
+    width: 100%;
+
+    height: 30px;
+
+    font-size: 12px;
+
+    padding-left: 10px;
+
+    border-radius: 4px;
+
+    box-shadow: 0px 1px 2px lightgrey;
+
+    border: 1px solid #ccc;
+
+}
+
+label.salary-range-label {
+
+    margin-bottom: 0px;
+
+}
+
+input.minimal.salaryRadioClass {
+
+    position: relative;
+
+    top: 5px;
+
+}
+
+label.salary-range-label-name {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+div#salaryAddRemove {
+
+    border: 1px solid lightgrey;
+
+    padding: 10px 0px;
+
+    border-radius: 4px;
+
+    box-shadow: 0px 1px 2px lightgrey;
+
+}
+
+.jrf-salary-inner-inputs {
+
+    width: 65px;
+
+    border: 1px solid grey;
+
+    border-radius: 5px;
+
+    margin-bottom: 3px;
+
+    padding-left: 2px;
+
+}
+
+.jrf-label-left-sec {
+
+    text-align: right;
+
+    font-size: 12px;
+
+}
+
+.row.jrf-outer-box {
+
+    padding: 8px;
+
+}
+
+.jrf-page-input-sec {
+
+}
+
+.jrf-page-main-heading
+
+{
+
+    text-align: center;
+
+    text-decoration: underline;
+
+    margin-bottom: 10px;
+
+}
+
+p.jrf-page-number {
+
+    text-align: right;
+
+    margin-right: 20px;
+
+    position: relative;
+
+    top: -30px;
+
+    right: 0;
+
+}
+
+
+
+.jrf-earning {
+
+    border: 1px solid black;
+
+    margin: 3px;
+
+}
+
+.jrf-deduction {
+
+    border: 1px solid black;
+
+    margin: 3px;
+
+}
+
+.jrf-earning ul {
+
+    list-style-type: none;
+
+    padding-left: 0px;
+
+}
+
+.jrf-deduction ul {
+
+    list-style-type: none;
+
+    padding-left: 0px;
+
+}
+
+
+
+/*Changes made on 16 July,2019*/
+
+.row.select-detail-below {
+
+    padding: 10px 15px 0px 15px;
+
+}
+
+.searchbtn-attendance {
+
+    position: relative;
+
+    top: 23px;
+
+    padding: 5px 10px;
+
+    border: none;
+
+    transition: all ease 0.3s;
+
+    background-color: #00728e;
+
+    border-color: #00728e;
+
+    color: white;
+
+}
+
+.searchbtn-attendance:hover {
+
+    background-color: #005f75;
+
+    border-color: #005f75;
+
+    color: white;
+
+}
+
+.attendance-column1 {
+
+    padding-right: 0px;
+
+}
+
+.attendance-column2 {
+
+    padding: 0px 5px;
+
+}
+
+.attendance-column3 {
+
+    padding: 0px 5px 0px 0px;
+
+}
+
+.attendance-column4 {
+
+    padding-left: 0px;
+
+}
+
+h4.Employee-name-heading {
+
+    margin: 10px 15px;
+
+    color: #3c8dbc;
+
+    text-align: center;
+
+}
+
+.arrow-styling-in {
+
+    font-size: 20px;
+
+    color: green;
+
+    margin-right: 5px;
+
+}
+
+.arrow-styling-out {
+
+    font-size: 20px;
+
+    color: red;
+
+    margin-right: 5px;
+
+}
+
+/*Work on 6 Augest, 2019*/
+
+td.multiple-in-outs {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+span.single-in-out {
+
+    margin-right: 5px;
+
+}
+
+td.holiday_attendance {
+
+    text-align: center;
+
+    letter-spacing: 17px;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+}
+
+.attendance-table-body tr td {
+
+    text-align: center;
+
+}
+
+
+
+/*Date 08 August 2019*/
+
+li.attendance-rectangle {
+
+    list-style-type: none;
+
+    display: -webkit-inline-box;
+
+    position: relative;
+
+}
+
+.attendance-guide ul li {
+
+    padding-left: 28px;
+
+    position: relative;
+
+    margin-right: 10px;
+
+}
+
+.attendance-guide ul {
+
+    padding-left: 20px;
+
+}
+
+.attendance-guide ul li::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 30px;
+
+    height: 15px;
+
+    top: 2px;
+
+    border-radius: 5px;
+
+    left: -4px;
+
+}
+
+hr.attendance-hr {
+
+    margin-top: 0px;
+
+    margin-bottom: 10px;
+
+}
+
+.holiday-only::before {
+
+    background-color: #808080;
+
+}
+
+.present-only::before {
+
+    background-color: #6665f5; 
+
+}
+
+
+
+.absent-only::before {
+
+    background-color: #fe0000;
+
+}
+
+
+
+.check-in-only::before {
+
+    background-color: #00a65a;
+
+}
+
+
+
+.check-out-only::before {
+
+    background-color: #30b3da;
+
+}
+
+.a-last-absent {
+
+    padding: 0 15px 5px 15px;
+
+    text-align: right;
+
+}
+
+span.a-last-absent-span1 {
+
+    color: #0965d8;
+
+    font-weight: 600;
+
+}
+
+.attendance-date-sec {
+
+    padding: 10px 15px;
+
+}
+
+.attendance-date-sec {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+}
+
+.attendance-date-sec-center h2 {
+
+    margin: 0px;
+
+}
+
+.calender-day-present {
+
+    background-color: #6665f5 !important;
+
+    border-color: #6665f5 !important;
+}
+
+.calender-day-absent {
+
+    background-color: #fe0000 !important;
+
+    border-color: #fe0000 !important;
+
+}
+
+.calender-day-holiday {
+
+    background-color: #808080 !important;
+
+    border-color: #808080 !important;
+
+}
+
+.calender-day-check-in {
+
+    background-color: #00a65a !important;
+
+    border-color: #00a65a !important;
+
+}
+
+.calender-day-check-out {
+
+    background-color: #30b3da !important;
+
+    border-color: #30b3da !important;
+
+}
+
+.modal-check-in {
+
+    background-color: #00a65a;
+
+    color: white;
+
+    margin-bottom: 5px;
+
+}
+
+.modal-check-in:hover {
+
+    color: white;
+
+}
+
+.modal-check-out {
+
+    background-color: #30b3da;
+
+    color: white;
+
+    margin-bottom: 5px;
+
+}
+
+.modal-check-out:hover {
+
+    color: white;
+
+}
+
+.modal-body.attendance-present-modal {
+
+    display: grid;
+
+    justify-content: center;
+
+}
+
+i.fa.fa-eye.present-mulitple-view {
+
+    font-size: 13px;
+
+    float: right;
+
+}
+
+button.close.attendance-close {
+
+    color: #3c8dbc;
+
+    background-color: white;
+
+    opacity: 1;
+
+    padding: 0px 5px;
+
+    border-radius: 50%;
+
+    margin-top: 0px;
+
+}
+
+.in-out-footer {
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+span.fc-day-number {
+
+    float: left !important;
+
+    line-height: 20px;
+
+}
+
+.attendance-edit {
+
+    float: right;
+
+    position: relative;
+
+    top: 10px;
+
+    right: 0px;
+
+    font-size: 14px;
+
+    padding: 1px;
+
+}
+
+.attendance-eye {
+
+    float: right;
+
+    position: relative;
+
+    top: 8px;
+
+    right: -6px;
+
+    font-size: 16px;
+
+    padding: 1px;
+
+}
+
+.attendance-eye:hover {
+
+    cursor: pointer;
+
+}
+
+.attendance-edit:hover {
+
+    cursor: pointer;
+
+}
+
+.fc-event.fc-draggable {
+
+    cursor: initial !important;
+    font-size: 15px;
+    line-height: 1.5;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    margin-left: 7px;
+    margin-bottom: 2px;
+
+}
+.fc button, .fc table, body .fc {
+    font-size: 18px !important;
+}
+
+sup.ast {
+
+    color: red;
+
+    font-size: 18px;
+
+    top: -2px;
+
+}
+
+.row.select-detail-below2 {
+
+    padding: 0px 15px 0px 15px;
+
+}
+
+.submit-btn {
+
+    background-color: white;
+
+    border-color: #00728e;
+
+    transition: all ease 0.3s;
+
+}
+
+.submit-btn:hover {
+
+    background-color: #00586d;
+
+    border-color: #00586d;
+
+    color: white;
+
+}
+
+.submit-btn-box {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+}
+
+.search-field-box {
+
+    margin: 10px;
+
+    border: 1px solid lightgrey;
+
+    border-radius: 4px;
+
+}
+
+p.found-results {
+
+    padding: 0 10px;
+
+    font-size: 15px;
+
+    letter-spacing: 0.5px;
+
+}
+
+.All-form-content {
+
+    padding: 0 15px 15px 15px;
+
+}
+
+.all-form-submit {
+
+    background-color: #00728e;
+
+    border-color: #00728e;
+
+    color: white;
+
+}
+
+.all-form-submit:hover {
+
+    background-color: #005f75;
+
+    border-color: #005f75;
+
+    color: white;
+
+}
+
+.emp-name-and-color {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+h3.a-employe-name {
+
+    color: #3c8dbc;
+
+    font-size: 18px;
+
+    margin-top: 0px;
+
+}
+
+.attendance-info {
+
+    float: right;
+
+    position: relative;
+
+    right: 57px;
+
+    font-size: 15px;
+
+    top: 8px;
+
+    padding: 1px;
+
+}
+
+.fc-event {
+
+    display: inline !important;
+
+}
+
+
+
+
+
+
+
+.info-tooltip, .eye-tooltip, .edit-tooltip, .status-tooltip {
+
+  position: relative;
+
+  display: inline-block;
+
+}
+
+.eye-tooltip, .edit-tooltip, .status-tooltip {
+
+    cursor: pointer;
+
+}
+
+
+
+.info-tooltip .info-tooltiptext, .eye-tooltip .eye-tooltiptext, .edit-tooltip .edit-tooltiptext, .status-tooltip .status-tooltiptext {
+
+  visibility: hidden;
+
+  width: 100px;
+
+  background-color: black;
+
+  color: #fff;
+
+  text-align: center;
+
+  border-radius: 6px;
+
+  padding: 4px 0;
+
+  font-size: 12px;
+
+  /* Position the tooltip */
+
+  position: absolute;
+
+  z-index: 1;
+
+  right: -40px;
+
+  top: 30px;
+
+  opacity: 0;
+
+  transition: opacity 1s;
+
+}
+
+
+
+.info-tooltip:hover .info-tooltiptext, .eye-tooltip:hover .eye-tooltiptext, .edit-tooltip:hover .edit-tooltiptext, .status-tooltip:hover .status-tooltiptext {
+
+  visibility: visible;
+
+  opacity: 1;
+
+}
+
+.info-tooltip:hover .a-icon1 {
+
+    color: #46b3f5;
+
+    transform: scale(1.3);
+
+}
+
+.eye-tooltip:hover .a-icon2 {
+
+    color: black;
+
+    transform: scale(1.3);
+
+}
+
+.edit-tooltip:hover .a-icon3 {
+
+    color: #e4b50d;
+
+    transform: scale(1.3);
+
+}
+
+.status-tooltip:hover .a-icon5 {
+
+    color: black;
+
+    transform: scale(1.3);
+
+}
+
+
+
+
+
+.info-tooltip .info-tooltiptext::after, .eye-tooltip .eye-tooltiptext::after, .edit-tooltip .edit-tooltiptext::after, .status-tooltip .status-tooltiptext::after {
+
+  content: " ";
+
+  position: absolute;
+
+  bottom: 100%;  /* At the top of the tooltip */
+
+  left: 50%;
+
+  margin-left: -5px;
+
+  border-width: 5px;
+
+  border-style: solid;
+
+  border-color: transparent transparent black transparent;
+
+}
+
+.three-icon-box {
+
+    text-align: right;
+
+    padding: 6px 6px 0px 0px !important;
+
+}
+
+.a-icon1 {
+
+    font-size: 16px;
+
+    padding: 0 3px;
+
+    color: #96cff1;
+
+    transition: all ease 0.3s;
+
+}
+
+.a-icon2 {
+
+    font-size: 16px;
+
+    padding: 0 3px;
+
+    color: #545353;
+
+    transition: all ease 0.3s;
+
+    flex-direction: 
+
+}
+
+.a-icon3 {
+
+    font-size: 16px;
+
+    padding: 0 3px;
+
+    color: #e2c24f;
+
+    transition: all ease 0.3s;
+
+}
+
+.a-icon4 {
+
+    font-size: 16px;
+
+    padding: 0 3px;
+
+    color: black;
+
+    transition: all ease 0.3s;
+
+}
+
+.a-icon5 {
+
+    font-size: 16px;
+
+    padding: 0 3px;
+
+    color: black;
+
+    transition: all ease 0.3s;
+
+}
+
+input.upload-excel-sheet {
+
+    position: relative;
+
+    top: 28px;
+
+}
+
+
+
+/*Css changes on 12 August, 2019*/
+
+.travel-input2 {
+
+    width: 105px;    
+
+}
+
+.travel-input3 {
+
+    width: 300px;
+
+}
+
+.travel-input4 {
+
+    width: 45px;
+
+}
+
+.travel-input5 {
+
+    width: 60px;
+
+}
+
+.travel-input6 {
+
+    width: 115px;
+
+}
+
+h2.travel-expense-title2 {
+
+    font-size: 20px;
+
+    padding: 0 10px;
+
+}
+
+.travel-box-border {
+
+    border: 1px solid lightgrey;
+
+    margin: 10px;
+
+    padding: 10px 0;
+
+    border-radius: 8px;
+
+}
+
+h3.travel-expense-title3 {
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    margin: 0px 0 5px 0;
+
+    text-align: center;
+
+    color: white;
+
+    background-color: #00728e;
+
+    padding: 5px 0;
+
+}
+
+.remove-travel-left6 {
+
+    padding-left: 0px;
+
+}
+
+.travel-table-input-style {
+
+    border-radius: 4px;
+
+    box-shadow: 0px 1px 2px lightgrey;
+
+}
+
+.travel-only-inputss {
+
+    font-size: 12px;
+
+    padding: 5px 5px !important;
+
+    height: 30px;
+
+}
+
+.travel-table-inner>tbody>tr>td {
+
+    padding: 5px !important;
+
+}
+
+i.fa.fa-plus.addtravel-row {
+
+    background-color: #00728e;
+
+    color: white;
+
+    padding: 7px 9px;
+
+    border-radius: 50%;
+
+}
+
+i.fa.fa-minus.remtravel-row {
+
+    background-color: #00728e;
+
+    color: white;
+
+    padding: 7px 9px;
+
+    border-radius: 50%;
+
+}
+
+.add-remark-textarea {
+
+    width: 100%;
+
+    min-height: 100px;
+
+    padding: 5px;
+
+}
+
+input.chooseAttachment-travel {
+
+    position: relative;
+
+    top: 4px;
+
+}
+
+.footer-travel {
+
+    margin-left: 0px;
+
+}
+
+input.travel-check1 {
+
+    position: relative;
+
+    top: 5px;
+
+}
+
+.attendance-tds {
+
+    height: 110px;
+
+}
+
+.travel-bottom-btns {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin: 20px 0;
+
+}
+
+a.travel-btn-style {
+
+    padding: 10px 10px;
+
+    margin: 0 5px;
+
+    border-radius: 7px;
+
+    border: 1px solid #00728e;
+
+    color: #00728e;
+
+    transition: all ease 0.2s;
+
+}
+
+a.travel-btn-style:hover {
+
+    background-color: #00728e;
+
+    color: white;
+
+}
+
+.utr-outerbox {
+
+    padding: 20px;
+
+    border: 1px solid lightgrey;
+
+    border-top: 3px solid #00728e;
+
+}
+
+input.utrNumber {
+
+    width: 100%;
+
+}
+
+/* css added on 13 August after lunch */
+
+label.utr-label {
+
+    padding: 5px 0 0 0;
+
+}
+
+.utr-submit-box {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin: 10px 0 0 0;
+
+}
+
+.utrSubmit {
+
+    background-color: #00728e;
+
+    color: white;
+
+    padding: 5px 10px;
+
+    border-radius: 4px;
+
+    border: none;
+
+}
+
+.utrSubmit:hover {
+
+    background-color: #025b71;
+
+}
+
+.utr-left-col {
+
+    padding-right: 0px;
+
+}
+
+.utr-right-col {
+
+    padding-left: 0px;
+
+}
+
+.leave-type-onnly {
+
+    display: flex;
+
+    justify-content: flex-start;
+
+}
+
+.full-short-half {
+
+    position: relative;
+
+    bottom: 1px;
+
+}
+
+/* Work on 14 August, 2019 */
+
+.border-1px {
+
+    margin: 1px;
+
+    padding: 0px 8px;
+
+    height: 30px;
+
+    line-height: 30px;
+
+    border-radius: 4px;
+
+    background-color: #f1f1f1;
+
+}
+
+.follow-up-columns {
+
+    padding: 0px 1px;
+
+    font-size: 12px;
+
+}
+
+p.follow-para1 {
+
+    margin: 5px 0px;
+
+    color: #3c8dbc;
+
+    font-weight: 600;
+
+}
+
+.follow-up-columns1 {
+
+    padding: 0 2px 0 0;
+
+}
+
+.follow-up-columns2 {
+
+    padding: 0 2px 0 2px;
+
+}
+
+.follow-up-columns3 {
+
+    padding: 0 2px 0 2px;
+
+}
+
+.follow-up-columns4 {
+
+    padding: 0 0 0 2px;
+
+}
+
+.follow-up-columns5 {
+
+    padding: 0px;
+
+    margin-top: 10px;
+
+}
+
+.view-employee-history {
+
+    font-size: 19px;
+
+    position: relative;
+
+    top: 5px;
+
+    margin-left: 6px;
+
+}
+
+.view-employee-history:hover {
+
+    cursor: pointer;
+
+}
+
+
+
+.view-employee-history-box {
+
+  position: relative;
+
+  display: inline-block;
+
+}
+
+
+
+.view-employee-history-box .history-tooltiptext {
+
+    visibility: hidden;
+
+    width: 250px;
+
+    background-color: black;
+
+    color: #fff;
+
+    text-align: center;
+
+    border-radius: 6px;
+
+    padding: 5px 0;
+
+    position: absolute;
+
+    z-index: 1;
+
+    top: 0px;
+
+    right: 105%;
+
+    margin-left: 10px;
+
+    opacity: 0;
+
+    transition: opacity 0.5s;
+
+}
+
+
+
+.view-employee-history-box:hover .history-tooltiptext {
+
+  visibility: visible;
+
+  opacity: 1;
+
+}
+
+.view-employee-history-box .history-tooltiptext::after {
+
+    content: " ";
+
+    position: absolute;
+
+    top: 15px;
+
+    right: -10px;
+
+    margin-top: -5px;
+
+    border-width: 5px;
+
+    border-style: solid;
+
+    border-color: transparent transparent transparent black;
+
+}
+
+div#calendar {
+
+    position: relative;
+
+}
+
+.table{
+    min-height: 130px;
+}
+
+.verify-btn-calender {
+
+    position: absolute !important;
+
+    right: 15px;
+
+}
+
+.attendance-verified {
+
+    background-color: #00728e;
+
+    color: white;
+
+    padding: 4px 13px;
+
+    border-radius: 4px;
+
+}
+
+
+
+/* task css on 16 August, 2019 */
+
+.task-columns {
+
+    padding: 0 5px 0 0;
+
+}
+
+/* .task-columns-select2
+
+{
+
+    padding: 0 5px 0 0;
+
+} */
+
+.row.task-rows {
+
+    padding: 10px 15px 10px 15px;
+
+}
+
+.remind-section {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    margin: 10px 0;
+
+}
+
+span.task-checkbox-label {
+
+    position: relative;
+
+    bottom: 2px;
+
+}
+
+.add-task-description {
+
+    display: block;
+
+    width: 100%;
+
+}
+
+.overdue-text-sec {
+
+    margin: 15px 0 5px 0;
+
+}
+
+.task-description-row {
+
+    margin: 0px -15px 15px -15px;
+
+}
+
+.select2-container--default .select2-selection--single, .select2-selection .select2-selection--single {
+
+    padding: 2px 0px;
+
+}
+
+/* (Task Management)17 August2019 Starts Here */
+
+.singleTaskBox {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px;
+
+    cursor: pointer;
+
+}
+
+.viewTaskTitleBox p {
+
+    margin-bottom: 0px;
+
+    font-weight: 600;
+
+    color: #00728e;
+
+}
+
+.task-checkbox, .viewTaskTitleBox {
+
+    margin-right: 15px;
+
+}
+
+.viewTaskTitleBox {
+
+    flex-basis: 470px;
+
+}
+
+.viewTaskAssignedDates {
+
+    flex-basis: 200px;
+
+}
+
+.viewTaskPriority {
+
+    flex-basis: 240px;
+
+}
+
+.viewTaskAssignedDates p, .viewTaskDueDates p,  .viewTaskPriority p{
+
+    margin-bottom: 5px;
+
+    color: #00728e;
+
+    font-weight: 600;
+
+}
+
+.singleTaskBox:hover {
+
+    box-shadow: 1px 1px 5px #dcdada;
+
+}
+
+.viewTaskPriority span {
+
+    background-color: #6cff8b;
+
+    display: block;
+
+    width: 60%;
+
+    border-top-right-radius: 10px;
+
+    border-bottom-right-radius: 10px;
+
+    padding: 1px 6px;
+
+}
+
+span.criticalPriorityColor {
+
+    background-color: #ff0000;
+
+    color: white;
+
+}
+
+span.highPriorityColor {
+
+    background-color: #FF4500;
+
+    color: white;
+
+}
+
+span.mediumPriorityColor {
+
+    background-color: #0000ff;
+
+    color: white;
+
+}
+
+span.lowPriorityColor {
+
+    background-color: #989898;
+
+    color: white;
+
+}
+
+.select2-container--default .select2-selection--multiple {
+
+    min-height: auto !important;
+
+}
+
+.vt-selected-left p, .vt-selected-right p {
+
+    font-weight: 600;
+
+}
+
+h4.viewTaskTitleModal {
+
+    color: #00728e;
+
+}
+
+.vt-selected-left span {
+
+    padding: 2px 3px;
+
+    border-radius: 4px;
+
+}
+
+.vt-selected-left-employees {
+
+    border: 1px solid #cccaca;
+
+    padding: 1px;
+
+    border-radius: 4px;
+
+    min-height: 30px;
+
+}
+
+.vt-selected-right span {
+
+    padding: 1px 3px;
+
+    border-radius: 4px;
+
+    border: 1px solid #cccaca;
+
+    display: block;
+
+    min-height: 30px;
+
+}
+
+.assignedTarea {
+
+    width: 100%;
+
+}
+
+/* Date 19 August, 2019 starts here */
+
+.viewTaskContent {
+
+    position: relative;
+
+}
+
+span.select2.select2-container.select2-container--default {
+
+    width: 100% !important;
+
+}
+
+.task-columns2 {
+
+    padding: 0 0 0 0;
+
+}
+
+.post .user-block {
+
+    margin-bottom: 5px;
+
+}
+
+/* 20 August, 2019 starts here */
+
+.singeeTaskModalContent h4 {
+
+    display: inline-block;
+
+}
+
+
+
+/* 23 August,2019 Starts here */
+
+.travelTypeBox {
+
+    text-align: center;
+
+}
+
+.travel-minus {
+
+    background-color: #ff0000;
+
+    padding: 8px 10px;
+
+    border-radius: 5px;
+
+    color: white;
+
+    position: relative;
+
+    top: 23px;
+
+}
+
+.travel-input-box-client {
+
+    padding: 3px 0px 10px 12px;
+
+}
+
+/* .national_travel_section, .local_travel_section {
+
+    border: 1px solid lightgrey;
+
+    padding: 10px;
+
+} */
+
+.other_purpose_description {
+
+    font-size: 12px;
+
+}
+
+.travel_customerss {
+
+    padding-left: 15px;
+
+}
+
+.travel-label-box {
+
+    text-align: right;
+
+    padding-right: 0px;
+
+    padding-top: 5px;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 1220px) {
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 20%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 80%;
+
+}
+
+.holiday-descr-input {
+
+    padding-left: 5.8%;
+
+} 
+
+}
+
+
+
+@media screen and (max-width: 1201px) {
+
+/*.mstr-hldy1 {
+
+    position: absolute;
+
+}  */ 
+
+}
+
+
+
+@media screen and (max-width: 1140px) {
+
+.mastertbl-editdepart-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-editdepartment-input {
+
+    width: 70%;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 18%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 82%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 24%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 76%;
+
+} 
+
+}
+
+
+
+
+
+@media screen and (max-width: 1100px) {
+
+.mastertbl-country-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 70%;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 18%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 82%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 21%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 79%;
+
+}
+
+.holiday-descr-input {
+
+    padding-left: 6%;
+
+} 
+
+}
+
+
+
+@media screen and (max-width: 1039px) and (min-width: 991px){
+
+.row.leave-type2 {
+
+    margin-left: 15%;
+
+    margin-right: 15%;
+
+}
+
+}
+
+
+
+@media screen and (max-width: 991px) {
+
+.row.leave-type2 {
+
+    margin-left: 7%;
+
+    margin-right: 7%;
+
+}
+
+.breadcrumb-leave-change {
+
+    position: absolute !important;
+
+    top: 4%!important;
+
+    right: 2% !important;
+
+    background: none !important;
+
+}
+
+.leaves1 {
+
+    padding-right: 5px;
+
+}
+
+.leaves2 {
+
+    padding-right: 10px;
+
+    padding-left: 5px;
+
+}
+
+.leaves3 {
+
+    padding-left: 0px;
+
+}
+
+.leaves4 {
+
+    padding-right: 5px;
+
+}
+
+.leaves5 {
+
+    padding-left: 5px;
+
+}
+
+.mastertbl-perk-lbl {
+
+    width: 15%;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 85%;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 20%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 80%;
+
+}
+
+.mastertbl-country-lbl {
+
+    width: 22%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 78%;
+
+}
+
+.mastertbl-editdepart-lbl {
+
+    width: 25%;
+
+}
+
+.mastertbl-editdepartment-input {
+
+    width: 75%;
+
+}  
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 25%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 75%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 30%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 70%;
+
+}
+
+.holiday-descr-input {
+
+    padding-left: 18.5%;
+
+} 
+
+}
+
+
+
+@media screen and (max-width: 920px) {
+
+.holiday-descr-input {
+
+    padding-left: 19%;
+
+}     
+
+} 
+
+
+
+@media screen and (max-width: 870px) {
+
+.mastertbl-department-lbl {
+
+    width: 22%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 78%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 30%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 70%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 36%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 64%;
+
+}  
+
+}
+
+
+
+
+
+
+
+@media screen and (max-width: 860px) {
+
+.mastertbl-department-lbl {
+
+    width: 25%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 75%;
+
+}
+
+}
+
+
+
+@media screen and (max-width: 830px) {
+
+.row.leave-type2 {
+
+    margin-left: 6%;
+
+    margin-right: 6%;
+
+}
+
+.leaves1 {
+
+    padding-right: 5px;
+
+}
+
+.leaves2 {
+
+    padding-right: 10px;
+
+    padding-left: 5px;
+
+}
+
+.leaves3 {
+
+    padding-left: 0px;
+
+}
+
+.leaves4 {
+
+    padding-right: 5px;
+
+}
+
+.leaves5 {
+
+    padding-left: 5px;
+
+}
+
+.mastertbl-perk-lbl {
+
+    width: 17%;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 83%;
+
+}
+
+.holiday-descr-input {
+
+    padding-left: 19.5%;
+
+}
+
+}
+
+
+
+@media screen and (min-width: 768px) {
+
+.follow-modal-dialog
+
+{
+
+    width: 65%;
+
+}
+
+}
+
+
+
+@media screen and (max-width: 991px) and (min-width: 768px) {
+
+.col-md-6.basic-detail-left {
+
+    padding-right: 15px;
+
+}
+
+.col-md-6.basic-detail-right {
+
+    padding-left: 15px;
+
+}
+
+.basic-input-left
+
+{
+
+    padding-left: 15px;
+
+}
+
+.basic-input-right
+
+{
+
+    padding-left: 15px;
+
+}
+
+.col-md-1.salu-change {
+
+    padding: 1px 15px 10px 15px;
+
+}
+
+.names123 {
+
+    padding: 0px 0px 0px 10px;
+
+}
+
+span.col-md-4.control-label.radio.basic-detail-label {
+
+    padding: 0px 4px 0px 15px;
+
+    text-align: left;
+
+}
+
+.col-md-8.basic-detail-radio-style {
+
+    padding-left: 21px;
+
+}
+
+
+
+
+
+}
+
+
+
+@media screen and (max-width: 767px) {
+
+.row.apply-leave-addrow-left {
+
+    padding-right: 0px;
+
+}
+
+.row.apply-leave-addrow-right {
+
+    padding-left: 0px;
+
+}
+
+.row.leave-type2 {
+
+    margin-left: -2%;
+
+    margin-right: -2%;
+
+}
+
+.row.leave-type1 {
+
+    margin-left: -2%;
+
+    margin-right: -2%;
+
+}
+
+.col-sm-12.apply-leave-form {
+
+    padding-left: 16px;
+
+    padding-right: 16px;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 22%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 78%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 25%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 75%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 30%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 70%;
+
+}
+
+.holiday-descr-input {
+
+    padding-left: 15px;
+
+}  
+
+}
+
+
+
+@media screen and (max-width: 630px) {
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 33%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 67%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 33%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 67%;
+
+} 
+
+}
+
+
+
+
+
+@media screen and (max-width: 590px) {
+
+.mastertbl-department-lbl {
+
+    width: 25%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 75%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 35%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 65%;
+
+}    
+
+}
+
+
+
+@media screen and (max-width: 540px) {
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 40%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 60%;
+
+}
+
+}
+
+
+
+@media screen and (max-width: 527px) {
+
+.mastertbl-perk-lbl {
+
+    width: 20%;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 80%;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 70%;
+
+}
+
+}
+
+
+
+@media screen and (max-width: 503px) {
+
+.leaves1 {
+
+    width: 50%;
+
+    padding-left: 10px;
+
+    padding-right: 5px;
+
+}
+
+.leaves2 {
+
+    width: 50%;
+
+    padding-left: 5px;
+
+    padding-right: 10px;
+
+}
+
+.leaves3 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.leaves4 {
+
+    width: 50%;
+
+    padding-left: 10px;
+
+    padding-right: 5px;
+
+}
+
+.leaves5 {
+
+    width: 50%;
+
+    padding-left: 5px;
+
+    padding-right: 10px;
+
+}
+
+.mastertbl-country-lbl {
+
+    width: 33%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 67%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 35%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 65%;
+
+}
+
+
+
+}
+
+
+
+@media screen and (max-width: 480px) {
+
+.mastertbl-country-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 70%;
+
+}
+
+.mastertbl-editdepart-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-editdepartment-input {
+
+    width: 70%;
+
+}  
+
+.mastertbl-department-lbl {
+
+    width: 30%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 70%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 37%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 63%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 44%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 56%;
+
+}
+
+
+
+} 
+
+@media screen and (max-width: 450px) {
+
+.mastertbl-department-lbl {
+
+    width: 35%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 65%;
+
+}
+
+.mastertbl-perk-lbl {
+
+    width: 23%;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 77%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 42%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 58%;
+
+}
+
+.mastertbl-financial-lbl
+
+{
+
+    width: 100%;
+
+}
+
+.mastertbl-financial-input
+
+{
+
+    width: 100%;
+
+}
+
+.add-financial-form
+
+{
+
+    display: block;
+
+}  
+
+}
+
+
+
+
+
+@media screen and (max-width: 405px) {
+
+.leaves1 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.leaves2 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.leaves3 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.leaves4 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.leaves5 {
+
+    width: 100%;
+
+    padding-left: 10px;
+
+    padding-right: 10px;
+
+}
+
+.mastertbl-perk-lbl {
+
+    width: 100%;
+
+    margin-right: 0px;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 100%;
+
+}
+
+.add-perk-form
+
+{
+
+    display: block;
+
+}
+
+.add-city-form
+
+{
+
+    display: block;
+
+}
+
+.mastertbl-department-lbl {
+
+    width: 100%;
+
+}
+
+.mastertbl-department-input {
+
+    width: 100%;
+
+}
+
+.mastertbl-editdepart-lbl {
+
+    width: 100%;
+
+}
+
+.mastertbl-editdepartment-input {
+
+    width: 100%;
+
+}
+
+.mastertbl-documenttype-lbl
+
+{
+
+    width: 100%;
+
+}
+
+.mastertbl-documenttype-input
+
+{
+
+    width: 100%;
+
+} 
+
+.add-editdepartment-form
+
+{
+
+    display: block;
+
+} 
+
+.add-department-form
+
+{
+
+    display: block;
+
+}
+
+.mastertbl-country-lbl {
+
+    width: 100%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 100%;
+
+}
+
+.add-country-form
+
+{
+
+    display: block;
+
+} 
+
+}
+
+
+
+@media screen and (max-width: 380px) {
+
+
+
+}
+
+
+
+
+
+@media screen and (max-width: 360px) {
+
+
+
+}
+
+@media screen and (max-width: 320px) {
+
+.mastertbl-perk-lbl {
+
+    width: 100%;
+
+    margin-right: 0px;
+
+}
+
+.mastertbl-perk-input {
+
+    width: 100%;
+
+}
+
+.mastertbl-country-lbl {
+
+    width: 100%;
+
+}
+
+.mastertbl-country-input {
+
+    width: 100%;
+
+}    
+
+.add-country-form {
+
+    display: block;
+
+}
+
+
+
+}

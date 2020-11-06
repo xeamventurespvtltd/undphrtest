@@ -1,0 +1,293 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Be Vietnam', sans-serif;
+}
+.wrapper {
+    width: 100%;
+    background-color: #f9f9f9;
+    margin: 0px auto;    
+    padding: 30px 10px;
+}
+h1, h2 {
+    text-align: center;
+}
+h2.sub-heading {
+    font-weight: 100;
+    font-size: 18px;
+    text-align: left;
+    margin-left: 10px;
+    text-decoration: underline;
+}
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+.flex-item {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgba(206, 206, 206, 0.8);
+    font-size: 16px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+h3.main-flex-heading {
+    font-size: 16px;
+    padding: 13px 10px;
+    background-color: #4c6586;
+    color: white;
+    font-weight: 100;
+    margin: 0;
+}
+.flex-item span {
+    font-size: 14px;
+}
+.flex-item input {
+    margin: 3px 5px;
+    padding: 4px;
+    width: 110px;
+    height: 25px;
+    border-radius: 4px;
+    border: 1px solid #d0cbcb;
+}
+.table {
+    display: table;
+}
+.table-row {
+    display: table-row;
+}
+.table-cell {
+    display: table-cell;
+    padding: 10px;
+    border: 1px solid black;
+}
+.strip-bg {
+    background-color: #f3f3f3;
+}
+.cell-padding {
+    padding: 5px 10px;
+}
+.formula-text {
+    font-size: 12px !important;
+    padding: 7px 10px;
+}
+.input-strip {
+    background-color: #f3f3f3;
+}
+.input-heading {
+    font-size: 15px;
+    padding: 5px !important;
+    margin: 6px 5px !important;
+    font-weight: 100;    
+    height: 31px !important;
+}
+.input-heading-box {
+    background-color: #4c6586;
+}
+.r-inputs {
+    background-color: #bdcbdc;
+}
+table {
+    border: 1px solid #ddd;
+    border-spacing: 1px;
+}
+tr th {
+    background-color: #4c6586;
+    color: white;
+    font-weight: 100;
+    padding: 10px;
+}
+th, td {
+    text-align: left;
+}
+tr:nth-child(odd) {
+  background-color: #f3f3f3;
+}
+.add-remove-box {
+    margin: 10px 0px;
+    display: flex;
+    justify-content: center;
+}
+.action-btn {
+    padding: 10px;
+    margin: 0 0px 0 10px;
+}
+.td-inputs, .td-inputsss {
+    margin: 3px 5px;
+    padding: 4px;
+    height: 25px;
+    border-radius: 4px;
+    border: 1px solid #d0cbcb;
+}
+.td-inputs {
+    min-width: 175px;
+}
+.td-inputsss {
+    width: 110px;
+}
+.text-center {
+    text-align: center;
+}
+.table-text {
+    font-size: 14px;
+    padding: 5px 10px;
+}
+.cf-long-text {
+    display: block;
+}
+.cf-comments {
+    resize: none;
+    padding: 5px;
+    margin: 0 5px;
+}
+.choose-file-style {
+    width: 190px;
+    padding: 0 5px;
+}
+.expense-type-style {
+    padding: 4px 0;
+    width: 100px;
+    font-size: 12px;
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
+/***************************Swal button**************************************************/
+.swal-button.swal-button--confirm.btn-success:hover {
+    background-color: #449d44;
+    border-color: #398439;
+}
+.swal-button:focus {
+    outline: none !important;
+}
+.error {
+    color: #f00;
+}
+
+
+/* Absolute Center Spinner */
+.loading {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* Transparent Overlay */
+.loading:before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+    background: radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0, .8));
+
+  background: -webkit-radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0,.8));
+}
+
+/* :not(:required) hides these rules from IE9 and below */
+.loading:not(:required) {
+  /* hide "loading..." text */
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+.loading:not(:required):after {
+  content: '';
+  display: block;
+  font-size: 10px;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  -webkit-animation: spinner 150ms infinite linear;
+  -moz-animation: spinner 150ms infinite linear;
+  -ms-animation: spinner 150ms infinite linear;
+  -o-animation: spinner 150ms infinite linear;
+  animation: spinner 150ms infinite linear;
+  border-radius: 0.5em;
+  -webkit-box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1.1em 0 0, rgba(255,255,255, 0.75) 0 1.5em 0 0, rgba(255,255,255, 0.75) -1.1em 1.1em 0 0, rgba(255,255,255, 0.75) -1.5em 0 0 0, rgba(255,255,255, 0.75) -1.1em -1.1em 0 0, rgba(255,255,255, 0.75) 0 -1.5em 0 0, rgba(255,255,255, 0.75) 1.1em -1.1em 0 0;
+box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1.1em 0 0, rgba(255,255,255, 0.75) 0 1.5em 0 0, rgba(255,255,255, 0.75) -1.1em 1.1em 0 0, rgba(255,255,255, 0.75) -1.5em 0 0 0, rgba(255,255,255, 0.75) -1.1em -1.1em 0 0, rgba(255,255,255, 0.75) 0 -1.5em 0 0, rgba(255,255,255, 0.75) 1.1em -1.1em 0 0;
+}
+
+/* Animation */
+
+@-webkit-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+/***************************Swal button**************************************************/

@@ -1,0 +1,27 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.main-content {
+    border-radius: 0.5rem;
+}
+
+.upper-content {
+    padding: 2rem 0;
+}
+
+.upper-content h1 {
+    font-size: 2rem;
+}
+
+.upper-content h2 {
+    font-size: 1rem;
+}
+
+.body-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: underline;
+}

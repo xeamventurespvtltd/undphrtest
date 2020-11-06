@@ -1,0 +1,1284 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use DB;
+use App\Holiday;
+use App\LeaveType;
+use App\CompensatoryLeave;
+use App\Department;
+use App\Project;
+use App\Country;
+use App\State;
+use App\User;
+use App\Employee;
+use App\LeaveDetail;
+use App\EmployeeProfile;
+use App\AppliedLeave;
+use App\AppliedLeaveApproval;
+use Carbon\Carbon;
+use Auth;
+use View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\GeneralMail;
+use App\AppliedLeaveDocument;
+use App\Attendance;
+
+ini_set('max_execution_time', 180); //3 minutes
+
+class LeaveController extends Controller
+{
+    /*
+        Get current year's holidays list
+    */
+    function listHolidays()
+    {
+    	$year = date("Y");
+    	$holidays = Holiday::where(['isactive'=>1])
+    						->whereYear('holiday_from',$year)
+    						->orderBy('holiday_from')
+    						->get();
+
+    	return view('leaves.list_holidays')->with(['holidays'=>$holidays]);
+    }//end of function
+
+    /*
+        Get data to be shown on apply leave form
+    */
+    function applyLeave()
+    {
+        $user = Auth::user();
+
+        $user_filled = Employee::where(['user_id'=>$user->id])->first();
+
+        $profile_filled =  $user_filled->is_complete;
+
+        if($profile_filled==0 AND $user->id!=1){
+
+            return redirect('profile-detail-form');
+        }
+    	$user = User::where(['id'=>Auth::id()])->first();
+    	$data['gender'] = $user->employee->gender;
+
+        if($data['gender'] == 'Male'){
+
+            $data['leave_types'] = LeaveType::where(['isactive'=>1])->where('id','!=',4)->get();
+        }elseif($data['gender'] == 'Female'){
+            $data['leave_types'] = LeaveType::where(['isactive'=>1])->where('id','!=',7)->get();
+        }else{
+            $data['leave_types'] = LeaveType::where(['isactive'=>1])->get();
+        }
+
+    	$data['departments'] = Department::where(['isactive'=>1])->get();
+    	$data['countries'] = Country::where(['isactive'=>1])->get();
+    	$data['states'] = State::where(['isactive'=>1])->get();
+        $data['user'] = $user;
+    	$data['probation_data'] = probationCalculations($user);
+		 /*echo"<PRE>";
+		print_r($data['probation_data']);
+		exit;*/
+    	$data['unpaid_leave'] = LeaveType::where(['name'=>'Unpaid Leave'])->first();
+
+		$data['leave_detail'] = LeaveDetail::where(['user_id'=>Auth::id()])->orderBy('id','DESC')->first();
+
+       /* if(empty($data['probation_data'])){
+            return redirect()->back()->with('error','Your profile is incomplete. Please contact the HR officer.');
+        }*/
+
+        $designation_login_data = DB::table('designation_user as du')
+
+                            ->where('du.user_id','=', Auth::id())
+
+                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+
+        $data['user_designation'] = $designation_login_data->designation_id;
+
+        $current_date = date('Y-m-d');
+        $curr_year =  date('Y');
+        $curr_month = date('m');
+
+        if($curr_month==1){
+            $start_year= $curr_year-1;
+            $startmonth = 12;
+        }else{
+            $start_year= $curr_year;
+            $startmonth = $curr_month-1;
+        }
+
+        $from_date = $start_year.'-'.$startmonth.'-'.'26';
+        $to_date = $curr_year.'-'.$curr_month.'-'.'25';
+
+       $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
+
+    	return view('leaves.apply_leave_form')->with(['data'=>$data]);
+
+    }//end of function
+
+    /*
+        Ajax request to get the leave replacements available between given dates
+    */
+    function leaveReplacementAvailability(Request $request)
+    {
+        $user = Auth::user();
+
+        $from_date = date("Y-m-d",strtotime($request->from_date));
+        $to_date = date("Y-m-d",strtotime($request->to_date));
+
+        $profile_pic_path = config('constants.uploadPaths.profilePic');
+        $static_pic_path = config('constants.static.profilePic');
+
+        $employees = EmployeeProfile::where(['department_id'=>$request->department,'isactive'=>1])
+            ->where('user_id','!=',$user->id)
+            ->whereHas('user.employee',function(Builder $query){
+                $query->where('isactive',1);
+            })
+            ->where('user_id','!=',1)
+            ->pluck('user_id')->toArray();
+
+        $took_leaves = AppliedLeave::where('isactive',1)
+                                ->where('from_date','>=',$from_date)
+                                ->where('to_date','<=',$to_date)
+                                ->whereIn('user_id',$employees)
+                                ->whereHas('appliedLeaveApprovals',function(Builder $query){
+                                    $query->where('leave_status','!=','2');
+                                })
+                                ->pluck('user_id')->toArray();
+
+        $exclusions = DB::table('employees as emp')
+                    ->join('users as u','u.id','=','emp.user_id')
+                    ->whereIn('emp.user_id',$employees)
+                    ->whereNotIn('emp.user_id',$took_leaves)
+                    ->select("emp.user_id","u.employee_code","emp.fullname",DB::raw("CASE WHEN emp.profile_picture = '' OR emp.profile_picture IS NULL THEN '".$static_pic_path."' ELSE CONCAT('".$profile_pic_path."',emp.profile_picture) END AS profile_picture"))
+                    ->get();
+
+        return $exclusions;
+
+    }//end of function
+
+    /*
+        Ajax request to get the official holidays between given dates to be used on apply
+        leave page
+    */
+    function betweenLeaveHolidays(Request $request)
+    {
+        $result = [];
+
+        if(!empty($request->all_dates_array)){
+            foreach ($request->all_dates_array as $key => $value) {
+                $date = date("l",strtotime($value));
+
+                if($date != 'Sunday'){
+                    $holiday = Holiday::where(['isactive'=>1])
+                                    ->where('holiday_from','<=',$value)
+                                    ->where('holiday_to','>=',$value)
+                                    ->first();
+
+                    if(!empty($holiday)){
+                        $result[] = $value;
+                    }
+                }
+
+            }
+        }
+
+        return $result;
+
+    }//end of function
+
+
+    function calculateMonthLeave($from,$to)
+    {
+
+       // dump($from);
+       // dump($to);
+
+        $user = Auth::user();
+        $userid = $user->id;
+
+        //$from_day = date("Y-m-d",strtotime($request->fromDate));
+        $current_date = date('Y-m-d');
+        $curr_year =  date('Y');
+        $curr_month = date('m');
+
+        if($curr_month==1){
+            $start_year= $curr_year-1;
+            $startmonth = 12;
+        }else{
+            $start_year= $curr_year;
+            $startmonth = $curr_month-1;
+        }
+
+        $date1 = $start_year.'-'.$startmonth.'-'.'26';
+        $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+
+        if(strtotime($from)>=strtotime($date1) AND strtotime($to)<=strtotime($date2)){
+
+             $date1 = $start_year.'-'.$startmonth.'-'.'26';
+             $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+
+
+        }elseif(strtotime($from)>=strtotime($date2) OR strtotime($to)>=strtotime($date2)){
+
+
+            if($curr_month==12){
+                $next_year= $curr_year+1;
+                $next_month = 1;
+            }else{
+                $next_year= $curr_year;
+                $next_month = $curr_month+1;
+            }
+
+            $next_month = $curr_month+1;
+             $date1 = $curr_year.'-'.$curr_month.'-'.'26';
+              $date2 = $next_year.'-'.$next_month.'-'.'25';
+
+        }elseif(strtotime($to)<=strtotime($date1) AND strtotime($from)<=strtotime($date1)){
+
+
+            if($curr_month==1){
+                $start_year= $curr_year-1;
+                $startmonth = 11;
+            }else{
+                $start_year= $curr_year;
+                $startmonth = $curr_month-2;
+            }
+
+            $date1 = $start_year.'-'.$startmonth.'-'.'26';
+            $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+
+
+        }
+
+        $current_month_leave = DB::table('applied_leave_segregations as als')
+                        ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+                        ->where(['al.final_status'=>'1','al.user_id'=>$userid])
+                        ->where('leave_type_id','!=',5)
+                        ->where(function($query)use($date1, $date2){
+                            $query->where('als.from_date','>=',$date1)
+                                ->where('als.to_date','<=',$date2);
+                        })
+                        ->sum('als.number_of_days');
+        //dump($current_month_leave);
+        return $current_month_leave;
+
+    }
+
+
+    /*
+        Store leave application's data in the database & send notification to the replacement
+        & first leave officer
+    */
+    function createLeaveApplication(Request $request)
+    {
+
+        // Validate
+
+    	$request->validate([
+            'toDate' => "required_if:secondaryLeaveType,==,Full",
+            'fromDate' => 'required',
+            'reasonLeave' => 'required',
+            'secondaryLeaveType' => 'required'
+        ]);
+
+        //////////////////////////Checks///////////////////////////
+        $current_date = date('Y-m-d');
+        $restriction_date = config('constants.restriction.applyLeave');
+        $current_month_start_date = date("Y-m-01");
+
+
+
+        if($request->noDays == 0){
+            $days_error = "The number of days should not be zero.";
+            return redirect('leaves/apply-leave')->with('leaveError',$days_error);
+        }
+
+
+		$user = Auth::user();
+		$userid = $user->id;
+
+		$user = User::where(['id'=>$userid])
+                ->with('employee')
+                ->with('userManager')
+                ->first();
+
+		$arr_underlaying_emp = array();
+
+        // Chk User in designation_user Table Logged User Id Exists..
+
+		$designation_login_data = DB::table('designation_user as du')
+							->where('du.user_id','=',$userid)
+							->select('du.id', 'du.user_id','du.designation_id')->first();
+		$designation_login_user = $designation_login_data->designation_id;
+
+		// Check for PO reporting manager exist
+
+		if($designation_login_user==3 ){
+
+			$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+
+			$login_user_state_id = $state_login_user->state_id;
+
+            $employees_under_states = EmployeeProfile::where(['state_id' => $login_user_state_id])
+                                    ->get();
+
+			foreach($employees_under_states as $employees_state){
+
+                $employeeId_under_state = $employees_state->user_id;
+
+                $empDesg_under_state = DB::table('designation_user as du')
+							->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+							->select('du.id', 'du.user_id','du.designation_id')->first();
+
+				if($empDesg_under_state!=""){
+					$arr_underlaying_emp[] = $empDesg_under_state;
+				}
+			}
+		}
+
+		//Check for PO-IT reporting manager exist
+
+		if($designation_login_user==5 ){
+
+			$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+
+			$login_user_state_id = $state_login_user->state_id;
+
+            $employees_under_states = EmployeeProfile::where(['state_id' => $login_user_state_id])->get();
+
+			foreach($employees_under_states as $employees_state){
+
+                $employeeId_under_state = $employees_state->user_id;
+
+                $empDesg_under_state = DB::table('designation_user as du')
+                                ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+						        ->select('du.id', 'du.user_id','du.designation_id')->first();
+
+				if($empDesg_under_state!=""){
+					$arr_underlaying_emp[] = $empDesg_under_state;
+				}
+			}
+		}
+
+		//Check Vccm Reporting Manager Exists..
+
+		if($designation_login_user==4){
+
+            // Chk Location id in location_user table by designation_user table user_id match
+
+			$district_login_user = DB::table('location_user as lu')
+						->where('lu.user_id','=',$designation_login_data->user_id)
+						->select('lu.id', 'lu.user_id','lu.location_id')->first();
+
+            $login_user_district_id = $district_login_user->location_id;
+
+            // Check How Many Users In That Location  $login_user_district_id
+
+			$employeesDistrict = DB::table('location_user as lu')
+							->where(['lu.location_id'=>$login_user_district_id])
+							->select('lu.id', 'lu.user_id','lu.location_id')->get();
+            //dd($employeesDistrict);
+
+			if($employeesDistrict)
+			{
+                // Chk Reporting manager Where designton_id 3,5(PO)
+
+				foreach($employeesDistrict as $empDistrict){
+
+					$user_id = $empDistrict->user_id;
+					$empDesg_under_district = DB::table('designation_user as du')
+											->where(['du.user_id'=>$user_id])
+											->where(function($query){
+												$query->where('du.designation_id','=',5)
+												->orWhere('du.designation_id','=', 3);
+											})
+											->select('du.id', 'du.user_id','du.designation_id')->first();
+
+					if($empDesg_under_district!="")
+					{
+						$arr_underlaying_emp[] = $empDesg_under_district;
+					}
+				}
+			}
+		}
+
+       // dd("+++++++++++");
+		//check for spo reporting manager exist
+		if($designation_login_user==2){
+
+
+				$empDesg_NPA = DB::table('designation_user as du')
+
+							->where('du.designation_id','=',1)
+
+							->select('du.id', 'du.user_id','du.designation_id')->first();
+
+							if($empDesg_NPA!=""){
+								$arr_underlaying_emp[] = $empDesg_NPA;
+							}
+
+
+		}
+
+		if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
+
+		}else{
+			$manager_error = "You do not have reporting manger under Your area.";
+            return redirect('leaves/apply-leave')->with('leaveError',$manager_error);
+		}
+
+        // Chk Previous Leave Pending Or Approved..
+
+        $pending_leave = AppliedLeaveApproval::where(['user_id'=>$userid,'leave_status'=>'0'])
+                                          ->whereHas('appliedLeave',function(Builder $query){
+                                            $query->where('isactive',1);
+                                          })
+                                          ->first();
+
+        if(!empty($pending_leave)){
+            $pending_error = "The approval status of your previously applied leave is pending with one or more authorities. Please contact the concerned person and clear it first.";
+
+            return redirect('leaves/apply-leave')->with('leaveError',$pending_error);
+        }
+
+        $last_applied_leave = $user->appliedLeaves()
+                                    ->where(['isactive'=>1])
+                                    ->orderBy('id','DESC')
+                                    ->first();
+
+        if(!empty($last_applied_leave)){
+            $created_at = new Carbon($last_applied_leave->created_at);
+            $now = Carbon::now();
+            $apply_difference = $created_at->diffInHours($now,false);
+
+            if($apply_difference < 2){
+                $leave_time_difference = true;
+            }else{
+                $leave_time_difference = false;
+            }
+
+           /* if($leave_time_difference){
+                $wait_error = "You have to wait for some time before you can apply for leave again.";
+                //return redirect('leaves/apply-leave')->with('leaveError',$wait_error);
+            }*/
+        }
+
+        $from_date = date("Y-m-d",strtotime($request->fromDate));
+
+        if($request->secondaryLeaveType != "Full"){
+            $to_date = $from_date;
+        }else{
+            $to_date = date("Y-m-d",strtotime($request->toDate));
+        }
+
+
+        $check_dates =  [
+                            'from_date' => $from_date,
+                            'to_date' => $to_date,
+                            'isactive' => 1
+                        ];
+
+
+       /*  if($request->secondaryLeaveType == "Short"){
+            $check_dates['from_time'] = $request->fromTime;
+            $check_dates['to_time'] = $request->toTime;
+
+        }elseif($request->secondaryLeaveType == "Half"){
+            $check_dates['leave_half'] = $request->selectHalf;
+
+        }    */
+
+        $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
+        //dd($already_applied_leave->id);
+
+        if(!empty($already_applied_leave)){
+            $unique_error = "You have already applied for leave on the given dates.";
+            return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
+        }
+
+
+
+        if(!empty($last_applied_leave)){
+
+            $chk_existing_date = DB::table('applied_leaves')
+                    ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
+                    ->first();
+            //dd($chk_existing_date);
+            if(!empty($chk_existing_date)){
+                $unique_error = "You have already applied for leave on given dt.";
+                return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
+
+            }
+        }
+
+
+        if($request->leaveTypeId == '4'){  //check for maternity leave
+            if($request->noDays > 90){
+                $maternity_error = "You cannot take maternity leave for more than 90 days.";
+
+            }else{
+                $already_applied_leave = $user->appliedLeaves()
+                                              ->where(['final_status'=>'1','leave_type_id'=>4,'isactive'=>1])
+                                              ->whereYear('updated_at',date("Y"))
+                                              ->first();
+
+                if(!empty($already_applied_leave)){
+                    $maternity_error = "You have already applied for a maternity leave this year.";
+
+                }else{
+                    $maternity_error = "";
+                }
+            }
+
+            if(!empty($maternity_error)){
+                return redirect('leaves/apply-leave')->with('leaveError',$maternity_error);
+            }
+        }
+
+        // chk for paternity leave not more than 15  days in a month.
+
+        if($request->leaveTypeId == '7'){
+            if($request->noDays > 15){
+                $paternity_error = "You cannot take Paternity leave for more than 15 days.";
+
+            }else{
+                $already_applied_leave = $user->appliedLeaves()
+                                              ->where(['final_status'=>'1','leave_type_id'=>7,'isactive'=>1])
+                                              ->whereYear('updated_at',date("Y"))
+                                              ->first();
+
+                if(!empty($already_applied_leave)){
+                    $paternity_error = "You have already applied for a paternity leave this year.";
+
+                }else{
+                    $paternity_error = "";
+                }
+            }
+
+            if(!empty($paternity_error)){
+                return redirect('leaves/apply-leave')->with('leaveError',$paternity_error);
+            }
+        }
+
+        //////////////////////////Segregation///////////////////////////
+
+//        if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
+//            $new_all_dates_array = explode(",",$request->newAllDatesArray);
+//
+//            $month_wise_array = [];
+//            $counter = 0;
+//            $key2 = 0;
+//            $days_counter = 0;
+//            foreach($new_all_dates_array as $key => $value) {
+//
+//                if($counter == 0){
+//                    $month_wise_array[$key2]['from_date'] = $value;
+//                    $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//                    $prev_month_year = date("m-Y",strtotime($value));
+//                    $prev_date = $value;
+//
+//                    if(count($new_all_dates_array) == 1){
+//                        $month_wise_array[$key2]['to_date'] = $value;
+//                    }
+//                }else{
+//                    $month_year = date("m-Y",strtotime($value));
+//
+//                    if($month_year == $prev_month_year){
+//                        $prev_month_year = date("m-Y",strtotime($value));
+//                        $prev_date = $value;
+//                        $month_wise_array[$key2]['to_date'] = $value;
+//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//
+//                    }else{
+//                        $month_wise_array[$key2]['to_date'] = $prev_date;
+//
+//                        $key2++;
+//                        $days_counter = 0;
+//                        $month_wise_array[$key2]['from_date'] = $value;
+//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//                        $prev_month_year = date("m-Y",strtotime($value));
+//                        $prev_date = $value;
+//
+//                        if((count($new_all_dates_array)-1) == $counter){
+//                            $month_wise_array[$key2]['to_date'] = $value;
+//                        }
+//                    }
+//                }
+//                $counter++;
+//
+//            }//end of foreach
+//
+//             $total = 0;
+//            foreach ($month_wise_array as $key => $value) {
+//               $total =   $total + $value['no_days'];
+//
+//            }
+//        }
+
+
+         /////////////////5 days capping for vccm for casual leave/////////////////
+        if($request->leaveTypeId == '1'  AND $designation_login_user==4){
+
+            $current_month_leave = $this->calculateMonthLeave($from_date,$to_date);
+           // dump($current_month_leave);
+             if(!isset($total)){
+                $total=0;
+            }
+
+            if($total + $current_month_leave>5 ){
+
+                //dd("s");
+
+                $more_than_5_error = "You are not allowed to apply for leave more than 5 days in a month. You have already taken" ."$current_month_leave"." leaves.";
+
+                return redirect('leaves/apply-leave')->with('leaveError',$more_than_5_error);
+
+            }
+          }
+
+
+          //dd("+++")
+
+        /////////////////////////Create Leave///////////////////////
+
+        $leave_data = [
+                        'leave_type_id' => $request->leaveTypeId,
+                        'reason' => $request->reasonLeave,
+                        'number_of_days' => $request->noDays,
+                        "secondary_leave_type" => $request->secondaryLeaveType,
+                        'from_date' => $from_date,
+                        'to_date' => $to_date,
+                        'excluded_dates' => $request->excludedDates,
+                        'final_status' => '0'
+                    ];
+
+
+
+        $applied_leave = $user->appliedLeaves()->create($leave_data);
+
+        if(!empty($request->fileNames)){
+            $documents = $request->fileNames;
+
+            foreach($documents as $doc) {
+                $document = round(microtime(true)).str_random(5).'.'.$doc->getClientOriginalExtension();
+                $doc->move(config('constants.uploadPaths.uploadAppliedLeaveDocument'), $document);
+
+                $document_data['name'] = $document;
+                $applied_leave->appliedLeaveDocuments()->create($document_data);
+            }
+        }
+
+
+//           if(isset($month_wise_array) AND ($month_wise_array!="")){   //for multi-month leave calculations in full day leaves
+//
+//            foreach ($month_wise_array as $key => $value) {
+//                $segregation_data = [
+//                                        'from_date' => date("Y-m-d",strtotime($value['from_date'])),
+//                                        'to_date' => date("Y-m-d",strtotime($value['to_date'])),
+//                                        'number_of_days' => $value['no_days'],
+//                                        'paid_count' => '0',
+//                                        'unpaid_count' => '0',
+//                                        'compensatory_count' => '0'
+//                                    ];
+//               $applied_leave->appliedLeaveSegregations()->create($segregation_data);
+//            }
+//        }
+        if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
+            $new_all_dates_array = explode(",",$request->newAllDatesArray);
+
+            $month_wise_array = [];
+            $counter = 0;
+            $key2 = 0;
+            $days_counter = 0;
+//            foreach($new_all_dates_array as $key => $value) {
+//                if($counter == 0){
+//                    $month_wise_array[$key2]['from_date'] = $value;
+//                    $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//                    $prev_month_year = date("m-Y",strtotime($value));
+//                    $prev_date = $value;
+//
+//                    if(count($new_all_dates_array) == 1){
+//                        $month_wise_array[$key2]['to_date'] = $value;
+//                    }
+//                }else{
+//                    $month_year = date("m-Y",strtotime($value));
+//
+//                    if($month_year == $prev_month_year){
+//                        $prev_month_year = date("m-Y",strtotime($value));
+//                        $prev_date = $value;
+//                        $month_wise_array[$key2]['to_date'] = $value;
+//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//                    }else{
+//                        $month_wise_array[$key2]['to_date'] = $prev_date;
+//
+//                        $key2++;
+//                        $days_counter = 0;
+//                        $month_wise_array[$key2]['from_date'] = $value;
+//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
+//                        $prev_month_year = date("m-Y",strtotime($value));
+//                        $prev_date = $value;
+//
+//                        if((count($new_all_dates_array)-1) == $counter){
+//                            $month_wise_array[$key2]['to_date'] = $value;
+//                        }
+//                    }
+//                }
+//                $counter++;
+//
+//            }//end of foreach
+//
+//            return $month_wise_array;
+//            foreach ($month_wise_array as $key => $value) {
+//            return $request->toDate;
+//            return date("d",strtotime($request->toDate));
+//            return date("m",strtotime($request->toDate));
+            if(date("d",strtotime($request->toDate)) > 25 || date("m",strtotime($request->toDate)) > date("m",strtotime($request->fromDate)))
+            {
+                $date = explode('/',$request->fromDate);
+                $year = $date[2];
+                $month = $date[0];
+                $firstEndDate = $year.'-'.$month.'-25';
+                echo $firstSegregation = $request->fromDate.' - '. $firstEndDate;
+                $fromDate = $request->fromDate;
+                $firstEndDate = date("yy-m-d", strtotime($firstEndDate));
+                $date1 = Carbon::createFromDate($fromDate);
+                $date2 = Carbon::createFromDate($firstEndDate);
+
+                $numberOfDays = $date2->diffInWeekdays($date1) + 2;
+
+                $segregation_data = [
+                    'from_date' => date("Y-m-d", strtotime($request->fromDate)),
+                    'to_date' => date("Y-m-d", strtotime($firstEndDate)),
+                    'number_of_days' => $numberOfDays,
+                    'paid_count' => '0',
+                    'unpaid_count' => '0',
+                    'compensatory_count' => '0'
+                ];
+
+                $applied_leave->appliedLeaveSegregations()->create($segregation_data);
+                echo "</br/>";
+                $secondFromDate = $year.'-'.$month.'-26';
+                echo  $secondSegregation = $secondFromDate.' - '. $request->toDate;
+                $date3 = Carbon::createFromDate($secondFromDate);
+                $date4 = Carbon::createFromDate($request->toDate);
+                echo "</br/>";
+
+//                    return $date4->diffInWeekdays($date3);
+                $numberOfDays = $date4->diffInWeekdays($date3) + 2;
+
+                $segregation_data = [
+                    'from_date' => date("Y-m-d", strtotime($secondFromDate)),
+                    'to_date' => date("Y-m-d", strtotime($request->toDate)),
+                    'number_of_days' => $numberOfDays,
+                    'paid_count' => '0',
+                    'unpaid_count' => '0',
+                    'compensatory_count' => '0'
+                ];
+                $applied_leave->appliedLeaveSegregations()->create($segregation_data);
+            }else {
+                $segregation_data = [
+                    'from_date' => date("Y-m-d", strtotime($request->toDate)),
+                    'to_date' => date("Y-m-d", strtotime($request->fromDate)),
+                    'number_of_days' => $request->noDays,
+                    'paid_count' => '0',
+                    'unpaid_count' => '0',
+                    'compensatory_count' => '0'
+                ];
+                $applied_leave->appliedLeaveSegregations()->create($segregation_data);
+            }
+//            }
+        }else{  //For Short and Half Day leave
+
+            $segregation_data =  [
+                'from_date' => date("Y-m-d",strtotime($request->fromDate)),
+                'to_date' => date("Y-m-d",strtotime($to_date)),
+                'number_of_days' => $request->noDays,
+                'paid_count' => '0',
+                'unpaid_count' => '0',
+                'compensatory_count' => '0'
+            ];
+            $applied_leave->appliedLeaveSegregations()->create($segregation_data);
+        }
+
+
+        //////////////////////////Approval///////////////////////////
+
+		$reporting_manager = $arr_underlaying_emp[0]->user_id;
+        $approval_data = [
+                            'user_id' => $userid,
+                            'supervisor_id' => $reporting_manager,
+                            'priority' => '1',
+                            'leave_status' => '0'
+                         ];
+        $applied_leave->appliedLeaveApprovals()->create($approval_data);
+
+        //////////////////////////Notify///////////////////////////
+
+
+		$notification_data = [
+                                 'sender_id' => $userid,
+                                 'receiver_id' => $reporting_manager,
+                                 'label' => 'Leave Application',
+                                 'read_status' => '0'
+                             ];
+
+        $message = $user->employee->fullname." has applied for a leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.';
+
+        $notification_data['message'] = $message;
+        $applied_leave->notifications()->create($notification_data);
+
+        pushNotification($notification_data['receiver_id'], $notification_data['label'], $notification_data['message']);
+
+
+
+        $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
+                                ->with('user')->first();
+        $mail_data['to_email'] = $reporting_manager_data->user->email;
+		//$mail_data['to_email'] = "xeam.richa@gmail.com";
+        $mail_data['subject'] = "Leave Application";
+        $mail_data['message'] = $user->employee->fullname." has applied for a leave. Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
+        $mail_data['fullname'] = $reporting_manager_data->fullname;
+
+        $this->sendGeneralMail($mail_data);
+
+        return redirect('leaves/applied-leaves');
+
+    }//end of function
+
+    /*
+        Save the approval status assigned by leave officer (approved or rejected) & if approved send for approval to next officer until the last one. Then perform leave calculations if everyone has approved
+    */
+    function saveLeaveApproval(Request $request)
+    {
+
+        $request->validate([
+            'remark' => 'required',
+        ]);
+
+
+       // $chk_leave_pool = LeaveDetail::where(['user_id'=>$request->userId])->first();
+        //$chk_applied_leave = AppliedLeave::where(['id'=>$leave_approval->applied_leave_id,'user_id'=>$leave_approval->user_id])->select('number_of_days')->first();
+
+        $leave_approval = AppliedLeaveApproval::find($request->alaId);
+
+        $applied_leave = $leave_approval->appliedLeave;
+
+        /*echo"<pre>";
+		print_r($applied_leave);
+		exit; */
+
+        /////////////////Checks////////////////////////
+        $current_date = date('Y-m-d');
+        $restriction_date = config('constants.restriction.approveLeave');
+        $current_month_start_date = date("Y-m-01");
+
+       /*  if(strtotime($current_date) > strtotime($restriction_date)){
+            if(strtotime($applied_leave->from_date) < strtotime($current_month_start_date)){
+                $restriction_error = "You cannot approve leave for a previous month's date now.";
+                return redirect()->back()->with('error',$restriction_error);
+            }
+        } */
+
+        $approver = User::where(['id'=>Auth::id()])->first();
+
+        $leave_approval->leave_status = $request->leaveStatus;
+        // Comment By Hitesh
+        $leave_approval->save();
+
+        $applier = $leave_approval->user;
+
+        $message_data = [
+                            'sender_id' => $approver->id,
+                            'receiver_id' => $leave_approval->user_id,
+                            'label' => 'Leave Remarks',
+                            'message' => $request->remark,
+                            'read_status' => '0'
+                        ];
+        $applied_leave->messages()->create($message_data);
+		if($leave_approval->leave_status==1){
+			$applied_leave->final_status = '1';
+		}else{
+			$applied_leave->final_status = '0';
+		}
+
+        $applied_leave->save();
+
+        $mail_data['to_email'] = $applier->email;
+        $mail_data['fullname'] = $applier->employee->fullname;
+
+        if($applied_leave->final_status == '1'){
+			$excluded_dates = $applied_leave->excluded_dates;
+			$excluded_date = explode(",",$excluded_dates);
+
+           /* echo "<PRE>";
+			print_r($excluded_date);
+			exit(); */
+
+			$from_date = $applied_leave->from_date;
+			$to_date = $applied_leave->to_date;
+			$user_id = $applied_leave->user_id;
+
+			$i=0;
+			while (strtotime($from_date) <= strtotime($to_date)) {
+
+				if (!in_array($from_date, $excluded_date))
+				  {
+					Attendance::create(['user_id'=>$user_id,'on_date'=>$from_date,'status'=>"Leave"]);
+				  }
+
+				$from_date = date ("Y-m-d", strtotime("+1 days", strtotime($from_date)));
+				$i++;
+			}
+
+            $probation_data = probationCalculations($applier);
+            leaveRelatedCalculations($probation_data,$applied_leave);
+
+            $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been approved.';
+
+            $mail_data['subject'] = "Leave Approved";
+            $mail_data['message'] = $message;
+            $this->sendGeneralMail($mail_data);
+
+            pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
+        }else{
+           /* $update_leave_data = [
+                                    'paid_count' => '0',
+                                    'unpaid_count' => '0',
+                                    'compensatory_count' => '0'
+                                 ];
+
+            $applied_leave->appliedLeaveSegregations()->update($update_leave_data);
+
+            CompensatoryLeave::where(['applied_leave_id'=>$applied_leave->id])
+                                ->update(['applied_leave_id'=>0]); */
+
+             if($leave_approval->leave_status == '2'){
+                $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been rejected.';
+
+                $mail_data['subject'] = "Leave Rejected";
+                $mail_data['message'] = $message;
+                $this->sendGeneralMail($mail_data);
+
+                pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
+            }
+        }
+
+
+        return redirect("leaves/approve-leaves");
+
+    }//end of function
+
+    /*
+        Check whether the leave has been approved by all concerned officers
+    */
+    function checkLeaveApprovalOnAllLevels($applied_leave)
+    {
+        $all_supervisors = $applied_leave->appliedLeaveApprovals()->count();
+        $all_approved_supervisors = $applied_leave->appliedLeaveApprovals()->where(['leave_status'=>'1'])->count();
+
+        if($all_supervisors == $all_approved_supervisors){
+            $applied_leave->final_status = '1';
+            $applied_leave->save();
+        }
+
+        return $applied_leave;
+
+    }//end of function
+
+    /*
+        Get the list of all leave requests a leave officer has to take action on or already has
+    */
+    function approveLeaves($leave_status = null)
+    {
+        $user = User::where(['id'=>Auth::id()])->first();
+
+        if(empty($leave_status) || $leave_status == 'pending'){
+            $status = '0';
+            $leave_status = 'pending';
+        }elseif ($leave_status == 'approved') {
+            $status = '1';
+            $leave_status = 'Approved';
+        }elseif ($leave_status == 'rejected') {
+            $status = '2';
+            $leave_status = 'Rejected';
+        }
+
+        $data = DB::table('applied_leave_approvals as ala')
+                ->join('applied_leaves as al','al.id','=','ala.applied_leave_id')
+                ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
+                ->join('employees as emp','emp.user_id','=','ala.user_id')
+                ->leftjoin('employees as emp2','emp2.user_id','=','lr.user_id')
+                ->join('leave_types as lt','al.leave_type_id','=','lt.id')
+                ->where(['ala.supervisor_id' => $user->id,'ala.leave_status'=>$status,'al.isactive'=>1])
+                ->select('ala.*','emp.fullname as applier_name','al.number_of_days','al.final_status','lt.name as leave_type_name','al.from_date','al.to_date','emp2.fullname as replacement_name','al.created_at')
+                ->orderBy('ala.applied_leave_id','DESC')
+                ->get();
+
+        if(!$data->isEmpty()){
+            foreach ($data as $key => $value) {
+                if($value->final_status == '0'){
+                    $check_rejected = DB::table('applied_leave_approvals as ala')
+                                ->where(['ala.applied_leave_id' => $value->applied_leave_id,'ala.leave_status'=>'2'])
+                                ->first();
+
+                    if(!empty($check_rejected)){
+                        $value->secondary_final_status = 'Rejected';
+                    }else{
+                        $value->secondary_final_status = 'In-Progress';
+                    }
+                }else{
+                    $value->secondary_final_status = 'Approved';
+                }
+            }
+        }
+
+        return view('leaves.list_applied_leave_approvals')->with(['data'=>$data,'selected_status'=>$leave_status]);
+
+    }//end of function
+
+    /*
+        Get the list of all leave requests a user has applied for
+    */
+    function appliedLeaves()
+    {
+        $user = User::where(['id'=>Auth::id()])->first();
+        $data = DB::table('applied_leaves as al')
+                ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
+                ->leftjoin('employees as emp','emp.user_id','=','lr.user_id')
+                ->join('leave_types as lt','al.leave_type_id','=','lt.id')
+                ->where(['al.user_id' => $user->id])
+                ->select('al.id','al.number_of_days','al.isactive','lt.name as leave_type_name','al.from_date','al.to_date','emp.fullname as replacement','al.final_status','al.created_at')
+                ->orderBy('al.id','desc')
+                ->get();
+
+        if(!$data->isEmpty()){
+            foreach ($data as $key => $value) {
+                $priority_wise_status = DB::table('applied_leave_approvals as ala')
+                                  ->where(['ala.applied_leave_id' => $value->id])
+                                  ->select('ala.priority','ala.leave_status')
+                                  ->orderBy('ala.priority')
+                                  ->get();
+
+                $can_cancel_leave = 0;
+                if(count($priority_wise_status) == 1 && $priority_wise_status[0]->leave_status == 0){
+                    $can_cancel_leave = 1;
+                }
+
+                $value->priority_wise_status = $priority_wise_status;
+                $value->can_cancel_leave = $can_cancel_leave;
+
+                if($value->final_status == '0'){
+                    $check_rejected = DB::table('applied_leave_approvals as ala')
+                                ->where(['ala.applied_leave_id' => $value->id,'ala.leave_status'=>'2'])
+                                ->first();
+
+                    if(!empty($check_rejected)){
+                        $value->secondary_final_status = 'Rejected';
+                    }else{
+                        $value->secondary_final_status = 'In-Progress';
+                    }
+                }else{
+                    $value->secondary_final_status = 'Approved';
+                }
+            }
+        }
+
+        return view('leaves.list_applied_leaves')->with(['data'=>$data]);
+
+    }//end of function
+
+    /*
+        Ajax request to get details of a specific leave to show in modal
+    */
+    function appliedLeaveInfo(Request $request)
+    {
+        $data = DB::table('applied_leaves as al')
+                ->where(['al.id' => $request->applied_leave_id])
+                ->select('al.*')
+                ->first();
+
+        $applied_leave = AppliedLeave::find($request->applied_leave_id);
+
+        $documents = $applied_leave->appliedLeaveDocuments()->get();
+
+        $view = View::make('leaves.applied_leave_info',['data'=>$data,'documents'=>$documents]);
+        $contents = $view->render();
+        return $contents;
+
+    }//end of function
+
+    /*
+        Download the document attached with an applied leave
+    */
+    function appliedLeaveDocument($id)
+    {
+        $document = AppliedLeaveDocument::find($id);
+        $path_to_file = config('constants.uploadPaths.uploadAppliedLeaveDocument').$document->name;
+        return response()->download($path_to_file);
+    }//end of function
+
+    /*
+        Ajax request to get details of applied leave approvals to show in modal
+    */
+    function messages(Request $request)
+    {
+        $applied_leave = AppliedLeave::find($request->applied_leave_id);
+        $messages = $applied_leave->messages()
+                                ->where('label','Leave Remarks')
+                                ->orderBy('created_at','DESC')
+                                ->with('sender.employee:id,user_id,fullname')
+                                ->with('receiver.employee:id,user_id,fullname')
+                                ->get();
+
+        $view = View::make('leaves.list_messages',['data' => $messages]);
+        $contents = $view->render();
+
+        return $contents;
+    }//end of function
+
+    /*
+        Cancel a leave request before any leave officer has taken an action
+    */
+    function cancelAppliedLeave($applied_leave_id)
+    {
+        $applied_leave = AppliedLeave::find($applied_leave_id);
+        $user_id = Auth::id();
+        $approval = $applied_leave->appliedLeaveApprovals()
+                                  ->where('leave_status','!=','0')
+                                  ->first();
+
+        if(!empty($approval)){
+            return redirect()->back()->with('cannot_cancel_error','Reporting manager has taken a decision. You cannot cancel the leave now.');
+
+        }elseif(($applied_leave->user_id == $user_id) && empty($approval)){
+            $applied_leave->isactive = 0;
+            $applied_leave->save();
+
+            CompensatoryLeave::where('applied_leave_id',$applied_leave_id)
+                               ->update(['applied_leave_id'=>0]);
+        }
+
+         return redirect()->back()->with('success', "Leave Cancel Successfully.");
+
+        //return redirect('leaves/applied-leaves');
+
+    }//end of function
+
+    /*
+        Send an email with a very basic formatting
+    */
+    function sendGeneralMail($mail_data)
+    {   //mail_data Keys => to_email, subject, fullname, message
+
+        if(!empty($mail_data['to_email'])){
+            Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
+        }
+
+        return true;
+
+    }//end of function
+
+    /*
+        Get information from database to show it on leave report form page
+    */
+    function leaveReportForm()
+    {
+        $data['departments'] = Department::where(['isactive'=>1])->get();
+        $data['projects'] = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();
+
+        return view('leaves.leave_report_form')->with(['data'=>$data]);
+
+    }//end of function
+
+    /*
+        Filter & generate leave report as per selected parameters & show them in a list
+    */
+    function createLeaveReport(Request $request)
+    {
+
+        $report_data =  [
+                            'from_date' => $request->fromDate,
+                            'to_date' => $request->toDate,
+                            'no_days' => $request->noDays,
+                            'weekends' => $request->weekends,
+                            'holidays' => $request->holidays
+                        ];
+
+        if($request->department == '0'){
+            $report_data['department_id'] = "";
+            $report_data['department_sign'] = "!=";
+        }else{
+            $report_data['department_id'] = $request->department;
+            $report_data['department_sign'] = "=";
+        }
+
+        if($request->project == '0'){
+            $report_data['project_id'] = "";
+            $report_data['project_sign'] = "!=";
+        }else{
+            $report_data['project_id'] = $request->project;
+            $report_data['project_sign'] = "=";
+        }
+
+        $from_date = date("Y-m-d",strtotime($report_data['from_date']));
+        $to_date = date("Y-m-d",strtotime($report_data['to_date']));
+
+        $profile_pic_path = config('constants.uploadPaths.profilePic');
+        $static_pic = config('constants.static.profilePic');
+
+        //print_r($report_data);die;
+
+        $data = DB::table('applied_leaves as al')
+                ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
+                ->join('employee_profiles as emp','emp.user_id','=','al.user_id')
+                ->join('users as u','al.user_id','=','u.id')
+                ->join('employees as e','al.user_id','=','e.user_id')
+                ->join('project_user as pu','pu.user_id','=','al.user_id')
+                ->where(['al.final_status'=>'1'])
+                ->where('als.from_date','>=',$from_date)
+                ->where('als.to_date','<=',$to_date)
+                ->where('pu.project_id',$report_data['project_sign'],$report_data['project_id'])
+                //->where('emp.location_id',$report_data['locationSign'],$report_data['locationId'])
+                ->where('emp.department_id',$report_data['department_sign'],$report_data['department_id'])
+                ->select("al.user_id","u.employee_code","e.fullname",DB::raw("SUM(als.paid_count) as paid_count,SUM(als.compensatory_count) as compensatory_count,SUM(als.unpaid_count) as unpaid_count, CASE WHEN e.profile_picture = '' OR e.profile_picture IS NULL THEN '".$static_pic."' ELSE CONCAT('".$profile_pic_path."',e.profile_picture) END AS profile_picture"))
+                ->groupBy("al.user_id")
+                ->orderBy("e.fullname")
+                ->get();
+
+        return view('leaves.list_leave_report')->with(['report_data'=>$report_data,'data'=>$data]);
+
+    }//end of function
+
+    /*
+        Show the details of a specific person when selected from a leave report list
+    */
+    function additionalLeaveReportInfo(Request $request)
+    {
+        $report_data =  [
+                            'from_date' => $request->from_date,
+                            'to_date' => $request->to_date,
+                            'user_id' => $request->id
+                        ];
+
+        $from_date = date("Y-m-d",strtotime($report_data['from_date']));
+        $to_date = date("Y-m-d",strtotime($report_data['to_date']));
+
+        $data = DB::table('applied_leaves as al')
+                ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
+                ->where(['al.final_status'=>'1','al.user_id'=>$report_data['user_id']])
+                ->where('als.from_date','>=',$from_date)
+                ->where('als.to_date','<=',$to_date)
+                ->select("al.*","als.*")
+                ->orderBy("al.created_at","desc")
+                ->get();
+
+        $employee_data = User::where(['id'=>$request->id])
+                            ->with('employee')
+                            ->first();
+
+        return view('leaves.additional_leave_report_info')->with(['report_data'=>$report_data,'data'=>$data,'employee_data'=>$employee_data]);
+
+    }//end of function
+
+}//end of class
