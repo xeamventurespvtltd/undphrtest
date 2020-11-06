@@ -3,6 +3,28 @@
 use App\LeaveDetail;
 use Illuminate\Http\Request;
 
+Route::get('test', function () {
+    for($i = 1; $i < 31; $i++) {
+        \Illuminate\Support\Facades\DB::table('attendances')->insert([
+            'user_id' => '555',
+            'on_date' => '2020-11-' . $i,
+            'status' => 'Present'
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('attendances')->insert([
+            'user_id' => '556',
+            'on_date' => '2020-11-' . $i,
+            'status' => 'Present'
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('attendances')->insert([
+            'user_id' => '557',
+            'on_date' => '2020-11-' . $i,
+            'status' => 'Present'
+        ]);
+    }
+});
+
 Route::get('leave-detail/upload', function () {
     return view('leaves.upload');
 });
@@ -75,10 +97,10 @@ Route::group(['prefix' => 'tasks', 'middleware' => 'App\Http\Middleware\Restrict
     Route::post('save-task-update', 'TaskController@saveTaskUpdate');
 
     Route::group(['middleware'=>['permission:task-report']], function(){
-		Route::get('report','TaskController@reportForm');
-		Route::get('additional-task-report-info','TaskController@additionalTaskReportInfo');
-		Route::post('create-task-report','TaskController@createTaskReport');
-	});
+        Route::get('report','TaskController@reportForm');
+        Route::get('additional-task-report-info','TaskController@additionalTaskReportInfo');
+        Route::post('create-task-report','TaskController@createTaskReport');
+    });
 });
 
 // Route::get('travel-module-output', function () {
@@ -156,16 +178,16 @@ Route::group(['prefix' => 'employees'], function () {
         /////////////////////////////////////////////////////
 
         Route::group(['middleware' => ['permission:replace-authority']], function(){
-			Route::get('replace-authority','UserController@replaceAuthority');
-			Route::post('replace-authority','UserController@saveReplaceAuthority');
-		});
+            Route::get('replace-authority','UserController@replaceAuthority');
+            Route::post('replace-authority','UserController@saveReplaceAuthority');
+        });
 
         Route::get('create-permission', 'UserController@createPermission');
         Route::get('give-permission', 'UserController@givePermission');
         Route::get('revoke-permission', 'UserController@revokePermission');
 
         Route::get('dashboard', 'UserController@dashboard');
-		Route::get('saveuserdata', 'UserController@saveuserdata');
+        Route::get('saveuserdata', 'UserController@saveuserdata');
         Route::get('logout', 'UserController@logout');
         Route::get('list', 'UserController@list');
         Route::get('list-all', 'UserController@list_all');
@@ -187,7 +209,7 @@ Route::group(['prefix' => 'employees'], function () {
         Route::get('change-password', 'UserController@changePassword');
         Route::post('change-password', 'UserController@saveNewPassword');
 
-         Route::get('get_missed_punch_today', 'UserController@getMissedPunchToday');
+        Route::get('get_missed_punch_today', 'UserController@getMissedPunchToday');
         Route::get('get_missed_punch_data', 'UserController@getMissedPunchData');
 
         Route::group(['middleware' => ['permission:create-employee']], function () {
@@ -217,7 +239,7 @@ Route::group(['prefix' => 'employees'], function () {
             Route::get('view-and-print-offer-letter', 'UserController@viewOfferLetter');
             // end of offer letter  //
 
-			Route::post('edit-location', 'UserController@editLocation');
+            Route::post('edit-location', 'UserController@editLocation');
 
             Route::post('edit-profile-details', 'UserController@editProfileDetails');
             Route::post('edit-account-details', 'UserController@editAccountDetails');
@@ -274,13 +296,13 @@ Route::group(['prefix'=>'attendances', 'middleware'=>'App\Http\Middleware\Restri
         Route::post('change-attendance', 'AttendanceController@changeAttendance');
     });
 
-	Route::get('change-offs-status', 'AttendanceController@changeAttendancOffeStatus');
-	Route::post('change-status', 'AttendanceController@changeAttendanceStatus');
-	Route::get('consolidated-attendance-sheets', 'AttendanceController@consolidatedAttendanceSheets');
-	Route::get('view', 'AttendanceController@viewEmployeeAttendance');
-	Route::get('export-punches', 'AttendanceController@exportPunches');
+    Route::get('change-offs-status', 'AttendanceController@changeAttendancOffeStatus');
+    Route::post('change-status', 'AttendanceController@changeAttendanceStatus');
+    Route::get('consolidated-attendance-sheets', 'AttendanceController@consolidatedAttendanceSheets');
+    Route::get('view', 'AttendanceController@viewEmployeeAttendance');
+    Route::get('export-punches', 'AttendanceController@exportPunches');
 
-	Route::post('verify-month-attendance', 'AttendanceController@verifyMonthAttendance');
+    Route::post('verify-month-attendance', 'AttendanceController@verifyMonthAttendance');
 
     Route::group(['middleware' => ['permission:view-attendance']], function () {
 
@@ -318,8 +340,8 @@ Route::group(['prefix' => 'leaves', 'middleware' => 'App\Http\Middleware\Restric
     Route::post('between-leave-holidays', 'LeaveController@betweenLeaveHolidays');
 
 
-	Route::get('approve-leaves/{leave_status?}', 'LeaveController@approveLeaves');
-	Route::post('save-leave-approval', 'LeaveController@saveLeaveApproval');
+    Route::get('approve-leaves/{leave_status?}', 'LeaveController@approveLeaves');
+    Route::post('save-leave-approval', 'LeaveController@saveLeaveApproval');
     Route::group(['middleware' => ['permission:approve-leave']], function () {
 
 
