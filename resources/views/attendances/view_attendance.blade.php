@@ -99,7 +99,7 @@
                         if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
                         $cMonth = $_REQUEST["month"];
-                         $cYear = $_REQUEST["year"];
+                        $cYear = $_REQUEST["year"];
 
                         $prev_year = $cYear;
                         $next_year = $cYear;
@@ -202,10 +202,12 @@
                                             @elseif($verify['isverified'] == 1)
                                                 <span class="verify-btn-calender attendance-verified label-success">Verified</span>
                                             @endif
-                                        @elseif($verify['isverified'] == 0)
-                                            <span  class="label label-info">Previous Month attendance not Varified.</span>
                                         @else
-                                            <span class="verify-btn-calender attendance-verified label-success">Verified</span>
+                                            @if($verify['isverified'] == 0)
+                                                <span  class="label label-info">Previous Month attendance not Varified.</span>
+                                            @else
+                                                <span class="verify-btn-calender attendance-verified label-success">Verified</span>
+                                            @endif
                                         @endif
                                         <div class="fc-clear"></div>
                                     </div>
@@ -432,14 +434,6 @@
                                     </div>
 
                                     <!-- Calender ends here -->
-
-
-
-
-
-
-
-
 
                                 </div>
                             </div>
@@ -741,8 +735,6 @@
                 }
             });
 
-
-
         });
     </script>
 
@@ -913,9 +905,6 @@
             }
             // }
         });
-
-
-
 
         function changeFunc() {
 

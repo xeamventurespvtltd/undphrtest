@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\LeavePoolExport;
+use App\Imports\LeaveDetailImport;
+use App\Imports\SalarySheetImport;
 use Illuminate\Http\Request;
 use DB;
 use App\Holiday;
@@ -19,6 +22,8 @@ use App\AppliedLeave;
 use App\AppliedLeaveApproval;
 use Carbon\Carbon;
 use Auth;
+use Maatwebsite\Excel\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Mail;
@@ -35,13 +40,13 @@ class LeaveController extends Controller
     */
     function listHolidays()
     {
-    	$year = date("Y");
-    	$holidays = Holiday::where(['isactive'=>1])
-    						->whereYear('holiday_from',$year)
-    						->orderBy('holiday_from')
-    						->get();
+        $year = date("Y");
+        $holidays = Holiday::where(['isactive'=>1])
+            ->whereYear('holiday_from',$year)
+            ->orderBy('holiday_from')
+            ->get();
 
-    	return view('leaves.list_holidays')->with(['holidays'=>$holidays]);
+        return view('leaves.list_holidays')->with(['holidays'=>$holidays]);
     }//end of function
 
     /*
@@ -59,8 +64,8 @@ class LeaveController extends Controller
 
             return redirect('profile-detail-form');
         }
-    	$user = User::where(['id'=>Auth::id()])->first();
-    	$data['gender'] = $user->employee->gender;
+        $user = User::where(['id'=>Auth::id()])->first();
+        $data['gender'] = $user->employee->gender;
 
         if($data['gender'] == 'Male'){
 
@@ -71,27 +76,27 @@ class LeaveController extends Controller
             $data['leave_types'] = LeaveType::where(['isactive'=>1])->get();
         }
 
-    	$data['departments'] = Department::where(['isactive'=>1])->get();
-    	$data['countries'] = Country::where(['isactive'=>1])->get();
-    	$data['states'] = State::where(['isactive'=>1])->get();
+        $data['departments'] = Department::where(['isactive'=>1])->get();
+        $data['countries'] = Country::where(['isactive'=>1])->get();
+        $data['states'] = State::where(['isactive'=>1])->get();
         $data['user'] = $user;
-    	$data['probation_data'] = probationCalculations($user);
-		 /*echo"<PRE>";
-		print_r($data['probation_data']);
-		exit;*/
-    	$data['unpaid_leave'] = LeaveType::where(['name'=>'Unpaid Leave'])->first();
+        $data['probation_data'] = probationCalculations($user);
+        /*echo"<PRE>";
+       print_r($data['probation_data']);
+       exit;*/
+        $data['unpaid_leave'] = LeaveType::where(['name'=>'Unpaid Leave'])->first();
 
-		$data['leave_detail'] = LeaveDetail::where(['user_id'=>Auth::id()])->orderBy('id','DESC')->first();
+        $data['leave_detail'] = LeaveDetail::where(['user_id'=>Auth::id()])->orderBy('id','DESC')->first();
 
-       /* if(empty($data['probation_data'])){
-            return redirect()->back()->with('error','Your profile is incomplete. Please contact the HR officer.');
-        }*/
+        /* if(empty($data['probation_data'])){
+             return redirect()->back()->with('error','Your profile is incomplete. Please contact the HR officer.');
+         }*/
 
         $designation_login_data = DB::table('designation_user as du')
 
-                            ->where('du.user_id','=', Auth::id())
+            ->where('du.user_id','=', Auth::id())
 
-                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+            ->select('du.id', 'du.user_id','du.designation_id')->first();
 
         $data['user_designation'] = $designation_login_data->designation_id;
 
@@ -110,9 +115,9 @@ class LeaveController extends Controller
         $from_date = $start_year.'-'.$startmonth.'-'.'26';
         $to_date = $curr_year.'-'.$curr_month.'-'.'25';
 
-       $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
+        $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
 
-    	return view('leaves.apply_leave_form')->with(['data'=>$data]);
+        return view('leaves.apply_leave_form')->with(['data'=>$data]);
 
     }//end of function
 
@@ -138,20 +143,20 @@ class LeaveController extends Controller
             ->pluck('user_id')->toArray();
 
         $took_leaves = AppliedLeave::where('isactive',1)
-                                ->where('from_date','>=',$from_date)
-                                ->where('to_date','<=',$to_date)
-                                ->whereIn('user_id',$employees)
-                                ->whereHas('appliedLeaveApprovals',function(Builder $query){
-                                    $query->where('leave_status','!=','2');
-                                })
-                                ->pluck('user_id')->toArray();
+            ->where('from_date','>=',$from_date)
+            ->where('to_date','<=',$to_date)
+            ->whereIn('user_id',$employees)
+            ->whereHas('appliedLeaveApprovals',function(Builder $query){
+                $query->where('leave_status','!=','2');
+            })
+            ->pluck('user_id')->toArray();
 
         $exclusions = DB::table('employees as emp')
-                    ->join('users as u','u.id','=','emp.user_id')
-                    ->whereIn('emp.user_id',$employees)
-                    ->whereNotIn('emp.user_id',$took_leaves)
-                    ->select("emp.user_id","u.employee_code","emp.fullname",DB::raw("CASE WHEN emp.profile_picture = '' OR emp.profile_picture IS NULL THEN '".$static_pic_path."' ELSE CONCAT('".$profile_pic_path."',emp.profile_picture) END AS profile_picture"))
-                    ->get();
+            ->join('users as u','u.id','=','emp.user_id')
+            ->whereIn('emp.user_id',$employees)
+            ->whereNotIn('emp.user_id',$took_leaves)
+            ->select("emp.user_id","u.employee_code","emp.fullname",DB::raw("CASE WHEN emp.profile_picture = '' OR emp.profile_picture IS NULL THEN '".$static_pic_path."' ELSE CONCAT('".$profile_pic_path."',emp.profile_picture) END AS profile_picture"))
+            ->get();
 
         return $exclusions;
 
@@ -171,9 +176,9 @@ class LeaveController extends Controller
 
                 if($date != 'Sunday'){
                     $holiday = Holiday::where(['isactive'=>1])
-                                    ->where('holiday_from','<=',$value)
-                                    ->where('holiday_to','>=',$value)
-                                    ->first();
+                        ->where('holiday_from','<=',$value)
+                        ->where('holiday_to','>=',$value)
+                        ->first();
 
                     if(!empty($holiday)){
                         $result[] = $value;
@@ -191,8 +196,8 @@ class LeaveController extends Controller
     function calculateMonthLeave($from,$to)
     {
 
-       // dump($from);
-       // dump($to);
+        // dump($from);
+        // dump($to);
 
         $user = Auth::user();
         $userid = $user->id;
@@ -215,8 +220,8 @@ class LeaveController extends Controller
 
         if(strtotime($from)>=strtotime($date1) AND strtotime($to)<=strtotime($date2)){
 
-             $date1 = $start_year.'-'.$startmonth.'-'.'26';
-             $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+            $date1 = $start_year.'-'.$startmonth.'-'.'26';
+            $date2 = $curr_year.'-'.$curr_month.'-'.'25';
 
 
         }elseif(strtotime($from)>=strtotime($date2) OR strtotime($to)>=strtotime($date2)){
@@ -231,8 +236,8 @@ class LeaveController extends Controller
             }
 
             $next_month = $curr_month+1;
-             $date1 = $curr_year.'-'.$curr_month.'-'.'26';
-              $date2 = $next_year.'-'.$next_month.'-'.'25';
+            $date1 = $curr_year.'-'.$curr_month.'-'.'26';
+            $date2 = $next_year.'-'.$next_month.'-'.'25';
 
         }elseif(strtotime($to)<=strtotime($date1) AND strtotime($from)<=strtotime($date1)){
 
@@ -252,14 +257,14 @@ class LeaveController extends Controller
         }
 
         $current_month_leave = DB::table('applied_leave_segregations as als')
-                        ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                        ->where(['al.final_status'=>'1','al.user_id'=>$userid])
-                        ->where('leave_type_id','!=',5)
-                        ->where(function($query)use($date1, $date2){
-                            $query->where('als.from_date','>=',$date1)
-                                ->where('als.to_date','<=',$date2);
-                        })
-                        ->sum('als.number_of_days');
+            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$userid])
+            ->where('leave_type_id','!=',5)
+            ->where(function($query)use($date1, $date2){
+                $query->where('als.from_date','>=',$date1)
+                    ->where('als.to_date','<=',$date2);
+            })
+            ->sum('als.number_of_days');
         //dump($current_month_leave);
         return $current_month_leave;
 
@@ -275,7 +280,7 @@ class LeaveController extends Controller
 
         // Validate
 
-    	$request->validate([
+        $request->validate([
             'toDate' => "required_if:secondaryLeaveType,==,Full",
             'fromDate' => 'required',
             'reasonLeave' => 'required',
@@ -295,146 +300,145 @@ class LeaveController extends Controller
         }
 
 
-		$user = Auth::user();
-		$userid = $user->id;
+        $user = Auth::user();
+        $userid = $user->id;
 
-		$user = User::where(['id'=>$userid])
-                ->with('employee')
-                ->with('userManager')
-                ->first();
+        $user = User::where(['id'=>$userid])
+            ->with('employee')
+            ->with('userManager')
+            ->first();
 
-		$arr_underlaying_emp = array();
+        $arr_underlaying_emp = array();
 
         // Chk User in designation_user Table Logged User Id Exists..
 
-		$designation_login_data = DB::table('designation_user as du')
-							->where('du.user_id','=',$userid)
-							->select('du.id', 'du.user_id','du.designation_id')->first();
-		$designation_login_user = $designation_login_data->designation_id;
+        $designation_login_data = DB::table('designation_user as du')
+            ->where('du.user_id','=',$userid)
+            ->select('du.id', 'du.user_id','du.designation_id')->first();
+        $designation_login_user = $designation_login_data->designation_id;
 
-		// Check for PO reporting manager exist
+        // Check for PO reporting manager exist
 
-		if($designation_login_user==3 ){
+        if($designation_login_user==3 ){
 
-			$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+            $state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
 
-			$login_user_state_id = $state_login_user->state_id;
+            $login_user_state_id = $state_login_user->state_id;
 
             $employees_under_states = EmployeeProfile::where(['state_id' => $login_user_state_id])
-                                    ->get();
+                ->get();
 
-			foreach($employees_under_states as $employees_state){
+            foreach($employees_under_states as $employees_state){
 
                 $employeeId_under_state = $employees_state->user_id;
 
                 $empDesg_under_state = DB::table('designation_user as du')
-							->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
-							->select('du.id', 'du.user_id','du.designation_id')->first();
+                    ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+                    ->select('du.id', 'du.user_id','du.designation_id')->first();
 
-				if($empDesg_under_state!=""){
-					$arr_underlaying_emp[] = $empDesg_under_state;
-				}
-			}
-		}
+                if($empDesg_under_state!=""){
+                    $arr_underlaying_emp[] = $empDesg_under_state;
+                }
+            }
+        }
 
-		//Check for PO-IT reporting manager exist
+        //Check for PO-IT reporting manager exist
 
-		if($designation_login_user==5 ){
+        if($designation_login_user==5 ){
 
-			$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+            $state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
 
-			$login_user_state_id = $state_login_user->state_id;
+            $login_user_state_id = $state_login_user->state_id;
 
             $employees_under_states = EmployeeProfile::where(['state_id' => $login_user_state_id])->get();
 
-			foreach($employees_under_states as $employees_state){
+            foreach($employees_under_states as $employees_state){
 
                 $employeeId_under_state = $employees_state->user_id;
 
                 $empDesg_under_state = DB::table('designation_user as du')
-                                ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
-						        ->select('du.id', 'du.user_id','du.designation_id')->first();
+                    ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+                    ->select('du.id', 'du.user_id','du.designation_id')->first();
 
-				if($empDesg_under_state!=""){
-					$arr_underlaying_emp[] = $empDesg_under_state;
-				}
-			}
-		}
+                if($empDesg_under_state!=""){
+                    $arr_underlaying_emp[] = $empDesg_under_state;
+                }
+            }
+        }
 
-		//Check Vccm Reporting Manager Exists..
+        //Check Vccm Reporting Manager Exists..
 
-		if($designation_login_user==4){
+        if($designation_login_user==4){
 
             // Chk Location id in location_user table by designation_user table user_id match
 
-			$district_login_user = DB::table('location_user as lu')
-						->where('lu.user_id','=',$designation_login_data->user_id)
-						->select('lu.id', 'lu.user_id','lu.location_id')->first();
+            $district_login_user = DB::table('location_user as lu')
+                ->where('lu.user_id','=',$designation_login_data->user_id)
+                ->select('lu.id', 'lu.user_id','lu.location_id')->first();
 
             $login_user_district_id = $district_login_user->location_id;
 
             // Check How Many Users In That Location  $login_user_district_id
 
-			$employeesDistrict = DB::table('location_user as lu')
-							->where(['lu.location_id'=>$login_user_district_id])
-							->select('lu.id', 'lu.user_id','lu.location_id')->get();
+            $employeesDistrict = DB::table('location_user as lu')
+                ->where(['lu.location_id'=>$login_user_district_id])
+                ->select('lu.id', 'lu.user_id','lu.location_id')->get();
             //dd($employeesDistrict);
 
-			if($employeesDistrict)
-			{
+            if($employeesDistrict)
+            {
                 // Chk Reporting manager Where designton_id 3,5(PO)
 
-				foreach($employeesDistrict as $empDistrict){
+                foreach($employeesDistrict as $empDistrict){
 
-					$user_id = $empDistrict->user_id;
-					$empDesg_under_district = DB::table('designation_user as du')
-											->where(['du.user_id'=>$user_id])
-											->where(function($query){
-												$query->where('du.designation_id','=',5)
-												->orWhere('du.designation_id','=', 3);
-											})
-											->select('du.id', 'du.user_id','du.designation_id')->first();
+                    $user_id = $empDistrict->user_id;
+                    $empDesg_under_district = DB::table('designation_user as du')
+                        ->where(['du.user_id'=>$user_id])
+                        ->where(function($query){
+                            $query->where('du.designation_id','=',5)
+                                ->orWhere('du.designation_id','=', 3);
+                        })
+                        ->select('du.id', 'du.user_id','du.designation_id')->first();
 
-					if($empDesg_under_district!="")
-					{
-						$arr_underlaying_emp[] = $empDesg_under_district;
-					}
-				}
-			}
-		}
+                    if($empDesg_under_district!="")
+                    {
+                        $arr_underlaying_emp[] = $empDesg_under_district;
+                    }
+                }
+            }
+        }
 
-       // dd("+++++++++++");
-		//check for spo reporting manager exist
-		if($designation_login_user==2){
-
-
-				$empDesg_NPA = DB::table('designation_user as du')
-
-							->where('du.designation_id','=',1)
-
-							->select('du.id', 'du.user_id','du.designation_id')->first();
-
-							if($empDesg_NPA!=""){
-								$arr_underlaying_emp[] = $empDesg_NPA;
-							}
+        // dd("+++++++++++");
+        //check for spo reporting manager exist
+        if($designation_login_user==2){
 
 
-		}
+            $empDesg_NPA = DB::table('designation_user as du')
 
-		if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
+                ->where('du.designation_id','=',1)
 
-		}else{
-			$manager_error = "You do not have reporting manger under Your area.";
+                ->select('du.id', 'du.user_id','du.designation_id')->first();
+
+            if($empDesg_NPA!=""){
+                $arr_underlaying_emp[] = $empDesg_NPA;
+            }
+
+
+        }
+
+        if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
+        }else{
+            $manager_error = "You do not have reporting manger under Your area.";
             return redirect('leaves/apply-leave')->with('leaveError',$manager_error);
-		}
+        }
 
         // Chk Previous Leave Pending Or Approved..
 
         $pending_leave = AppliedLeaveApproval::where(['user_id'=>$userid,'leave_status'=>'0'])
-                                          ->whereHas('appliedLeave',function(Builder $query){
-                                            $query->where('isactive',1);
-                                          })
-                                          ->first();
+            ->whereHas('appliedLeave',function(Builder $query){
+                $query->where('isactive',1);
+            })
+            ->first();
 
         if(!empty($pending_leave)){
             $pending_error = "The approval status of your previously applied leave is pending with one or more authorities. Please contact the concerned person and clear it first.";
@@ -443,9 +447,9 @@ class LeaveController extends Controller
         }
 
         $last_applied_leave = $user->appliedLeaves()
-                                    ->where(['isactive'=>1])
-                                    ->orderBy('id','DESC')
-                                    ->first();
+            ->where(['isactive'=>1])
+            ->orderBy('id','DESC')
+            ->first();
 
         if(!empty($last_applied_leave)){
             $created_at = new Carbon($last_applied_leave->created_at);
@@ -458,10 +462,10 @@ class LeaveController extends Controller
                 $leave_time_difference = false;
             }
 
-           /* if($leave_time_difference){
-                $wait_error = "You have to wait for some time before you can apply for leave again.";
-                //return redirect('leaves/apply-leave')->with('leaveError',$wait_error);
-            }*/
+            /* if($leave_time_difference){
+                 $wait_error = "You have to wait for some time before you can apply for leave again.";
+                 //return redirect('leaves/apply-leave')->with('leaveError',$wait_error);
+             }*/
         }
 
         $from_date = date("Y-m-d",strtotime($request->fromDate));
@@ -474,20 +478,11 @@ class LeaveController extends Controller
 
 
         $check_dates =  [
-                            'from_date' => $from_date,
-                            'to_date' => $to_date,
-                            'isactive' => 1
-                        ];
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+            'isactive' => 1
+        ];
 
-
-       /*  if($request->secondaryLeaveType == "Short"){
-            $check_dates['from_time'] = $request->fromTime;
-            $check_dates['to_time'] = $request->toTime;
-
-        }elseif($request->secondaryLeaveType == "Half"){
-            $check_dates['leave_half'] = $request->selectHalf;
-
-        }    */
 
         $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
         //dd($already_applied_leave->id);
@@ -502,8 +497,8 @@ class LeaveController extends Controller
         if(!empty($last_applied_leave)){
 
             $chk_existing_date = DB::table('applied_leaves')
-                    ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
-                    ->first();
+                ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
+                ->first();
             //dd($chk_existing_date);
             if(!empty($chk_existing_date)){
                 $unique_error = "You have already applied for leave on given dt.";
@@ -519,9 +514,9 @@ class LeaveController extends Controller
 
             }else{
                 $already_applied_leave = $user->appliedLeaves()
-                                              ->where(['final_status'=>'1','leave_type_id'=>4,'isactive'=>1])
-                                              ->whereYear('updated_at',date("Y"))
-                                              ->first();
+                    ->where(['final_status'=>'1','leave_type_id'=>4,'isactive'=>1])
+                    ->whereYear('updated_at',date("Y"))
+                    ->first();
 
                 if(!empty($already_applied_leave)){
                     $maternity_error = "You have already applied for a maternity leave this year.";
@@ -544,9 +539,9 @@ class LeaveController extends Controller
 
             }else{
                 $already_applied_leave = $user->appliedLeaves()
-                                              ->where(['final_status'=>'1','leave_type_id'=>7,'isactive'=>1])
-                                              ->whereYear('updated_at',date("Y"))
-                                              ->first();
+                    ->where(['final_status'=>'1','leave_type_id'=>7,'isactive'=>1])
+                    ->whereYear('updated_at',date("Y"))
+                    ->first();
 
                 if(!empty($already_applied_leave)){
                     $paternity_error = "You have already applied for a paternity leave this year.";
@@ -561,68 +556,12 @@ class LeaveController extends Controller
             }
         }
 
-        //////////////////////////Segregation///////////////////////////
-
-//        if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
-//            $new_all_dates_array = explode(",",$request->newAllDatesArray);
-//
-//            $month_wise_array = [];
-//            $counter = 0;
-//            $key2 = 0;
-//            $days_counter = 0;
-//            foreach($new_all_dates_array as $key => $value) {
-//
-//                if($counter == 0){
-//                    $month_wise_array[$key2]['from_date'] = $value;
-//                    $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//                    $prev_month_year = date("m-Y",strtotime($value));
-//                    $prev_date = $value;
-//
-//                    if(count($new_all_dates_array) == 1){
-//                        $month_wise_array[$key2]['to_date'] = $value;
-//                    }
-//                }else{
-//                    $month_year = date("m-Y",strtotime($value));
-//
-//                    if($month_year == $prev_month_year){
-//                        $prev_month_year = date("m-Y",strtotime($value));
-//                        $prev_date = $value;
-//                        $month_wise_array[$key2]['to_date'] = $value;
-//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//
-//                    }else{
-//                        $month_wise_array[$key2]['to_date'] = $prev_date;
-//
-//                        $key2++;
-//                        $days_counter = 0;
-//                        $month_wise_array[$key2]['from_date'] = $value;
-//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//                        $prev_month_year = date("m-Y",strtotime($value));
-//                        $prev_date = $value;
-//
-//                        if((count($new_all_dates_array)-1) == $counter){
-//                            $month_wise_array[$key2]['to_date'] = $value;
-//                        }
-//                    }
-//                }
-//                $counter++;
-//
-//            }//end of foreach
-//
-//             $total = 0;
-//            foreach ($month_wise_array as $key => $value) {
-//               $total =   $total + $value['no_days'];
-//
-//            }
-//        }
-
-
-         /////////////////5 days capping for vccm for casual leave/////////////////
+        /////////////////5 days capping for vccm for casual leave/////////////////
         if($request->leaveTypeId == '1'  AND $designation_login_user==4){
 
             $current_month_leave = $this->calculateMonthLeave($from_date,$to_date);
-           // dump($current_month_leave);
-             if(!isset($total)){
+            // dump($current_month_leave);
+            if(!isset($total)){
                 $total=0;
             }
 
@@ -635,23 +574,23 @@ class LeaveController extends Controller
                 return redirect('leaves/apply-leave')->with('leaveError',$more_than_5_error);
 
             }
-          }
+        }
 
 
-          //dd("+++")
+        //dd("+++")
 
         /////////////////////////Create Leave///////////////////////
 
         $leave_data = [
-                        'leave_type_id' => $request->leaveTypeId,
-                        'reason' => $request->reasonLeave,
-                        'number_of_days' => $request->noDays,
-                        "secondary_leave_type" => $request->secondaryLeaveType,
-                        'from_date' => $from_date,
-                        'to_date' => $to_date,
-                        'excluded_dates' => $request->excludedDates,
-                        'final_status' => '0'
-                    ];
+            'leave_type_id' => $request->leaveTypeId,
+            'reason' => $request->reasonLeave,
+            'number_of_days' => $request->noDays,
+            "secondary_leave_type" => $request->secondaryLeaveType,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+            'excluded_dates' => $request->excludedDates,
+            'final_status' => '0'
+        ];
 
 
 
@@ -670,20 +609,8 @@ class LeaveController extends Controller
         }
 
 
-//           if(isset($month_wise_array) AND ($month_wise_array!="")){   //for multi-month leave calculations in full day leaves
-//
-//            foreach ($month_wise_array as $key => $value) {
-//                $segregation_data = [
-//                                        'from_date' => date("Y-m-d",strtotime($value['from_date'])),
-//                                        'to_date' => date("Y-m-d",strtotime($value['to_date'])),
-//                                        'number_of_days' => $value['no_days'],
-//                                        'paid_count' => '0',
-//                                        'unpaid_count' => '0',
-//                                        'compensatory_count' => '0'
-//                                    ];
-//               $applied_leave->appliedLeaveSegregations()->create($segregation_data);
-//            }
-//        }
+        //////////////////////////Segregation///////////////////////////
+
         if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
             $new_all_dates_array = explode(",",$request->newAllDatesArray);
 
@@ -691,61 +618,27 @@ class LeaveController extends Controller
             $counter = 0;
             $key2 = 0;
             $days_counter = 0;
-//            foreach($new_all_dates_array as $key => $value) {
-//                if($counter == 0){
-//                    $month_wise_array[$key2]['from_date'] = $value;
-//                    $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//                    $prev_month_year = date("m-Y",strtotime($value));
-//                    $prev_date = $value;
-//
-//                    if(count($new_all_dates_array) == 1){
-//                        $month_wise_array[$key2]['to_date'] = $value;
-//                    }
-//                }else{
-//                    $month_year = date("m-Y",strtotime($value));
-//
-//                    if($month_year == $prev_month_year){
-//                        $prev_month_year = date("m-Y",strtotime($value));
-//                        $prev_date = $value;
-//                        $month_wise_array[$key2]['to_date'] = $value;
-//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//                    }else{
-//                        $month_wise_array[$key2]['to_date'] = $prev_date;
-//
-//                        $key2++;
-//                        $days_counter = 0;
-//                        $month_wise_array[$key2]['from_date'] = $value;
-//                        $month_wise_array[$key2]['no_days'] = ++$days_counter;
-//                        $prev_month_year = date("m-Y",strtotime($value));
-//                        $prev_date = $value;
-//
-//                        if((count($new_all_dates_array)-1) == $counter){
-//                            $month_wise_array[$key2]['to_date'] = $value;
-//                        }
-//                    }
-//                }
-//                $counter++;
-//
-//            }//end of foreach
-//
-//            return $month_wise_array;
-//            foreach ($month_wise_array as $key => $value) {
-//            return $request->toDate;
-//            return date("d",strtotime($request->toDate));
-//            return date("m",strtotime($request->toDate));
             if(date("d",strtotime($request->toDate)) > 25 || date("m",strtotime($request->toDate)) > date("m",strtotime($request->fromDate)))
             {
                 $date = explode('/',$request->fromDate);
                 $year = $date[2];
                 $month = $date[0];
                 $firstEndDate = $year.'-'.$month.'-25';
-                echo $firstSegregation = $request->fromDate.' - '. $firstEndDate;
+                $firstSegregation = $request->fromDate.' - '. $firstEndDate;
                 $fromDate = $request->fromDate;
                 $firstEndDate = date("yy-m-d", strtotime($firstEndDate));
                 $date1 = Carbon::createFromDate($fromDate);
                 $date2 = Carbon::createFromDate($firstEndDate);
 
-                $numberOfDays = $date2->diffInWeekdays($date1) + 2;
+                $numberOfDays = $date2->diffInDays($date1) + 1;
+
+                $excludingDates = explode(',', $request->excludedDates);
+                foreach ($excludingDates as $excludingDate) {
+                    $exist = Carbon::createFromDate($excludingDate)->between($date1, $date2);
+                    if($exist == 1){
+                        $numberOfDays = $numberOfDays - 1;
+                    }
+                }
 
                 $segregation_data = [
                     'from_date' => date("Y-m-d", strtotime($request->fromDate)),
@@ -757,16 +650,20 @@ class LeaveController extends Controller
                 ];
 
                 $applied_leave->appliedLeaveSegregations()->create($segregation_data);
-                echo "</br/>";
+
                 $secondFromDate = $year.'-'.$month.'-26';
                 echo  $secondSegregation = $secondFromDate.' - '. $request->toDate;
                 $date3 = Carbon::createFromDate($secondFromDate);
                 $date4 = Carbon::createFromDate($request->toDate);
-                echo "</br/>";
 
-//                    return $date4->diffInWeekdays($date3);
-                $numberOfDays = $date4->diffInWeekdays($date3) + 2;
-
+                $numberOfDays = $date4->diffInDays($date3) + 1;
+                $excludingDates = explode(',', $request->excludedDates);
+                foreach ($excludingDates as $excludingDate) {
+                    $exist = Carbon::createFromDate($excludingDate)->between($date3, $date4);
+                    if($exist == 1){
+                        $numberOfDays = $numberOfDays - 1;
+                    }
+                }
                 $segregation_data = [
                     'from_date' => date("Y-m-d", strtotime($secondFromDate)),
                     'to_date' => date("Y-m-d", strtotime($request->toDate)),
@@ -804,24 +701,24 @@ class LeaveController extends Controller
 
         //////////////////////////Approval///////////////////////////
 
-		$reporting_manager = $arr_underlaying_emp[0]->user_id;
+        $reporting_manager = $arr_underlaying_emp[0]->user_id;
         $approval_data = [
-                            'user_id' => $userid,
-                            'supervisor_id' => $reporting_manager,
-                            'priority' => '1',
-                            'leave_status' => '0'
-                         ];
+            'user_id' => $userid,
+            'supervisor_id' => $reporting_manager,
+            'priority' => '1',
+            'leave_status' => '0'
+        ];
         $applied_leave->appliedLeaveApprovals()->create($approval_data);
 
         //////////////////////////Notify///////////////////////////
 
 
-		$notification_data = [
-                                 'sender_id' => $userid,
-                                 'receiver_id' => $reporting_manager,
-                                 'label' => 'Leave Application',
-                                 'read_status' => '0'
-                             ];
+        $notification_data = [
+            'sender_id' => $userid,
+            'receiver_id' => $reporting_manager,
+            'label' => 'Leave Application',
+            'read_status' => '0'
+        ];
 
         $message = $user->employee->fullname." has applied for a leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.';
 
@@ -830,12 +727,10 @@ class LeaveController extends Controller
 
         pushNotification($notification_data['receiver_id'], $notification_data['label'], $notification_data['message']);
 
-
-
         $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
-                                ->with('user')->first();
+            ->with('user')->first();
         $mail_data['to_email'] = $reporting_manager_data->user->email;
-		//$mail_data['to_email'] = "xeam.richa@gmail.com";
+        //$mail_data['to_email'] = "xeam.richa@gmail.com";
         $mail_data['subject'] = "Leave Application";
         $mail_data['message'] = $user->employee->fullname." has applied for a leave. Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
         $mail_data['fullname'] = $reporting_manager_data->fullname;
@@ -856,51 +751,38 @@ class LeaveController extends Controller
             'remark' => 'required',
         ]);
 
-
-       // $chk_leave_pool = LeaveDetail::where(['user_id'=>$request->userId])->first();
-        //$chk_applied_leave = AppliedLeave::where(['id'=>$leave_approval->applied_leave_id,'user_id'=>$leave_approval->user_id])->select('number_of_days')->first();
-
         $leave_approval = AppliedLeaveApproval::find($request->alaId);
 
         $applied_leave = $leave_approval->appliedLeave;
-
-        /*echo"<pre>";
-		print_r($applied_leave);
-		exit; */
 
         /////////////////Checks////////////////////////
         $current_date = date('Y-m-d');
         $restriction_date = config('constants.restriction.approveLeave');
         $current_month_start_date = date("Y-m-01");
 
-       /*  if(strtotime($current_date) > strtotime($restriction_date)){
-            if(strtotime($applied_leave->from_date) < strtotime($current_month_start_date)){
-                $restriction_error = "You cannot approve leave for a previous month's date now.";
-                return redirect()->back()->with('error',$restriction_error);
-            }
-        } */
-
         $approver = User::where(['id'=>Auth::id()])->first();
 
         $leave_approval->leave_status = $request->leaveStatus;
+
         // Comment By Hitesh
         $leave_approval->save();
 
         $applier = $leave_approval->user;
 
         $message_data = [
-                            'sender_id' => $approver->id,
-                            'receiver_id' => $leave_approval->user_id,
-                            'label' => 'Leave Remarks',
-                            'message' => $request->remark,
-                            'read_status' => '0'
-                        ];
+            'sender_id' => $approver->id,
+            'receiver_id' => $leave_approval->user_id,
+            'label' => 'Leave Remarks',
+            'message' => $request->remark,
+            'read_status' => '0'
+        ];
+
         $applied_leave->messages()->create($message_data);
-		if($leave_approval->leave_status==1){
-			$applied_leave->final_status = '1';
-		}else{
-			$applied_leave->final_status = '0';
-		}
+        if($leave_approval->leave_status==1){
+            $applied_leave->final_status = '1';
+        }else{
+            $applied_leave->final_status = '0';
+        }
 
         $applied_leave->save();
 
@@ -908,30 +790,30 @@ class LeaveController extends Controller
         $mail_data['fullname'] = $applier->employee->fullname;
 
         if($applied_leave->final_status == '1'){
-			$excluded_dates = $applied_leave->excluded_dates;
-			$excluded_date = explode(",",$excluded_dates);
+            $excluded_dates = $applied_leave->excluded_dates;
+            $excluded_date = explode(",",$excluded_dates);
 
-           /* echo "<PRE>";
-			print_r($excluded_date);
-			exit(); */
+            $from_date = $applied_leave->from_date;
+            $to_date = $applied_leave->to_date;
+            $user_id = $applied_leave->user_id;
 
-			$from_date = $applied_leave->from_date;
-			$to_date = $applied_leave->to_date;
-			$user_id = $applied_leave->user_id;
+            $i=0;
+            while (strtotime($from_date) <= strtotime($to_date)) {
 
-			$i=0;
-			while (strtotime($from_date) <= strtotime($to_date)) {
+                if (!in_array($from_date, $excluded_date))
+                {
+                    Attendance::create(['user_id'=>$user_id,'on_date'=>$from_date,'status'=>"Leave"]);
+                }
 
-				if (!in_array($from_date, $excluded_date))
-				  {
-					Attendance::create(['user_id'=>$user_id,'on_date'=>$from_date,'status'=>"Leave"]);
-				  }
-
-				$from_date = date ("Y-m-d", strtotime("+1 days", strtotime($from_date)));
-				$i++;
-			}
+                $from_date = date ("Y-m-d", strtotime("+1 days", strtotime($from_date)));
+                $i++;
+            }
 
             $probation_data = probationCalculations($applier);
+
+            /*
+             * Leave calculation update segregation
+             */
             leaveRelatedCalculations($probation_data,$applied_leave);
 
             $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been approved.';
@@ -942,18 +824,7 @@ class LeaveController extends Controller
 
             pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
         }else{
-           /* $update_leave_data = [
-                                    'paid_count' => '0',
-                                    'unpaid_count' => '0',
-                                    'compensatory_count' => '0'
-                                 ];
-
-            $applied_leave->appliedLeaveSegregations()->update($update_leave_data);
-
-            CompensatoryLeave::where(['applied_leave_id'=>$applied_leave->id])
-                                ->update(['applied_leave_id'=>0]); */
-
-             if($leave_approval->leave_status == '2'){
+            if($leave_approval->leave_status == '2'){
                 $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been rejected.';
 
                 $mail_data['subject'] = "Leave Rejected";
@@ -963,8 +834,6 @@ class LeaveController extends Controller
                 pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
             }
         }
-
-
         return redirect("leaves/approve-leaves");
 
     }//end of function
@@ -1005,22 +874,22 @@ class LeaveController extends Controller
         }
 
         $data = DB::table('applied_leave_approvals as ala')
-                ->join('applied_leaves as al','al.id','=','ala.applied_leave_id')
-                ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
-                ->join('employees as emp','emp.user_id','=','ala.user_id')
-                ->leftjoin('employees as emp2','emp2.user_id','=','lr.user_id')
-                ->join('leave_types as lt','al.leave_type_id','=','lt.id')
-                ->where(['ala.supervisor_id' => $user->id,'ala.leave_status'=>$status,'al.isactive'=>1])
-                ->select('ala.*','emp.fullname as applier_name','al.number_of_days','al.final_status','lt.name as leave_type_name','al.from_date','al.to_date','emp2.fullname as replacement_name','al.created_at')
-                ->orderBy('ala.applied_leave_id','DESC')
-                ->get();
+            ->join('applied_leaves as al','al.id','=','ala.applied_leave_id')
+            ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
+            ->join('employees as emp','emp.user_id','=','ala.user_id')
+            ->leftjoin('employees as emp2','emp2.user_id','=','lr.user_id')
+            ->join('leave_types as lt','al.leave_type_id','=','lt.id')
+            ->where(['ala.supervisor_id' => $user->id,'ala.leave_status'=>$status,'al.isactive'=>1])
+            ->select('ala.*','emp.fullname as applier_name','al.number_of_days','al.final_status','lt.name as leave_type_name','al.from_date','al.to_date','emp2.fullname as replacement_name','al.created_at')
+            ->orderBy('ala.applied_leave_id','DESC')
+            ->get();
 
         if(!$data->isEmpty()){
             foreach ($data as $key => $value) {
                 if($value->final_status == '0'){
                     $check_rejected = DB::table('applied_leave_approvals as ala')
-                                ->where(['ala.applied_leave_id' => $value->applied_leave_id,'ala.leave_status'=>'2'])
-                                ->first();
+                        ->where(['ala.applied_leave_id' => $value->applied_leave_id,'ala.leave_status'=>'2'])
+                        ->first();
 
                     if(!empty($check_rejected)){
                         $value->secondary_final_status = 'Rejected';
@@ -1044,21 +913,21 @@ class LeaveController extends Controller
     {
         $user = User::where(['id'=>Auth::id()])->first();
         $data = DB::table('applied_leaves as al')
-                ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
-                ->leftjoin('employees as emp','emp.user_id','=','lr.user_id')
-                ->join('leave_types as lt','al.leave_type_id','=','lt.id')
-                ->where(['al.user_id' => $user->id])
-                ->select('al.id','al.number_of_days','al.isactive','lt.name as leave_type_name','al.from_date','al.to_date','emp.fullname as replacement','al.final_status','al.created_at')
-                ->orderBy('al.id','desc')
-                ->get();
+            ->leftjoin('leave_replacements as lr','al.id','=','lr.applied_leave_id')
+            ->leftjoin('employees as emp','emp.user_id','=','lr.user_id')
+            ->join('leave_types as lt','al.leave_type_id','=','lt.id')
+            ->where(['al.user_id' => $user->id])
+            ->select('al.id','al.number_of_days','al.isactive','lt.name as leave_type_name','al.from_date','al.to_date','emp.fullname as replacement','al.final_status','al.created_at')
+            ->orderBy('al.id','desc')
+            ->get();
 
         if(!$data->isEmpty()){
             foreach ($data as $key => $value) {
                 $priority_wise_status = DB::table('applied_leave_approvals as ala')
-                                  ->where(['ala.applied_leave_id' => $value->id])
-                                  ->select('ala.priority','ala.leave_status')
-                                  ->orderBy('ala.priority')
-                                  ->get();
+                    ->where(['ala.applied_leave_id' => $value->id])
+                    ->select('ala.priority','ala.leave_status')
+                    ->orderBy('ala.priority')
+                    ->get();
 
                 $can_cancel_leave = 0;
                 if(count($priority_wise_status) == 1 && $priority_wise_status[0]->leave_status == 0){
@@ -1070,8 +939,8 @@ class LeaveController extends Controller
 
                 if($value->final_status == '0'){
                     $check_rejected = DB::table('applied_leave_approvals as ala')
-                                ->where(['ala.applied_leave_id' => $value->id,'ala.leave_status'=>'2'])
-                                ->first();
+                        ->where(['ala.applied_leave_id' => $value->id,'ala.leave_status'=>'2'])
+                        ->first();
 
                     if(!empty($check_rejected)){
                         $value->secondary_final_status = 'Rejected';
@@ -1094,9 +963,9 @@ class LeaveController extends Controller
     function appliedLeaveInfo(Request $request)
     {
         $data = DB::table('applied_leaves as al')
-                ->where(['al.id' => $request->applied_leave_id])
-                ->select('al.*')
-                ->first();
+            ->where(['al.id' => $request->applied_leave_id])
+            ->select('al.*')
+            ->first();
 
         $applied_leave = AppliedLeave::find($request->applied_leave_id);
 
@@ -1125,11 +994,11 @@ class LeaveController extends Controller
     {
         $applied_leave = AppliedLeave::find($request->applied_leave_id);
         $messages = $applied_leave->messages()
-                                ->where('label','Leave Remarks')
-                                ->orderBy('created_at','DESC')
-                                ->with('sender.employee:id,user_id,fullname')
-                                ->with('receiver.employee:id,user_id,fullname')
-                                ->get();
+            ->where('label','Leave Remarks')
+            ->orderBy('created_at','DESC')
+            ->with('sender.employee:id,user_id,fullname')
+            ->with('receiver.employee:id,user_id,fullname')
+            ->get();
 
         $view = View::make('leaves.list_messages',['data' => $messages]);
         $contents = $view->render();
@@ -1145,8 +1014,8 @@ class LeaveController extends Controller
         $applied_leave = AppliedLeave::find($applied_leave_id);
         $user_id = Auth::id();
         $approval = $applied_leave->appliedLeaveApprovals()
-                                  ->where('leave_status','!=','0')
-                                  ->first();
+            ->where('leave_status','!=','0')
+            ->first();
 
         if(!empty($approval)){
             return redirect()->back()->with('cannot_cancel_error','Reporting manager has taken a decision. You cannot cancel the leave now.');
@@ -1156,10 +1025,10 @@ class LeaveController extends Controller
             $applied_leave->save();
 
             CompensatoryLeave::where('applied_leave_id',$applied_leave_id)
-                               ->update(['applied_leave_id'=>0]);
+                ->update(['applied_leave_id'=>0]);
         }
 
-         return redirect()->back()->with('success', "Leave Cancel Successfully.");
+        return redirect()->back()->with('success', "Leave Cancel Successfully.");
 
         //return redirect('leaves/applied-leaves');
 
@@ -1198,12 +1067,12 @@ class LeaveController extends Controller
     {
 
         $report_data =  [
-                            'from_date' => $request->fromDate,
-                            'to_date' => $request->toDate,
-                            'no_days' => $request->noDays,
-                            'weekends' => $request->weekends,
-                            'holidays' => $request->holidays
-                        ];
+            'from_date' => $request->fromDate,
+            'to_date' => $request->toDate,
+            'no_days' => $request->noDays,
+            'weekends' => $request->weekends,
+            'holidays' => $request->holidays
+        ];
 
         if($request->department == '0'){
             $report_data['department_id'] = "";
@@ -1230,21 +1099,21 @@ class LeaveController extends Controller
         //print_r($report_data);die;
 
         $data = DB::table('applied_leaves as al')
-                ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
-                ->join('employee_profiles as emp','emp.user_id','=','al.user_id')
-                ->join('users as u','al.user_id','=','u.id')
-                ->join('employees as e','al.user_id','=','e.user_id')
-                ->join('project_user as pu','pu.user_id','=','al.user_id')
-                ->where(['al.final_status'=>'1'])
-                ->where('als.from_date','>=',$from_date)
-                ->where('als.to_date','<=',$to_date)
-                ->where('pu.project_id',$report_data['project_sign'],$report_data['project_id'])
-                //->where('emp.location_id',$report_data['locationSign'],$report_data['locationId'])
-                ->where('emp.department_id',$report_data['department_sign'],$report_data['department_id'])
-                ->select("al.user_id","u.employee_code","e.fullname",DB::raw("SUM(als.paid_count) as paid_count,SUM(als.compensatory_count) as compensatory_count,SUM(als.unpaid_count) as unpaid_count, CASE WHEN e.profile_picture = '' OR e.profile_picture IS NULL THEN '".$static_pic."' ELSE CONCAT('".$profile_pic_path."',e.profile_picture) END AS profile_picture"))
-                ->groupBy("al.user_id")
-                ->orderBy("e.fullname")
-                ->get();
+            ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
+            ->join('employee_profiles as emp','emp.user_id','=','al.user_id')
+            ->join('users as u','al.user_id','=','u.id')
+            ->join('employees as e','al.user_id','=','e.user_id')
+            ->join('project_user as pu','pu.user_id','=','al.user_id')
+            ->where(['al.final_status'=>'1'])
+            ->where('als.from_date','>=',$from_date)
+            ->where('als.to_date','<=',$to_date)
+            ->where('pu.project_id',$report_data['project_sign'],$report_data['project_id'])
+            //->where('emp.location_id',$report_data['locationSign'],$report_data['locationId'])
+            ->where('emp.department_id',$report_data['department_sign'],$report_data['department_id'])
+            ->select("al.user_id","u.employee_code","e.fullname",DB::raw("SUM(als.paid_count) as paid_count,SUM(als.compensatory_count) as compensatory_count,SUM(als.unpaid_count) as unpaid_count, CASE WHEN e.profile_picture = '' OR e.profile_picture IS NULL THEN '".$static_pic."' ELSE CONCAT('".$profile_pic_path."',e.profile_picture) END AS profile_picture"))
+            ->groupBy("al.user_id")
+            ->orderBy("e.fullname")
+            ->get();
 
         return view('leaves.list_leave_report')->with(['report_data'=>$report_data,'data'=>$data]);
 
@@ -1256,29 +1125,181 @@ class LeaveController extends Controller
     function additionalLeaveReportInfo(Request $request)
     {
         $report_data =  [
-                            'from_date' => $request->from_date,
-                            'to_date' => $request->to_date,
-                            'user_id' => $request->id
-                        ];
+            'from_date' => $request->from_date,
+            'to_date' => $request->to_date,
+            'user_id' => $request->id
+        ];
 
         $from_date = date("Y-m-d",strtotime($report_data['from_date']));
         $to_date = date("Y-m-d",strtotime($report_data['to_date']));
 
         $data = DB::table('applied_leaves as al')
-                ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
-                ->where(['al.final_status'=>'1','al.user_id'=>$report_data['user_id']])
-                ->where('als.from_date','>=',$from_date)
-                ->where('als.to_date','<=',$to_date)
-                ->select("al.*","als.*")
-                ->orderBy("al.created_at","desc")
-                ->get();
+            ->join('applied_leave_segregations as als','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$report_data['user_id']])
+            ->where('als.from_date','>=',$from_date)
+            ->where('als.to_date','<=',$to_date)
+            ->select("al.*","als.*")
+            ->orderBy("al.created_at","desc")
+            ->get();
 
         $employee_data = User::where(['id'=>$request->id])
-                            ->with('employee')
-                            ->first();
+            ->with('employee')
+            ->first();
 
         return view('leaves.additional_leave_report_info')->with(['report_data'=>$report_data,'data'=>$data,'employee_data'=>$employee_data]);
 
     }//end of function
+
+    public function uploadLeavePool(Request $request)
+    {
+        $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
+
+        $count = 0;
+        if (count($data)) {
+            foreach ($data[0] as $key => $record) {
+//                if($key != 0) {
+                if($record['emp_code'] != ''){
+                    $user = User::where("employee_code", $record['emp_code'])->with('designation')->first();
+                    if(isset($user->designation[0])) {
+                        $designation = $user->designation[0]->id;
+                    }
+
+                    if (isset($user)) {
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '10')->first();
+                        if ($leaveDetail != '') {
+                            $count++;
+                            LeaveDetail::where('id', $leaveDetail->id)->update([
+                                'accumalated_casual_leave' => $record['accumulate_cl'],
+                                'accumalated_sick_leave' => $record['sick_leave'],
+                            ]);
+                        }else{
+                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+
+                            if($designation==4){    // for vccm
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+                                $balance_sick_leave = $record['sick_leave'];
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+                                $balance_sick_leave = $record['sick_leave'];
+
+                            }elseif ($designation==2){    // for SPO
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+                                $balance_sick_leave = $record['sick_leave'];
+                            }
+                            $approval_data = [
+                                'user_id' =>  $user->id,
+                                'month_info' => '2020-10-26',
+                                'accumalated_casual_leave' => $record['accumulate_cl'],
+                                'accumalated_sick_leave' => $record['sick_leave'],
+                                'balance_casual_leave' => $balance_casual_leave,
+                                'balance_sick_leave' => $record['sick_leave'],
+                                'balance_maternity_leave' => '180',
+                                'balance_paternity_leave' => '15',
+                                'unpaid_casual' => 0,
+                                'paid_casual' => 0,
+                                'unpaid_sick' => 0,
+                                'paid_sick' => 0,
+                                'compensatory_count' => 0,
+                                'isactive' => 1
+                            ];
+                            LeaveDetail::create($approval_data);
+                        }
+
+
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
+                        if ($leaveDetail != '') {
+                            if($designation==4){    // for vccm
+                                $accumlated_casual = $record['accumulate_cl'] + 1.5;
+                                $accumlated_sick = $record['sick_leave'];
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $accumlated_casual = $record['accumulate_cl'] + 2;
+                                $accumlated_sick = $record['sick_leave'];
+                            }elseif ($designation==2){    // for SPO
+                                $accumlated_casual = $record['accumulate_cl'];
+                                $accumlated_sick = $record['sick_leave'];
+                            }
+
+                            LeaveDetail::where('id', $leaveDetail->id)->update([
+                                'accumalated_casual_leave' => $accumlated_casual,
+                                'accumalated_sick_leave' => $accumlated_sick,
+                            ]);
+                        }else{
+                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+
+                            if($designation==4){    // for vccm
+                                $accumlated_casual = $record['accumulate_cl'] + 1.5;
+                                $accumlated_sick = $record['sick_leave'];
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $accumlated_casual = $record['accumulate_cl'] + 2;
+                                $accumlated_sick = $record['sick_leave'];
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
+
+                            }elseif ($designation==2){    // for SPO
+                                $accumlated_casual = $record['accumulate_cl'];
+                                $accumlated_sick = $record['sick_leave'];
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
+                            }
+                            $approval_data = [
+                                'user_id' =>  $user->id,
+                                'month_info' => '2020-11-26',
+                                'accumalated_casual_leave' => $accumlated_casual,
+                                'accumalated_sick_leave' => $accumlated_sick,
+                                'balance_casual_leave' => $balance_casual_leave,
+                                'balance_sick_leave' => $balance_sick_leave,
+                                'balance_maternity_leave' => '180',
+                                'balance_paternity_leave' => '15',
+                                'unpaid_casual' => 0,
+                                'paid_casual' => 0,
+                                'unpaid_sick' => 0,
+                                'paid_sick' => 0,
+                                'compensatory_count' => 0,
+                                'isactive' => 1
+                            ];
+                            LeaveDetail::create($approval_data);
+                        }
+                    }
+                }
+            }
+        }
+        return $count;
+    }
+
+    public function exportLeavePool(Request $request)
+    {
+        $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
+
+        $count = 0;
+        if (count($data)) {
+            foreach ($data[0] as $key => $record) {
+//                if($key != 0) {
+                if($record['emp_code'] != ''){
+                    $user = User::where("employee_code", $record['emp_code'])->with('employee')->first();
+
+                    if (isset($user)) {
+
+//                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '10')->first();
+//                        if(isset($leaveDetail)) {
+//                            $userLeavePool = ['name' => $user->employee['fullname'], 'emp_code' => $user->employee_code, 'accumulate_casual_leave' => $leaveDetail->accumalated_casual_leave, 'accumulate_sick_leave' => $leaveDetail->accumalated_sick_leave];
+//                            $leavePools[] = $userLeavePool;
+//                        }
+                        $users[] = $user->id;
+                    }
+                }
+            }
+        }
+//        $leaveDetail = DB::table('leave_details')
+//            ->join('employees', 'employees.user_id', '=', 'leave_details.user_id')
+//            ->whereIn('employees.user_id', $users)->whereYear('leave_details.month_info', '2020')
+//            ->whereMonth('leave_details.month_info', '11')
+//            ->select('employees.employee_id', 'employees.fullname', 'leave_details.accumalated_casual_leave', 'leave_details.accumalated_sick_leave')->get();
+
+        $export = new LeavePoolExport($users);
+        return \Maatwebsite\Excel\Facades\Excel::download($export, 'CG_oct_nov_leave_pool.xlsx');
+    }
+
 
 }//end of class

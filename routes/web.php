@@ -1,5 +1,20 @@
 <?php
+
+use App\LeaveDetail;
 use Illuminate\Http\Request;
+
+Route::get('leave-detail/upload', function () {
+    return view('leaves.upload');
+});
+Route::post('upload', 'LeaveController@uploadLeavePool');
+
+
+
+Route::get('leave-detail/export', function () {
+    return view('leaves.export');
+});
+Route::post('export', 'LeaveController@exportLeavePool');
+
 
 Route::get('local-claim-form', function () {
     return view('travel.local_claim_form');

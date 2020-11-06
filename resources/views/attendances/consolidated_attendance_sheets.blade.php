@@ -231,8 +231,8 @@ strong {
                                 <td title="view calendar">{{@$value->fullname}}</td>
                 								<td title="view calendar">{{@$value->state_name}}</td>
                 								<td title="view calendar">{{@$value->verification}}</td>
-                                <td>{{$value->paid_leaves->paid_count ?? '0'}}</td>
-                                <td><strong>{{$value->unpaid_leaves->unpaid_count ?? '0'}}</strong></td>
+                                <td>{{$value->paid_leaves ?? '0'}}</td>
+                                <td><strong>{{$value->unpaid_leaves ?? '0'}}</strong></td>
 
 
                                 <td>

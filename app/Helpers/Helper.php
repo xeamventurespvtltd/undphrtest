@@ -146,11 +146,12 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
     // previous month entry set h...
 
     if(isset($leave_status_prev) && !empty($leave_status_prev)){
-
+// dd('IF Date of Joining not in current month');
         // IF Date of Joining not in current month
         //if no leaves in current month..
         if(!$leave_status_current_month){
             $count = $leave_status_prev->count();
+            // dd($count);
 
             if($designation==4){    // for vccm
 
@@ -172,7 +173,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 $accumlated_casual = $prev_accumlated_casual;
                 $prev_accumlated_sick = $leave_status_prev->accumalated_sick_leave;
                 $accumlated_sick = $prev_accumlated_sick;
-
             }
 
             $prev_balance_casual_leave = $leave_status_prev->balance_casual_leave;
@@ -291,6 +291,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     //pai casual
                     $paid_casual = $applied_leave->number_of_days - $unpaid_casual;
                 }
+                saveLeaveSegration($applied_leave,  $paid_casual, $unpaid_casual);
 
             }elseif($applied_leave->leave_type_id==2){ //sick leave
                 $remain_sick = $accumlated_sick_after - $applied_leave->number_of_days;
@@ -306,6 +307,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     $unpaid_sick = abs($remain_sick);
                     $paid_sick = $applied_leave->number_of_days - $unpaid_sick;
                 }
+                saveLeaveSegration($applied_leave,  $paid_sick, $unpaid_sick);
             }elseif($applied_leave->leave_type_id==4){ //maternity leave
                 $balance_maternity = 0;
             }elseif($applied_leave->leave_type_id==7){ //Paternity leave
@@ -336,7 +338,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
         }else{
             //if leave detail has entry for current month
-            // dd("current month");
+//             dd("current month");
 
             // if current month Case:
 
@@ -373,7 +375,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             //For casual leave
 
             if($applied_leave->leave_type_id==1){
-
                 // In Casual Condition 	Accumulated Sick are not Changed
                 $current_accumlated_sick = $leave_status_after->accumalated_sick_leave;
                 $accumlated_sick= $current_accumlated_sick;
@@ -383,12 +384,14 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 // Chk Remaining Accumulated Casual Leaves
                 $remain_accumulate_casual = $accumlated_casual - $applied_leave->number_of_days;
 
+
                 // when remaining accumulated casula greater than equals to zero
                 if($remain_accumulate_casual>=0){
 
                     // chk paid casual
                     $paid_casual = $paid_casual + $applied_leave->number_of_days;
-
+                    $paid_count  = $applied_leave->number_of_days;
+                    $unpaid_count = 0;
                     // chk Unpaid casual
                     $unpaid_casual = $unpaid_casual;
 
@@ -403,12 +406,14 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     // In that Case accumlated_casual leaves 0
                     //$accumlated_casual = 0;
 
-                    $accumlated_casual = 0;
+
 
                     // Unpaid casual
                     $unpaid_casual_now = abs($remain_accumulate_casual);
                     $unpaid_casual = $unpaid_casual + $unpaid_casual_now;
-
+                    $paid_count  = $accumlated_casual;
+                    $unpaid_count = $unpaid_casual_now;
+                    $accumlated_casual = 0;
                     // Paid Casual not changed
                     //$paid_casual = $paid_casual;
 
@@ -432,6 +437,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     }
 
                 }
+                saveLeaveSegration($applied_leave,  $paid_count, $unpaid_count);
 
             }elseif($applied_leave->leave_type_id==2){ // For Sick Leave Condition
 
@@ -495,6 +501,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     */
 
                 }
+                saveLeaveSegration($applied_leave,  $paid_sick, $unpaid_sick);
             }elseif($applied_leave->leave_type_id==4){
 
                 // Balance Maternity Leave
@@ -530,8 +537,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
         }
     }else{
 
-        //dd("In that conition goes when employee Join in Current month");
-
         // get Current Month Info..
 
         if(isset($leave_status_current_month) ){
@@ -540,7 +545,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 ->whereMonth('month_info',$current_month)  //works with to_date as well
                 ->first();
 
-            //dd($leave_status);
+            dd($leave_status);
 
             $id_to_update = $leave_status->id;
 
@@ -608,6 +613,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     }
 
                 }
+                saveLeaveSegration($applied_leave,  $paid_casual, $unpaid_casual);
 
             }elseif($applied_leave->leave_type_id==2){ //  Leave Type Sick
 
@@ -643,6 +649,8 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     $paid_sick = $paid_sick + $paid_sick_now;
                 }
 
+                saveLeaveSegration($applied_leave,  $paid_sick, $unpaid_sick);
+
             }elseif($applied_leave->leave_type_id==4){ // For maternity Leave Type
                 $balance_maternity = $balance_maternity-$applied_leave->number_of_days;
             }elseif($applied_leave->leave_type_id==7){ // For paternity Leave Type
@@ -673,75 +681,63 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
         }
     }
 
-    /*
-
-        $today_date = date('d');
-        $today = date('d-m-Y');
-        $start_date;
-        $end_date;
-
-        if($today_date > 25){
-            $start_date = date('26-m-Y');
-            $end_date = date('d-m-Y', strtotime(date('Y-m')." +1 month"));
-        } else if($today_date < 26){
-            $start_date = date('26-m-Y', strtotime(date('Y-m')." -1 month"));
-            $end_date = date('25-m-Y');
-        }
-
-       $leave_status_final = LeaveDetail::where('user_id', $userId)
-                            ->whereBetween('month_info',[$start_date, $end_date])
-                            ->first();
-    */
 
     //if( isset($leave_status_current_month) ){
     $leave_status_final = LeaveDetail::where('user_id', $userId)
         ->whereMonth('month_info',$current_month)
         ->first();
 
-    $paid_count = $leave_status_final->paid_casual + $leave_status_final->paid_sick;
+    // $paid_count = $leave_status_final->paid_casual + $leave_status_final->paid_sick;
 
-    $unpaid_count = $leave_status_final->unpaid_casual + $leave_status_final->unpaid_sick;
+    // $unpaid_count = $leave_status_final->unpaid_casual + $leave_status_final->unpaid_sick;
 
-    $compensatory_count = $leave_status_final->compensatory_count;
+    // $compensatory_count = $leave_status_final->compensatory_count;
 
-    $leaveSegregations = $applied_leave->appliedLeaveSegregations;
+// return $applied_leave->leave_type_id;
 
-    foreach($leaveSegregations as $key => $leaveSegregation){
-//        return $key;
-//        if($key != 0) {
-        $leaveRequire = $leaveSegregation->number_of_days;
-        $remainingLeave = $leaveRequire;
-        $compensatoryLeaveUse = 0;
-        $paidLeaveUse = 0;
-        if($paid_count > 0) {
-            if ($leaveRequire <= $paid_count) {
-                $paidLeaveUse = $paid_count - $leaveRequire;
-                $remainingLeave = 0;
-            } elseif ($paid_count < $leaveRequire) {
-                $paidLeaveUse = $paid_count;
-                $remainingLeave = $leaveRequire - $paid_count;
-            }
-        }
-
-        $unpaidLeave = $remainingLeave;
-
-//            return $paidLeaveUse.'-compensatory'.$compensatoryLeaveUse.'-Unpaid'.$unpaidLeave;
-        \App\AppliedLeaveSegregation::where('id', $leaveSegregation->id)->update([
-            'paid_count' => $paidLeaveUse,
-            'unpaid_count' => $unpaidLeave,
-            'compensatory_count' => 0
-        ]);
-//        }
-    }
-//    return $applied_leave->appliedLeaveSegregations;
-
-//    $update_leave_data = [
-//        'paid_count' => $paid_count,
-//        'unpaid_count' => $unpaid_count,
-//        'compensatory_count' => $compensatory_count
-//    ];
-//    $applied_leave->appliedLeaveSegregations()->update($update_leave_data);
     //}
+}
+
+function saveLeaveSegration($applied_leave, $paid_count, $unpaid_count){
+    $leaveSegregations = $applied_leave->appliedLeaveSegregations;
+    if(count($leaveSegregations) > 1) {
+        foreach ($leaveSegregations as $key => $leaveSegregation) {
+            // if($key != 0){
+            $leaveRequire = $leaveSegregation->number_of_days;
+            $remainingLeave = $leaveRequire;
+            $compensatoryLeaveUse = 0;
+            $paidLeaveUse = 0;
+            // return $paid_count;
+            if ($paid_count > 0) {
+                if ($leaveRequire <= $paid_count) {
+                    $paidLeaveUse = $leaveRequire;
+                    $remainingLeave = 0;
+                    $paid_count = $paid_count - $leaveRequire;
+                } elseif ($paid_count < $leaveRequire) {
+                    $paidLeaveUse = $paid_count;
+                    $remainingLeave = $leaveRequire - $paid_count;
+                    $paid_count = 0;
+                }
+            }
+
+// return $paidLeaveUse;
+            $unpaidLeave = $remainingLeave;
+
+            \App\AppliedLeaveSegregation::where('id', $leaveSegregation->id)->update([
+                'paid_count' => $paidLeaveUse,
+                'unpaid_count' => $unpaidLeave,
+                'compensatory_count' => 0
+            ]);
+            // }
+        }
+    }else {
+        $update_leave_data = [
+            'paid_count' => $paid_count,
+            'unpaid_count' => $unpaid_count,
+            'compensatory_count' => 0
+        ];
+        $applied_leave->appliedLeaveSegregations()->update($update_leave_data);
+    }
 }
 
 function probationCalculations($user)

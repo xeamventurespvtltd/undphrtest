@@ -658,7 +658,7 @@ class UserController extends Controller
     */
     function list(Request $request)
     {
-    	return $user = Auth::user();
+    	$user = Auth::user();
 
     	if(empty($request->project_id)){
             $req['project_id'] = 1;

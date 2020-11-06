@@ -63,15 +63,15 @@ class AttendanceController extends Controller
         $username = $user->employee->fullname;
 
         $attendance = $user->attendances()
-                           ->where(['on_date' => $date])
-                           ->with(['attendancePunches'=>function($query){
-                                $query->where('type','!=','NA');
-                            }])
-                           ->first();
+            ->where(['on_date' => $date])
+            ->with(['attendancePunches'=>function($query){
+                $query->where('type','!=','NA');
+            }])
+            ->first();
 
         $attendance_locations = $user->attendanceLocations()
-                                    ->whereDate('created_at',$date)
-                                    ->get();
+            ->whereDate('created_at',$date)
+            ->get();
 
         return view('attendances.view_map')->with(['attendance'=>$attendance,'attendance_locations'=>$attendance_locations,'date' => $date,'username'=>$username]);
     }
@@ -83,17 +83,17 @@ class AttendanceController extends Controller
     {
         $date = date("Y-m-d",strtotime('2019-12-27'));
         $applied_leaves = AppliedLeave::where('from_date',$date)
-                                        ->where('to_date',$date)
-                                        ->whereDate('created_at',$date)
-                                        ->where(['final_status'=>'1','isactive'=>1])
-                                        ->whereHas('appliedLeaveSegregations', function(Builder $query)use($date){
-                                            $query->where('from_date',$date)
-                                                  ->where('to_date',$date)
-                                                  ->whereDate('created_at',$date)
-                                                  ->where('unpaid_count','0');
-                                        })->with('appliedLeaveSegregations')
-                                          ->with('appliedLeaveApprovals')
-                                          ->get();
+            ->where('to_date',$date)
+            ->whereDate('created_at',$date)
+            ->where(['final_status'=>'1','isactive'=>1])
+            ->whereHas('appliedLeaveSegregations', function(Builder $query)use($date){
+                $query->where('from_date',$date)
+                    ->where('to_date',$date)
+                    ->whereDate('created_at',$date)
+                    ->where('unpaid_count','0');
+            })->with('appliedLeaveSegregations')
+            ->with('appliedLeaveApprovals')
+            ->get();
 
         //dd($applied_leaves);
 
@@ -121,22 +121,22 @@ class AttendanceController extends Controller
 
     function saveAttendancePunch(Request $request)  //Biometric
     {
-    	$user = User::where(['employee_code'=>$request->employee_code])->first();
-    	$on_date = date("Y-m-d",strtotime($request->on_date));
+        $user = User::where(['employee_code'=>$request->employee_code])->first();
+        $on_date = date("Y-m-d",strtotime($request->on_date));
 
-    	$attendance = $user->attendances()->where(['on_date'=>$on_date])->first();
+        $attendance = $user->attendances()->where(['on_date'=>$on_date])->first();
 
-    	if(empty($attendance)){
-    		$data = [
-    					'on_date' => $on_date,
-    					'status' => 'Present'
-    				];
+        if(empty($attendance)){
+            $data = [
+                'on_date' => $on_date,
+                'status' => 'Present'
+            ];
 
-    		$attendance = $user->attendances()->create($data);
-    	}
+            $attendance = $user->attendances()->create($data);
+        }
 
-    	$on_time = date("H:i:s",strtotime($request->on_time));
-    	$punch = $attendance->attendancePunches()->create(['on_time'=>$on_time]);
+        $on_time = date("H:i:s",strtotime($request->on_time));
+        $punch = $attendance->attendancePunches()->create(['on_time'=>$on_time]);
 
     }//end of function
 
@@ -151,45 +151,45 @@ class AttendanceController extends Controller
 
         $profile_filled =  $user_filled->is_complete;
 
-         if($profile_filled==0 AND $user->id!=1){
+        if($profile_filled==0 AND $user->id!=1){
 
-                return redirect('profile-detail-form');
-            }
+            return redirect('profile-detail-form');
+        }
         $user = User::where(['id'=>Auth::id()])
-    				->with('employee')
-    				->first();
+            ->with('employee')
+            ->first();
 
-		$user_designation_data = DB::table('designation_user as du')
+        $user_designation_data = DB::table('designation_user as du')
 
-							->where('du.user_id','=',$user->id)
+            ->where('du.user_id','=',$user->id)
 
-							->select('du.id', 'du.user_id','du.designation_id')->first();
-		 $user_designation = $user_designation_data->designation_id;
-		 $user->user_designation = $user_designation;
-		//$user->designation;
+            ->select('du.id', 'du.user_id','du.designation_id')->first();
+        $user_designation = $user_designation_data->designation_id;
+        $user->user_designation = $user_designation;
+        //$user->designation;
 
-		 $curr_year =  date('Y');
-		$curr_month = date('m');
+        $curr_year =  date('Y');
+        $curr_month = date('m');
 
-		if($curr_month==1){
-		$start_year= $curr_year-1;
-		$startmonth = 12;
-		}else{
-		$start_year= $curr_year;
-		$startmonth = $curr_month-1;
-		}
+        if($curr_month==1){
+            $start_year= $curr_year-1;
+            $startmonth = 12;
+        }else{
+            $start_year= $curr_year;
+            $startmonth = $curr_month-1;
+        }
 
-		$date1 = $curr_year.'-'.$curr_month.'-'.'25';
+        $date1 = $curr_year.'-'.$curr_month.'-'.'25';
         $on_date = date('Y-m-d',strtotime($date1));
-		$verification = $user->attendanceVerifications()
-                            ->where(['on_date'=>$on_date])
-                            ->first();
+        $verification = $user->attendanceVerifications()
+            ->where(['on_date'=>$on_date])
+            ->first();
 
         if(!empty($verification) && $verification->isverified == 1){
             $verify['isverified'] = 1;  //verified
         }else{
-			$verify['isverified'] = 0;  //not verified
-		}
+            $verify['isverified'] = 0;  //not verified
+        }
 
         $req['year'] = 0;
         $req['month'] = 0;
@@ -202,7 +202,7 @@ class AttendanceController extends Controller
             $req['year'] = $request->year;
         }
 
-    	return view('attendances.my_attendance')->with(['user'=>$user,'req'=>$req,'verify'=>$verify]);
+        return view('attendances.my_attendance')->with(['user'=>$user,'req'=>$req,'verify'=>$verify]);
 
     }//end of function
 
@@ -211,33 +211,33 @@ class AttendanceController extends Controller
     */
     function viewEmployeeAttendance(Request $request)
     {
-       $user = User::where(['id'=>$request->id])
-                    ->with('employee')
-                    ->with(['leaveAuthorities'=>function($query){
-                        $query->where('priority','2');
-                    }])
-                    ->first();
+        $user = User::where(['id'=>$request->id])
+            ->with('employee')
+            ->with(['leaveAuthorities'=>function($query){
+                $query->where('priority','2');
+            }])
+            ->first();
 
-		$user_designation_data = DB::table('designation_user as du')
-							->where('du.user_id','=',$user->id)
-							->select('du.id', 'du.user_id','du.designation_id')->first();
-		 $user_designation = $user_designation_data->designation_id;
-		 $user->user_designation = $user_designation;
-		 //return $user;
+        $user_designation_data = DB::table('designation_user as du')
 
+            ->where('du.user_id','=',$user->id)
 
+            ->select('du.id', 'du.user_id','du.designation_id')->first();
+        $user_designation = $user_designation_data->designation_id;
+        $user->user_designation = $user_designation;
+        //return $user;
 
 
         $req['year'] = 0;
         $req['month'] = 0;
 
         if($request->month==1){
-           $req['month'] = 12;
+            $req['month'] = 12;
         }else{
             // cooment by HK
-			 //$req['month'] = $request->month+1;
-              $req['month'] = $request->month;
-		}
+            //$req['month'] = $request->month+1;
+            $req['month'] = $request->month;
+        }
 
         if($request->year){
             $req['year'] = $request->year;
@@ -251,26 +251,24 @@ class AttendanceController extends Controller
         $on_date = date('Y-m-d',strtotime($on_date));
 
         $verification = $user->attendanceVerifications()
-                            ->where(['on_date'=>$on_date])
-                            ->first();
+            ->where(['on_date'=>$on_date])
+            ->first();
 
         if(!empty($verification) && $verification->isverified == 1){
             $verify['isverified'] = 1;  //verified
         }else{
-			$verify['isverified'] = 0;  //not verified
-		}
+            $verify['isverified'] = 0;  //not verified
+        }
 
-       /*  if(!$user->leaveAuthorities->isEmpty()){
-            if($user->leaveAuthorities[0]->manager_id == Auth::id()){
-                $verify['verifier'] = $user->leaveAuthorities[0]->manager_id;
-            }
-        } */
+        /*  if(!$user->leaveAuthorities->isEmpty()){
+             if($user->leaveAuthorities[0]->manager_id == Auth::id()){
+                 $verify['verifier'] = $user->leaveAuthorities[0]->manager_id;
+             }
+         } */
 
-		$verify['verifier'] = Auth::id();
+        $verify['verifier'] = Auth::id();
 
-		$leaveDetail = LeaveDetail::where('user_id', $request->id)->whereYear('month_info', $request->year)->whereMonth('month_info', $request->month)->first();
-
-        return view('attendances.view_attendance', compact('leaveDetail'))->with(['user'=>$user,'req'=>$req,'verify'=>$verify, 'on_date'=>$on_date]);
+        return view('attendances.view_attendance')->with(['user'=>$user,'req'=>$req,'verify'=>$verify, 'on_date'=>$on_date]);
 
     }//end of function
 
@@ -278,40 +276,41 @@ class AttendanceController extends Controller
      * For changing or creating the attendance status of a user of a day.
      * Used by employee having the view-attendance permission.
     */
-	function changeAttendancOffeStatus(Request $request)
+    function changeAttendancOffeStatus(Request $request)
     {
-		$user_id = Auth::id();
-		$on_date = date("Y-m-d");
-		 if($request->status=='Holiday'){
-				$status='Holiday';
-				$attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
+        $user_id = Auth::id();
+        $on_date = date("Y-m-d");
+        if($request->status=='Holiday'){
+            $status='Holiday';
+            $attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
 
-				if(!empty($attendance)){
-					$attendance->update(['status'=>$status]);
-				}else{
-					$attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
-				}
-			return redirect()->back()->withSuccess('Holiday added successfully.');
-			}
-			elseif($request->status=='Week-Off'){
-				$status='Week-Off';
-				$attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
-				if(!empty($attendance)){
-					$attendance->update(['status'=>$status]);
-				}else{
-					$attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
-				}
-				return redirect()->back()->withSuccess('Week-Off added successfully.');
-			}
+            if(!empty($attendance)){
+                $attendance->update(['status'=>$status]);
 
-	}
+            }else{
+                $attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
+            }
+            return redirect()->back()->withSuccess('Holiday added successfully.');
+        }
+        elseif($request->status=='Week-Off'){
+            $status='Week-Off';
+            $attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
+            if(!empty($attendance)){
+                $attendance->update(['status'=>$status]);
+            }else{
+                $attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
+            }
+            return redirect()->back()->withSuccess('Week-Off added successfully.');
+        }
+
+    }
 
     function changeAttendanceStatus(Request $request)
     {
 
-       // dd($request->all());
+        // dd($request->all());
 
-		$date = date("Y-m-d",strtotime($request->on_date));
+        $date = date("Y-m-d",strtotime($request->on_date));
         $attendance = Attendance::where(['user_id'=>$request->user_id,'on_date'=>$date])->first();
 
         if(!empty($attendance)){
@@ -346,9 +345,9 @@ class AttendanceController extends Controller
             foreach ($biometrics as $biometric) {
 
                 $user = User::whereHas('employee',function(Builder $query)use($biometric){
-                            $query->where('employee_id',$biometric->punchingcode)
-                                  ->where('isactive',1);
-                        })->first();
+                    $query->where('employee_id',$biometric->punchingcode)
+                        ->where('isactive',1);
+                })->first();
 
                 if(!empty($user)){
                     $attendance = $user->attendances()->where(['on_date'=>$biometric->date])->first();
@@ -368,25 +367,25 @@ class AttendanceController extends Controller
                         }
                     }else {
                         $holiday = Holiday::where('holiday_from','<=',$biometric->date)
-                                ->where('holiday_to','>=',$biometric->date)
-                                ->where('isactive',1)
-                                ->first();
+                            ->where('holiday_to','>=',$biometric->date)
+                            ->where('isactive',1)
+                            ->first();
 
                         if(!empty($holiday) && strtotime(date("Y-m-d H:i:s")) > strtotime($datetimeString)){
                             $attendance = $user->attendances()->create(['on_date'=>$biometric->date,'status'=>'Holiday']);
                         }else{
                             $leave = AppliedLeave::where('from_date','<=',$biometric->date)
-                                                ->where('to_date','>=',$biometric->date)
-                                                ->where(['final_status'=>'1','user_id'=>$user->id])
-                                                ->first();
+                                ->where('to_date','>=',$biometric->date)
+                                ->where(['final_status'=>'1','user_id'=>$user->id])
+                                ->first();
 
                             if(!empty($leave) && strtotime(date("Y-m-d H:i:s")) > strtotime($datetimeString)){
                                 $attendance = $user->attendances()->create(['on_date'=>$biometric->date,'status'=>'Leave']);
                             }else{
                                 $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
-                                                    ->where('date_from','<=',$biometric->date)
-                                                    ->where('date_to','>=',$biometric->date)
-                                                    ->first();
+                                    ->where('date_from','<=',$biometric->date)
+                                    ->where('date_to','>=',$biometric->date)
+                                    ->first();
 
                                 if(!empty($travel) && strtotime(date("Y-m-d H:i:s")) > strtotime($datetimeString)){
                                     $attendance = $user->attendances()->create(['on_date'=>$biometric->date,'status'=>'Travel']);
@@ -398,7 +397,7 @@ class AttendanceController extends Controller
 
                         if(!empty($attendance)){
                             $attendance_punch = $attendance->attendancePunches()
-                                                        ->create(['on_time'=>$datetime]);
+                                ->create(['on_time'=>$datetime]);
                             $biometric->ispunched = 1;
                             $biometric->save();
                         }
@@ -437,65 +436,65 @@ class AttendanceController extends Controller
             })->chunk(50, function($users)use($dates){
                 foreach ($users as $key => $user) {
                     foreach ($dates as $key => $date) {
-                            $attendance = $user->attendances()->where(['on_date'=>$date])->first();
+                        $attendance = $user->attendances()->where(['on_date'=>$date])->first();
 
-                            if(!empty($attendance)){
-                                if($attendance->status == 'Present' || $attendance->status == 'Absent'){
-                                    $leave = AppliedLeave::where('from_date','<=',$date)
-                                                        ->where('to_date','>=',$date)
-                                                        ->where(['final_status'=>'1','user_id'=>$user->id])
-                                                        ->first();
+                        if(!empty($attendance)){
+                            if($attendance->status == 'Present' || $attendance->status == 'Absent'){
+                                $leave = AppliedLeave::where('from_date','<=',$date)
+                                    ->where('to_date','>=',$date)
+                                    ->where(['final_status'=>'1','user_id'=>$user->id])
+                                    ->first();
 
-                                    if(!empty($leave) && ($leave->leave_type_id != 6) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                        $attendance->status = 'Leave';
-                                        $attendance->save();
-                                    }else{
-                                        $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
-                                                            ->where('date_from','<=',$date)
-                                                            ->where('date_to','>=',$date)
-                                                            ->first();
-
-                                        if(!empty($travel) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                            $attendance->status = 'Travel';
-                                            $attendance->save();
-                                        }
-                                    }
-                                }
-                            }else{
-                                $holiday = Holiday::where('holiday_from','<=',$date)
-                                                ->where('holiday_to','>=',$date)
-                                                ->where('isactive',1)
-                                                ->first();
-
-                                if(!empty($holiday) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                    $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Holiday']);
+                                if(!empty($leave) && ($leave->leave_type_id != 6) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                    $attendance->status = 'Leave';
+                                    $attendance->save();
                                 }else{
-                                    $leave = AppliedLeave::where('from_date','<=',$date)
-                                                        ->where('to_date','>=',$date)
-                                                        ->where(['final_status'=>'1','user_id'=>$user->id])
-                                                        ->first();
+                                    $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
+                                        ->where('date_from','<=',$date)
+                                        ->where('date_to','>=',$date)
+                                        ->first();
 
-                                    if(!empty($leave) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                        $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Leave']);
-                                    }else{
-                                        $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
-                                                            ->where('date_from','<=',$date)
-                                                            ->where('date_to','>=',$date)
-                                                            ->first();
-
-                                        if(!empty($travel) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                            $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Travel']);
-                                        }elseif(strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
-                                            if(date("l",strtotime($date)) == 'Sunday'){
-                                                $day_status = 'Week-Off';
-                                            }else{
-                                                $day_status = 'Absent';
-                                            }
-                                            $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>$day_status]);
-                                        }
+                                    if(!empty($travel) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                        $attendance->status = 'Travel';
+                                        $attendance->save();
                                     }
                                 }
                             }
+                        }else{
+                            $holiday = Holiday::where('holiday_from','<=',$date)
+                                ->where('holiday_to','>=',$date)
+                                ->where('isactive',1)
+                                ->first();
+
+                            if(!empty($holiday) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Holiday']);
+                            }else{
+                                $leave = AppliedLeave::where('from_date','<=',$date)
+                                    ->where('to_date','>=',$date)
+                                    ->where(['final_status'=>'1','user_id'=>$user->id])
+                                    ->first();
+
+                                if(!empty($leave) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                    $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Leave']);
+                                }else{
+                                    $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
+                                        ->where('date_from','<=',$date)
+                                        ->where('date_to','>=',$date)
+                                        ->first();
+
+                                    if(!empty($travel) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                        $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Travel']);
+                                    }elseif(strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
+                                        if(date("l",strtotime($date)) == 'Sunday'){
+                                            $day_status = 'Week-Off';
+                                        }else{
+                                            $day_status = 'Absent';
+                                        }
+                                        $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>$day_status]);
+                                    }
+                                }
+                            }
+                        }
 
                         $start_of_month = date("Y-m-01",strtotime($date));
 
@@ -506,8 +505,8 @@ class AttendanceController extends Controller
                         }
 
                         $verification = $user->attendanceVerifications()
-                                                ->where(['on_date'=>$start_of_month])
-                                                ->first();
+                            ->where(['on_date'=>$start_of_month])
+                            ->first();
 
                         if(empty($verification) && strtotime(date("Y-m-d h:i:s")) > strtotime($start_of_month)){
                             $verification = $user->attendanceVerifications()->create(['manager_id'=>$hod_id,'on_date'=>$start_of_month]);
@@ -624,9 +623,9 @@ class AttendanceController extends Controller
                     $date = $year.'-'.$month.'-'.'0'.$i;
                 }
                 $holiday = Holiday::where('holiday_from','<=',$date)
-                            ->where('holiday_to','>=',$date)
-                            ->where('isactive',1)
-                            ->first();
+                    ->where('holiday_to','>=',$date)
+                    ->where('isactive',1)
+                    ->first();
 
                 if(!empty($holiday) && date("l",strtotime($date)) != "Sunday"){
                     $holiday_counter += 1;
@@ -661,22 +660,22 @@ class AttendanceController extends Controller
                     $value->absent_days = ($value->absent_days < 0) ? 0 : $value->absent_days;
 
                     $travels = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$value->user_id])
-                                ->where(function($query)use($req,$value){
-                                    $query->orWhere(function($query)use($req,$value){
-                                                $query->whereYear('date_from',$req['year'])
-                                                    ->whereMonth('date_from',$req['month']);
-                                            })
-                                            ->orWhere(function($query)use($req,$value){
-                                                $query->whereYear('date_from',$req['year'])
-                                                    ->whereMonth('date_to',$req['month']);
-                                            })
-                                            ->orWhere(function($query)use($req,$value){
-                                                $query->whereYear('date_from',$req['year'])
-                                                    ->whereMonth('date_from','<',$req['month'])
-                                                    ->whereMonth('date_to','>',$req['month']);
-                                            });
-                                        })
-                                ->get();
+                        ->where(function($query)use($req,$value){
+                            $query->orWhere(function($query)use($req,$value){
+                                $query->whereYear('date_from',$req['year'])
+                                    ->whereMonth('date_from',$req['month']);
+                            })
+                                ->orWhere(function($query)use($req,$value){
+                                    $query->whereYear('date_from',$req['year'])
+                                        ->whereMonth('date_to',$req['month']);
+                                })
+                                ->orWhere(function($query)use($req,$value){
+                                    $query->whereYear('date_from',$req['year'])
+                                        ->whereMonth('date_from','<',$req['month'])
+                                        ->whereMonth('date_to','>',$req['month']);
+                                });
+                        })
+                        ->get();
 
                     if(!$travels->isEmpty()){
                         $value->travel_days = $this->calculateTotalTravelDuration($travels, $req);
@@ -685,22 +684,22 @@ class AttendanceController extends Controller
                     }
 
                     return $value->paid_leaves = DB::table('applied_leave_segregations as als')
-                            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
-                            ->where(function($query)use($req){
-                                $query->whereYear('als.to_date',$req['year'])
-                                    ->whereMonth('als.to_date',$req['month']);
-                            })
-                            ->sum('als.paid_count');
+                        ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+                        ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
+                        ->where(function($query)use($req){
+                            $query->whereYear('als.to_date',$req['year'])
+                                ->whereMonth('als.to_date',$req['month']);
+                        })
+                        ->sum('als.paid_count');
 
                     $value->unpaid_leaves = DB::table('applied_leave_segregations as als')
-                            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
-                            ->where(function($query)use($req){
-                                $query->whereYear('als.to_date',$req['year'])
-                                    ->whereMonth('als.to_date',$req['month']);
-                            })
-                            ->sum('als.unpaid_count');
+                        ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+                        ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
+                        ->where(function($query)use($req){
+                            $query->whereYear('als.to_date',$req['year'])
+                                ->whereMonth('als.to_date',$req['month']);
+                        })
+                        ->sum('als.unpaid_count');
 
                     $value->total = ($value->workdays+$value->holidays+$value->sundays) - ($value->absent_days + $value->unpaid_leaves);
                 }else{
@@ -736,22 +735,22 @@ class AttendanceController extends Controller
     */
     function consolidatedAttendanceSheets(Request $request)
     {
-        $user_with_no_designation=$has_no_designation=0;
+        $user_with_no_designation = $has_no_designation = 0;
 
 
-        $data['projects'] = Project::where(['isactive'=>1,'approval_status'=>'1'])->select('id','name')->get();
-        $data['departments'] = Department::where(['isactive'=>1])->select('id','name')->get();
+        $data['projects'] = Project::where(['isactive' => 1, 'approval_status' => '1'])->select('id', 'name')->get();
+        $data['departments'] = Department::where(['isactive' => 1])->select('id', 'name')->get();
         $user = Auth::user();
-		$userid = $user->id;
+        $userid = $user->id;
 
-		if(isset( $user->employeeProfile)){
-			$data['user_department'] = $user->employeeProfile->department_id;
-		}else{
-			$data['user_department'] = "";
-		}
+        if (isset($user->employeeProfile)) {
+            $data['user_department'] = $user->employeeProfile->department_id;
+        } else {
+            $data['user_department'] = "";
+        }
 
-		$req['emp_records'] = '!=';
-		$req['company_sign'] = '!=';
+        $req['emp_records'] = '!=';
+        $req['company_sign'] = '!=';
         $req['project'] = 0;
         $req['project_sign'] = '!=';
         $req['department'] = 0;
@@ -764,82 +763,82 @@ class AttendanceController extends Controller
         $req['employee_status'] = $request->employee_status;
         $req['attendance_type'] = 'All';
 
-		 if($request->emp_records){
+        if ($request->emp_records) {
             $req['emp_records'] = $request->emp_records;
         }
 
-        if($request->submit){
+        if ($request->submit) {
             $req['submit'] = $request->submit;
         }
 
 
-        if($request->project){
+        if ($request->project) {
             $req['project'] = $request->project;
             $req['project_sign'] = '=';
         }
 
         $department_name = 'All';
-        if($request->department){
+        if ($request->department) {
             $req['department'] = $request->department;
             $req['department_sign'] = '=';
-            $department_name = Department::where('id',$request->department)->value('name');
+            $department_name = Department::where('id', $request->department)->value('name');
         }
 
-        if($request->month){
+        if ($request->month) {
             $req['month'] = $request->month;
             $req['month_sign'] = '=';
         }
 
-        if($request->year){
+        if ($request->year) {
             $req['year'] = $request->year;
             $req['year_sign'] = '=';
         }
 
-        if(!empty($request->all())){
+        if (!empty($request->all())) {
 
-            $month_last_date = date("Y-m-t",strtotime($req['year'].'-'.$req['month'].'-01'));
+            $month_last_date = date("Y-m-t", strtotime($req['year'] . '-' . $req['month'] . '-01'));
             $employees = DB::table('projects as p')
-                ->join('project_user as pu','p.id','=','pu.project_id')
+                ->join('project_user as pu', 'p.id', '=', 'pu.project_id')
                 //->join('companies as c','c.id','p.company_id')
-                ->join('employee_profiles as ep','ep.user_id','=','pu.user_id')
-                ->join('employees as e','ep.user_id','=','e.user_id')
-                ->join('users as u','ep.user_id','=','u.id')
+                ->join('employee_profiles as ep', 'ep.user_id', '=', 'pu.user_id')
+                ->join('employees as e', 'ep.user_id', '=', 'e.user_id')
+                ->join('users as u', 'ep.user_id', '=', 'u.id')
                 //->join('departments as d','d.id','=','ep.department_id')
-                ->where('p.id',$req['project_sign'],$req['project'])
+                ->where('p.id', $req['project_sign'], $req['project'])
                 //->where('p.company_id',$req['company_sign'],$req['company'])
                 //->where('d.id',$req['department_sign'],$req['department'])
-                ->where('e.user_id','!=',1)
-                ->whereDate('e.joining_date','<=',$month_last_date)
-                ->where(['pu.isactive'=>1,'p.isactive'=>1,'p.approval_status'=>'1','e.approval_status'=>'1','e.isactive'=>(int)$req['employee_status']]);
+                ->where('e.user_id', '!=', 1)
+                ->whereDate('e.joining_date', '<=', $month_last_date)
+                ->where(['pu.isactive' => 1, 'p.isactive' => 1, 'p.approval_status' => '1', 'e.approval_status' => '1', 'e.isactive' => (int)$req['employee_status']]);
 
 
-            $employees = $employees->select('ep.user_id','e.fullname', 'e.employee_id','u.employee_code','e.joining_date', 'ep.state_id')->get();
-			//$employees = $employees->select('*')->get();
-        }else{
+            $employees = $employees->select('ep.user_id', 'e.fullname', 'e.employee_id', 'u.employee_code', 'e.joining_date', 'ep.state_id')->get();
+            //$employees = $employees->select('*')->get();
+        } else {
             $employees = collect();
         }
 
 
-        if(!empty($req['year'])){
+        if (!empty($req['year'])) {
             $year = $req['year'];
             $month = $req['month'];
 
-			if($month==1){
-				$date1_year= $year-1;
-				$prevmonth = 12;
-			}else{
-				$date1_year= $year;
-				$prevmonth = $month-1;
-			}
+            if ($month == 1) {
+                $date1_year = $year - 1;
+                $prevmonth = 12;
+            } else {
+                $date1_year = $year;
+                $prevmonth = $month - 1;
+            }
 
-			$date1 = $date1_year.'-'.$prevmonth.'-'.'26';
-			$date2 = $year.'-'.$month.'-'.'25';
+            $date1 = $date1_year . '-' . $prevmonth . '-' . '26';
+            $date2 = $year . '-' . $month . '-' . '25';
 
-			$diff = strtotime($date2) - strtotime($date1);
+            $diff = strtotime($date2) - strtotime($date1);
 
-			// 1 day = 24 hours
-			// 24 * 60 * 60 = 86400 seconds
-		 	$total_days = abs(round($diff / 86400));
+            // 1 day = 24 hours
+            // 24 * 60 * 60 = 86400 seconds
+            $total_days = abs(round($diff / 86400));
 
             $holiday_counter = 0;
             $sunday_counter = 0;
@@ -847,35 +846,33 @@ class AttendanceController extends Controller
             $sunday_array = [];
 
 
+            while (strtotime($date1) <= strtotime($date2)) {
 
+                $date1 = date("Y-m-d", strtotime("+1 days", strtotime($date1)));
 
-			while (strtotime($date1) <= strtotime($date2)) {
+                $holiday = Attendance::where('on_date', $date1)
+                    ->where('status', 'Holiday')
+                    ->first();
 
-				$date1 = date ("Y-m-d", strtotime("+1 days", strtotime($date1)));
-
-				$holiday = Attendance::where('on_date',$date1)
-                            ->where('status','Holiday')
-                            ->first();
-
-				if(!empty($holiday)){
+                if (!empty($holiday)) {
                     $holiday_counter += 1;
                     $holiday_array[] = $date1;
-                }else{
-					$Week_off = Attendance::where('on_date',$date1)
-                            ->where('status','Week-Off')
-                            ->first();
+                } else {
+                    $Week_off = Attendance::where('on_date', $date1)
+                        ->where('status', 'Week-Off')
+                        ->first();
 
-					if(!empty($Week_off)){
-						$sunday_counter += 1;
-						$sunday_array[] = $date1;
-					}
-				}
+                    if (!empty($Week_off)) {
+                        $sunday_counter += 1;
+                        $sunday_array[] = $date1;
+                    }
+                }
 
-			}
-			//exit;
+            }
+            //exit;
 
 
-             //$data['holidays'] = $holiday_counter;
+            //$data['holidays'] = $holiday_counter;
 
 
             //$data['sundays'] = $sunday_counter;
@@ -884,82 +881,86 @@ class AttendanceController extends Controller
 
             $data['department_name'] = $department_name;
 
-		//exit;
+            //exit;
 
         }
 
         $data['isverified'] = 1;
 
-        if(!$employees->isEmpty()){
+        if (!$employees->isEmpty()) {
             foreach ($employees as $key => $value) {
 
                 /*$attendance_result = AttendanceResult::where(['user_id'=>$value->user_id,'on_date'=>date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-'.'25'))])->first();*/
 
                 /*if(empty($attendance_result)){*/
-					//echo "if";
-                    $value->on_date = date("d/m/Y",strtotime($req['year'].'-'.$req['month'].'-'.'25'));
+                //echo "if";
+                $value->on_date = date("d/m/Y", strtotime($req['year'] . '-' . $req['month'] . '-' . '25'));
 
-				   //$value->holidays = effectiveHolidays($value->joining_date,$holiday_array);
-                    //$value->sundays = effectiveSundays($value->joining_date,$sunday_array);
-                    //$value->workdays = $data['workdays'];
+                //$value->holidays = effectiveHolidays($value->joining_date,$holiday_array);
+                //$value->sundays = effectiveSundays($value->joining_date,$sunday_array);
+                //$value->workdays = $data['workdays'];
 
-                    //$value->late = $this->calculateLateAttendance($value->user_id,$req['year'],$req['month']);
+                //$value->late = $this->calculateLateAttendance($value->user_id,$req['year'],$req['month']);
 
-                    //$value->absent_days = $this->calculateAbsentAttendance($value->user_id,$req['year'],$req['month']); // - ($value->holidays);
+                //$value->absent_days = $this->calculateAbsentAttendance($value->user_id,$req['year'],$req['month']); // - ($value->holidays);
 
-                    //$value->absent_days = ($value->workdays < $value->absent_days) ? $value->workdays : $value->absent_days;
+                //$value->absent_days = ($value->workdays < $value->absent_days) ? $value->workdays : $value->absent_days;
 
-                    //$value->absent_days = ($value->absent_days < 0) ? 0 : $value->absent_days;
+                //$value->absent_days = ($value->absent_days < 0) ? 0 : $value->absent_days;
 
 
-					if($req['month']==1) {
-						$start_year = $req['year']-1;
-						$last_month = 12;
-					} else {
-						$start_year = $req['year'];
-						$last_month = $req['month']-1;
-					}
+                if ($req['month'] == 1) {
+                    $start_year = $req['year'] - 1;
+                    $last_month = 12;
+                } else {
+                    $start_year = $req['year'];
+                    $last_month = $req['month'] - 1;
+                }
 
-					$state_data = State::where('id',$value->state_id)
-										->first();
+                $state_data = State::where('id', $value->state_id)
+                    ->first();
 
-                    if($state_data) {
-                        $value->state_name = $state_data->name;
-                    }
+                if ($state_data) {
+                    $value->state_name = $state_data->name;
+                }
 
-					//echo"<br/>";
-					$start_month = date("Y-m-d",strtotime($start_year.'-'.$last_month.'-26'));
-					//echo"<br/>";
-					$end_month = date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-25'));
+                //echo"<br/>";
+                $start_month = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
+                //echo"<br/>";
+                $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
 
-				 	$value->paid_leaves = DB::table('applied_leave_segregations as als')
-                            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
-                            ->where(function($query)use($start_month, $end_month){
-                                $query->where('als.to_date','>=',$start_month)
-									->where('als.to_date','<=',$end_month);
-                            })
-                            ->select('als.paid_count')
-                            ->orderBy('als.applied_leave_id', 'DESC')->limit(1)
-                            ->first();
 
-                    // ->sum('als.paid_count');
-                    //dd($value->paid_leaves);
+//                if($value->user_id == 517) {
 
-                    $value->unpaid_leaves = DB::table('applied_leave_segregations as als')
-                            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$value->user_id])
-                            ->where(function($query)use($start_month, $end_month){
-                                 $query->where('als.to_date','>=',$start_month)
-									->where('als.to_date','<=',$end_month);
-                            })
-                            ->select('als.unpaid_count')
-                            ->orderBy('als.applied_leave_id', 'DESC')
-                            ->limit(1)->first();
-                           // ->sum('als.unpaid_count');
+                $value->paid_leaves = DB::table('applied_leave_segregations as als')
+                    ->join('applied_leaves as al', 'al.id', '=', 'als.applied_leave_id')
+                    ->where(['al.final_status' => '1', 'al.user_id' => $value->user_id])
+                    ->where(function ($query) use ($start_month, $end_month) {
+                        $query->where('als.to_date', '>=', $start_month)
+                            ->where('als.to_date', '<=', $end_month);
+                    })
+                    ->select('als.paid_count')
+                    ->orderBy('als.applied_leave_id', 'DESC')
+                    ->sum('paid_count');
+//                }
 
-                    //$value->total = ($value->workdays+$value->holidays+$value->sundays) - ($value->absent_days + $value->unpaid_leaves);
-					$value->verification = "No";
+                // ->sum('als.paid_count');
+                //dd($value->paid_leaves);
+
+                $value->unpaid_leaves = DB::table('applied_leave_segregations as als')
+                    ->join('applied_leaves as al', 'al.id', '=', 'als.applied_leave_id')
+                    ->where(['al.final_status' => '1', 'al.user_id' => $value->user_id])
+                    ->where(function ($query) use ($start_month, $end_month) {
+                        $query->where('als.to_date', '>=', $start_month)
+                            ->where('als.to_date', '<=', $end_month);
+                    })
+                    ->select('als.unpaid_count')
+                    ->orderBy('als.applied_leave_id', 'DESC')->sum('unpaid_count');
+                // ->limit(1)->first();
+                // ->sum('als.unpaid_count');
+
+                //$value->total = ($value->workdays+$value->holidays+$value->sundays) - ($value->absent_days + $value->unpaid_leaves);
+                $value->verification = "No";
                 /*} else {
 					$state_data = State::where('id',$value->state_id)
 										->first();
@@ -977,587 +978,549 @@ class AttendanceController extends Controller
                     $value->total = $attendance_result->total_present_days;
                 }*/
 
-                $verification = AttendanceVerification::where(['on_date'=>date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-'.'25')),'user_id'=>$value->user_id])->first();
+                $verification = AttendanceVerification::where(['on_date' => date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-' . '25')), 'user_id' => $value->user_id])->first();
 
-                if(empty($verification) || $verification->isverified == 0){
+                if (empty($verification) || $verification->isverified == 0) {
                     //$data['isverified'] = 0;
                     $value->isverified = 0;
-					$value->verification = "No";
-                }else{
+                    $value->verification = "No";
+                } else {
                     $value->isverified = 1;
-					$value->verification = "Yes";
+                    $value->verification = "Yes";
                 }
             }
         }
-         //exit;
+        //exit;
+        $designation_login_data = DB::table('designation_user as du')
+            ->where('du.user_id', '=', $userid)
+            ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+        $designation_login_user = $designation_login_data->designation_id;
 
+
+        $token = 0;
+        $employees_po = array();
         //return $employees;
-		$designation_login_data = DB::table('designation_user as du')
+        foreach ($employees as $key => $value) {
 
-							->where('du.user_id','=',$userid)
-
-							->select('du.id', 'du.user_id','du.designation_id')->first();
-		$designation_login_user = $designation_login_data->designation_id;
-
+            $designation_user_data = DB::table('designation_user as du')
+                ->where('du.user_id', '=', $value->user_id)
+                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
 
 
-
-		$token = 0;
-		$employees_po = array();
-		//return $employees;
-		foreach($employees as $key=>$value){
-
-			$designation_user_data = DB::table('designation_user as du')
-
-								->where('du.user_id','=',$value->user_id)
-
-								->select('du.id', 'du.user_id','du.designation_id')->first();
-
-
-		   if($designation_user_data){
+            if ($designation_user_data) {
                 $designation_user = $designation_user_data->designation_id;
                 $employees[$key]->designation_id = $designation_user;
 
-			$district_listed_user = DB::table('location_user as lu')
-
-							->where('lu.user_id','=',$designation_user_data->user_id)
-
-							->select('lu.id', 'lu.user_id','lu.location_id')->first();
+                $district_listed_user = DB::table('location_user as lu')
+                    ->where('lu.user_id', '=', $designation_user_data->user_id)
+                    ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
             }
 
 
+            if (!empty($district_listed_user) and $district_listed_user->location_id) {
+                $listed_user_district_id = $district_listed_user->location_id;
+                $employees[$key]->district_id = $listed_user_district_id;
+            } else {
+                $employees[$key]->district_id = "";
+            }
 
 
+            $state_listed_user = EmployeeProfile::where(['user_id' => $value->user_id])
+                ->first();
 
+            $listed_user_state_id = $state_listed_user->state_id;
+            $employees[$key]->state_id = $listed_user_state_id;
+        }
 
+        //check for district if po
+        if ($designation_login_user == 5) {
+            $token = 5;
+            $district_login_user = DB::table('location_user as lu')
+                ->where('lu.user_id', '=', $designation_login_data->user_id)
+                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
 
-			if(!empty($district_listed_user) AND $district_listed_user->location_id){
-				$listed_user_district_id = $district_listed_user->location_id;
-				$employees[$key]->district_id = $listed_user_district_id;
-			}else{
-				$employees[$key]->district_id = "";
-			}
+            $login_user_district_id = array();
+            foreach ($district_login_user as $district) {
+                if (!empty($district) and $district->location_id) {
+                    $login_user_district_id[] = $district->location_id;
+                } else {
+                    $login_user_district_id[] = "";
+                }
 
+            }
+            if ($req['emp_records'] == "Self") {
+                $choose_desg_id = 5;
+            } else {
+                $choose_desg_id = 4;
+            }
+            $i = 0;
+            foreach ($employees as $employee) {
 
-			$state_listed_user = EmployeeProfile::where(['user_id' => $value->user_id])
-                                    ->first();
+                if (isset($employee->designation_id)) {
 
-			$listed_user_state_id = $state_listed_user->state_id;
-			$employees[$key]->state_id = $listed_user_state_id;
-		}
-
-		 //check for district if po
-		  if($designation_login_user==5){
-			$token=5;
-			$district_login_user = DB::table('location_user as lu')
-
-							->where('lu.user_id','=',$designation_login_data->user_id)
-
-							->select('lu.id', 'lu.user_id','lu.location_id')->get();
-
-			$login_user_district_id = array();
-			foreach($district_login_user as $district){
-				if(!empty($district) AND $district->location_id){
-					$login_user_district_id[] = $district->location_id;
-				}else{
-					$login_user_district_id[] ="";
-				}
-
-			}
-				if( $req['emp_records']=="Self"){
-					$choose_desg_id = 5;
-				}else{
-					$choose_desg_id = 4;
-				}
-		$i=0;
-				foreach($employees as $employee){
-
-					 if(isset($employee->designation_id) ){
-
-                        if($employee->designation_id==$choose_desg_id)
-                         {
-                             foreach($login_user_district_id as $district_id){
-                                if($employee->district_id==$district_id  ){
-                                     $employees_po[$i] = $employee;
-                                     $i++;
-                                     break;
-                                }
+                    if ($employee->designation_id == $choose_desg_id) {
+                        foreach ($login_user_district_id as $district_id) {
+                            if ($employee->district_id == $district_id) {
+                                $employees_po[$i] = $employee;
+                                $i++;
+                                break;
                             }
-                         }
-
-                     }else{
-                        //dd($employee);
-                        $user_with_no_designation = $employee->employee_id;
-                        $has_no_designation=1;
-                        break;
-                     }
-
-				}
-		}
-
-		 if($designation_login_user==3){
-
-			$token=3;
-			$district_login_user = DB::table('location_user as lu')
-
-							->where('lu.user_id','=',$designation_login_data->user_id)
-
-							->select('lu.id', 'lu.user_id','lu.location_id')->get();
-
-			$login_user_district_id = array();
-			foreach($district_login_user as $district){
-				if(!empty($district) AND $district->location_id){
-					$login_user_district_id[] = $district->location_id;
-				}else{
-					$login_user_district_id[] ="";
-				}
-			}
-
-			$i=0;
-			if( $req['emp_records']=="Self"){
-				$choose_desg_id = 3;
-			}else{
-				$choose_desg_id = 4;
-			}
-
-				foreach($employees as $employee){
-
-					 if($employee->designation_id==$choose_desg_id)
-					 {
-						 foreach($login_user_district_id as $district_id){
-							if($employee->district_id==$district_id  ){
-								 $employees_po[$i] = $employee;
-								 $i++;
-								 break;
-							}
-						}
-					 }
-				}
-		}
-
-
-		if($designation_login_user==4){
-			$token=4;
-			$employees_po=array();
-		}
-
-		if($designation_login_user==1){
-			$token++;
-			$i=0;
-
-			foreach($employees as $emp){
-			    if(isset($emp->designation_id) AND ($emp->designation_id!="")){
-
-
-			        if($emp->designation_id==2){ //spo
-					$empDesg_NPA = DB::table('designation_user as du')
-
-								->where('du.designation_id','=',1)
-
-								->select('du.id', 'du.user_id','du.designation_id')->first();
-
-					if($empDesg_NPA!=""){
-
-						$u_id = $empDesg_NPA->user_id;
-
-						$emp_data = Employee::where(['user_id' => $u_id])
-											->first();
-						$emp->reporting_head = $emp_data->fullname;
-
-						$user_data = User::where(['id' => $u_id])
-											->first();
-						$emp->reporting_head_uId = $user_data->employee_code;
-
-					}
-
-				 }
-
-				 	if($emp->designation_id==3){ //po-op
-
-					$User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
-									->first();
-
-					$user_state_id = $User_state->state_id;
-					$employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
-									->get();
-
-					foreach($employees_under_states as $employees_state){
-						$employeeId_under_state = $employees_state->user_id;
-						$empDesg_under_state = DB::table('designation_user as du')
-
-								->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
-
-								->select('du.id', 'du.user_id','du.designation_id')->first();
-
-
-								if($empDesg_under_state!=""){
-
-									$arr_underlaying_emp[] = $empDesg_under_state;
-
-									$u_id = $empDesg_under_state->user_id;
-
-									$emp_data = Employee::where(['user_id' => $u_id])
-												->first();
-									$emp->reporting_head = $emp_data->fullname;
-
-									$user_data = User::where(['id' => $u_id])
-												->first();
-									$emp->reporting_head_uId = $user_data->employee_code;
-								}
-					}
-
-				}
-
-						if($emp->designation_id==5){ //po-it
-
-					$User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
-									->first();
-
-					$user_state_id = $User_state->state_id;
-					$employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
-									->get();
-
-					foreach($employees_under_states as $employees_state){
-						$employeeId_under_state = $employees_state->user_id;
-						$empDesg_under_state = DB::table('designation_user as du')
-
-								->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
-
-								->select('du.id', 'du.user_id','du.designation_id')->first();
-
-
-								if($empDesg_under_state!=""){
-
-									//$arr_underlaying_emp[] = $empDesg_under_state;
-
-									$u_id = $empDesg_under_state->user_id;
-
-									$emp_data = Employee::where(['user_id' => $u_id])
-												->first();
-									$emp->reporting_head = $emp_data->fullname;
-
-									$user_data = User::where(['id' => $u_id])
-												->first();
-									$emp->reporting_head_uId = $user_data->employee_code;
-								}
-					}
-
-				}
-
-					if($emp->designation_id==4){ //vccm
-					$user_district = DB::table('location_user as lu')
-
-							->where('lu.user_id','=',$emp->user_id)
-
-							->select('lu.id', 'lu.user_id','lu.location_id')->first();
-					$user_district_id = $user_district->location_id;
-
-					if($user_district_id!=""){
-							$employeesDistrict = DB::table('location_user as lu')
-
-									->where(['lu.location_id'=>$user_district_id])
-
-									->select('lu.id', 'lu.user_id','lu.location_id')->get();
-					}
-
-
-				    if($employeesDistrict)
-					{
-						foreach($employeesDistrict as $empDistrict){
-							$user_id = $empDistrict->user_id;
-							$empDesg_under_district = DB::table('designation_user as du')
-
-													->where(['du.user_id'=>$user_id])
-													 ->where(function($query){
-														 $query->where('du.designation_id','=',5)
-															->orWhere('du.designation_id','=', 3);
-													})
-													->select('du.id', 'du.user_id','du.designation_id')->first();
-
-
-
-							if($empDesg_under_district!="")
-							{
-								$u_id = $empDesg_under_district->user_id;
-
-								$emp_data = Employee::where(['user_id' => $u_id])
-											->first();
-								$emp->reporting_head = $emp_data->fullname;
-
-								$user_data = User::where(['id' => $u_id])
-											->first();
-								$emp->reporting_head_uId = $user_data->employee_code;
-							}
-
-						}
-
-					}
-
-
-				}
-
-			}
-
-
-
-
-
-
-
-
-			}
-			$employees_po=$employees;
-
-		}
-
-
-		//check for state if spo
-		if($designation_login_user==2){
-
-
-			$token++;
-			$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
-
-			$login_user_state_id = $state_login_user->state_id;
-
-			$i=0;
-			if( $req['emp_records']=="Self"){
-
-               // dd("self");
-
-				foreach($employees as $employee){
-					if($employee->state_id==$login_user_state_id AND $employee->designation_id==2){
-						 if(!empty($employee)){
-							$employees_po[$i] = $employee;
-						}
-					}
-				$i++;
-				}
-
-			}else{
-
-                //dd("++++++++");
-
-				foreach($employees as $employee){
-
-					if($employee->state_id==$login_user_state_id AND ($employee->designation_id==3 OR $employee->designation_id==5)){
-						 if(!empty($employee)){
-							$employees_po[$i] = $employee;
-						}
-					}
-				$i++;
-				}
-			}
-
-
-		}
-
-
-         if($has_no_designation){
-            return redirect()->back()->with('error_msg', 'Employee Code - '.$user_with_no_designation.'. No designation found for some of your team members or your self.');
+                        }
+                    }
+
+                } else {
+                    //dd($employee);
+                    $user_with_no_designation = $employee->employee_id;
+                    $has_no_designation = 1;
+                    break;
+                }
+
+            }
+        }
+
+        if ($designation_login_user == 3) {
+
+            $token = 3;
+            $district_login_user = DB::table('location_user as lu')
+                ->where('lu.user_id', '=', $designation_login_data->user_id)
+                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+
+            $login_user_district_id = array();
+            foreach ($district_login_user as $district) {
+                if (!empty($district) and $district->location_id) {
+                    $login_user_district_id[] = $district->location_id;
+                } else {
+                    $login_user_district_id[] = "";
+                }
+            }
+
+            $i = 0;
+            if ($req['emp_records'] == "Self") {
+                $choose_desg_id = 3;
+            } else {
+                $choose_desg_id = 4;
+            }
+
+            foreach ($employees as $employee) {
+
+                if ($employee->designation_id == $choose_desg_id) {
+                    foreach ($login_user_district_id as $district_id) {
+                        if ($employee->district_id == $district_id) {
+                            $employees_po[$i] = $employee;
+                            $i++;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
 
-		if((!isset($employees_po) OR empty($employees_po)) AND $token==0){
-			$employees_po=$employees;
-		}
-		//return $employees_po;
-/* echo"<PRE>";
-		print_r($employees_po);
-		exit; */
+        if ($designation_login_user == 4) {
+            $token = 4;
+            $employees_po = array();
+        }
+
+        if ($designation_login_user == 1) {
+            $token++;
+            $i = 0;
+
+            foreach ($employees as $emp) {
+                if (isset($emp->designation_id) and ($emp->designation_id != "")) {
+
+
+                    if ($emp->designation_id == 2) { //spo
+                        $empDesg_NPA = DB::table('designation_user as du')
+                            ->where('du.designation_id', '=', 1)
+                            ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+                        if ($empDesg_NPA != "") {
+
+                            $u_id = $empDesg_NPA->user_id;
+
+                            $emp_data = Employee::where(['user_id' => $u_id])
+                                ->first();
+                            $emp->reporting_head = $emp_data->fullname;
+
+                            $user_data = User::where(['id' => $u_id])
+                                ->first();
+                            $emp->reporting_head_uId = $user_data->employee_code;
+
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 3) { //po-op
+
+                        $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                            ->first();
+
+                        $user_state_id = $User_state->state_id;
+                        $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                            ->get();
+
+                        foreach ($employees_under_states as $employees_state) {
+                            $employeeId_under_state = $employees_state->user_id;
+                            $empDesg_under_state = DB::table('designation_user as du')
+                                ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                            if ($empDesg_under_state != "") {
+
+                                $arr_underlaying_emp[] = $empDesg_under_state;
+
+                                $u_id = $empDesg_under_state->user_id;
+
+                                $emp_data = Employee::where(['user_id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head = $emp_data->fullname;
+
+                                $user_data = User::where(['id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head_uId = $user_data->employee_code;
+                            }
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 5) { //po-it
+
+                        $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                            ->first();
+
+                        $user_state_id = $User_state->state_id;
+                        $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                            ->get();
+
+                        foreach ($employees_under_states as $employees_state) {
+                            $employeeId_under_state = $employees_state->user_id;
+                            $empDesg_under_state = DB::table('designation_user as du')
+                                ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                            if ($empDesg_under_state != "") {
+
+                                //$arr_underlaying_emp[] = $empDesg_under_state;
+
+                                $u_id = $empDesg_under_state->user_id;
+
+                                $emp_data = Employee::where(['user_id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head = $emp_data->fullname;
+
+                                $user_data = User::where(['id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head_uId = $user_data->employee_code;
+                            }
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 4) { //vccm
+                        $user_district = DB::table('location_user as lu')
+                            ->where('lu.user_id', '=', $emp->user_id)
+                            ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
+                        $user_district_id = $user_district->location_id;
+
+                        if ($user_district_id != "") {
+                            $employeesDistrict = DB::table('location_user as lu')
+                                ->where(['lu.location_id' => $user_district_id])
+                                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+                        }
+
+
+                        if ($employeesDistrict) {
+                            foreach ($employeesDistrict as $empDistrict) {
+                                $user_id = $empDistrict->user_id;
+                                $empDesg_under_district = DB::table('designation_user as du')
+                                    ->where(['du.user_id' => $user_id])
+                                    ->where(function ($query) {
+                                        $query->where('du.designation_id', '=', 5)
+                                            ->orWhere('du.designation_id', '=', 3);
+                                    })
+                                    ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                                if ($empDesg_under_district != "") {
+                                    $u_id = $empDesg_under_district->user_id;
+
+                                    $emp_data = Employee::where(['user_id' => $u_id])
+                                        ->first();
+                                    $emp->reporting_head = $emp_data->fullname;
+
+                                    $user_data = User::where(['id' => $u_id])
+                                        ->first();
+                                    $emp->reporting_head_uId = $user_data->employee_code;
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+
+
+            }
+            $employees_po = $employees;
+
+        }
+
+
+        //check for state if spo
+        if ($designation_login_user == 2) {
+
+
+            $token++;
+            $state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+
+            $login_user_state_id = $state_login_user->state_id;
+
+            $i = 0;
+            if ($req['emp_records'] == "Self") {
+
+                // dd("self");
+
+                foreach ($employees as $employee) {
+                    if ($employee->state_id == $login_user_state_id and $employee->designation_id == 2) {
+                        if (!empty($employee)) {
+                            $employees_po[$i] = $employee;
+                        }
+                    }
+                    $i++;
+                }
+
+            } else {
+
+                //dd("++++++++");
+
+                foreach ($employees as $employee) {
+
+                    if ($employee->state_id == $login_user_state_id and ($employee->designation_id == 3 or $employee->designation_id == 5)) {
+                        if (!empty($employee)) {
+                            $employees_po[$i] = $employee;
+                        }
+                    }
+                    $i++;
+                }
+            }
+
+
+        }
+
+
+        if ($has_no_designation) {
+            return redirect()->back()->with('error_msg', 'Employee Code - ' . $user_with_no_designation . '. No designation found for some of your team members or your self.');
+        }
+
+
+        if ((!isset($employees_po) or empty($employees_po)) and $token == 0) {
+            $employees_po = $employees;
+        }
+        //return $employees_po;
+        /* echo"<PRE>";
+                print_r($employees_po);
+                exit; */
+//        if($value->user_id == 517) {
+//            return $data;
+//        }
         if($request->submit == 'Attendance sheet'){
 
-			$users = [];
-			$heading_array = array('S. no', 'Employee Name', 'Employee Code', 'Designation', 'State', 'Reporting head', 'Reporting head Employee Code', 'Verified', 'Month');
+            $users = [];
+            $heading_array = array('S. no', 'Employee Name', 'Employee Code', 'Designation', 'State', 'Reporting head', 'Reporting head Employee Code', 'Verified', 'Month');
 
-			foreach($employees_po as $emp){
-				array_push($users,$emp->user_id);
-			}
+            foreach($employees_po as $emp){
+                array_push($users,$emp->user_id);
+            }
 
-			$data = [];
+            $data = [];
 
-			$key=0;
-			if($req['month']==1){
-				$start_year = $req['year']-1;
-				$last_month = 12;
-			}else{
-				$start_year = $req['year'];
-				$last_month = $req['month']-1;
-			}
+            $key=0;
+            if($req['month']==1){
+                $start_year = $req['year']-1;
+                $last_month = 12;
+            }else{
+                $start_year = $req['year'];
+                $last_month = $req['month']-1;
+            }
 
-			foreach($employees_po as $emp)
-			{
+            foreach($employees_po as $emp)
+            {
 
 
-				$user=$emp->user_id;
-				$start_date = date("Y-m-d",strtotime($start_year.'-'.$last_month.'-26'));
-				$end_month = date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-25'));
-				$punches = Attendance::where('user_id',$user)
-                            //->whereYear('on_date',$request->year)
-                            //->whereMonth('on_date',$request->month)
-							->where('on_date','>=',$start_month)
-							->where('on_date','<=',$end_month)
+                $user=$emp->user_id;
+                $start_date = date("Y-m-d",strtotime($start_year.'-'.$last_month.'-26'));
+                $end_month = date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-25'));
+                $punches = Attendance::where('user_id',$user)
+                    //->whereYear('on_date',$request->year)
+                    //->whereMonth('on_date',$request->month)
+                    ->where('on_date','>=',$start_month)
+                    ->where('on_date','<=',$end_month)
 
-                            ->with('user')
-                            ->with('user.employee')
-                            ->with('user.designation')
-                            ->orderBy('on_date','ASC')
-                            ->get();
+                    ->with('user')
+                    ->with('user.employee')
+                    ->with('user.designation')
+                    ->orderBy('on_date','ASC')
+                    ->get();
 
                 $data[$key]['#'] = $key+1;
 
-				// echo "<br/> key  $key";
-					$emp_data = Employee::where(['user_id'=>$user])->first();
-					$emp_profile_data = EmployeeProfile::where(['user_id'=>$user])->with('state')->first();
-					if(isset($emp_profile_data->state)){
-						$emp_state = $emp_profile_data->state->name;
-					}else{
-						$emp_state = "NULL";
-					}
+                // echo "<br/> key  $key";
+                $emp_data = Employee::where(['user_id'=>$user])->first();
+                $emp_profile_data = EmployeeProfile::where(['user_id'=>$user])->with('state')->first();
+                if(isset($emp_profile_data->state)){
+                    $emp_state = $emp_profile_data->state->name;
+                }else{
+                    $emp_state = "NULL";
+                }
 
 
 
-					$prev_month = date ("F", strtotime("-1 month", strtotime($end_month)));
+                $prev_month = date ("F", strtotime("-1 month", strtotime($end_month)));
 
-					$month = date('F', strtotime($end_month));
+                $month = date('F', strtotime($end_month));
 
 
-					$verified_data = AttendanceVerification::where(['user_id'=>$user])
-					                   ->whereYear('on_date', $req['year'])
-					                   ->whereMonth('on_date', $req['month'])
-					                    ->first();
-					if($verified_data){
-						$verified = $verified_data->isverified;
-						if($verified==1){
-							$verify_status = "Yes";
-						}else{
-							$verify_status = "No";
-						}
-					}else{
-						$verify_status = "No";
-					}
+                $verified_data = AttendanceVerification::where(['user_id'=>$user])
+                    ->whereYear('on_date', $req['year'])
+                    ->whereMonth('on_date', $req['month'])
+                    ->first();
+                if($verified_data){
+                    $verified = $verified_data->isverified;
+                    if($verified==1){
+                        $verify_status = "Yes";
+                    }else{
+                        $verify_status = "No";
+                    }
+                }else{
+                    $verify_status = "No";
+                }
 
-					// Get LoggedIn User Detailed...
+                // Get LoggedIn User Detailed...
 
-                    $logged_in_user = User::where(['id'=>Auth::id()])
+                $logged_in_user = User::where(['id'=>Auth::id()])
                     ->with('employee')
                     ->first();
 
-					$user_data = User::where(['id'=>$user])->with('designation')->first();
+                $user_data = User::where(['id'=>$user])->with('designation')->first();
 
-					$data[$key]['fullname'] = $emp_data->fullname;
-					$data[$key]['employee_code'] = $user_data->employee_code;
-					$data[$key]['designation'] = $user_data->designation[0]->name;
-					$data[$key]['State'] = $emp_state;
+                $data[$key]['fullname'] = $emp_data->fullname;
+                $data[$key]['employee_code'] = $user_data->employee_code;
+                $data[$key]['designation'] = $user_data->designation[0]->name;
+                $data[$key]['State'] = $emp_state;
 
-                    $data[$key]['Reporting head'] =     $logged_in_user->employee->fullname;
-                    $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
+                $data[$key]['Reporting head'] =     $logged_in_user->employee->fullname;
+                $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
 
-                    /*if(isset($emp->reporting_head) && isset($emp->reporting_head_uId)){
-						$data[$key]['Reporting head'] = 	$emp->reporting_head;
-						$data[$key]['Reporting head UId'] = $emp->reporting_head_uId;
-					}else{
+                /*if(isset($emp->reporting_head) && isset($emp->reporting_head_uId)){
+                    $data[$key]['Reporting head'] = 	$emp->reporting_head;
+                    $data[$key]['Reporting head UId'] = $emp->reporting_head_uId;
+                }else{
 
-						$data[$key]['Reporting head'] = 	"Not assigned";
-						$data[$key]['Reporting head UId'] = "Null";
-					}*/
+                    $data[$key]['Reporting head'] = 	"Not assigned";
+                    $data[$key]['Reporting head UId'] = "Null";
+                }*/
 
-					$data[$key]['Verified'] = $verify_status;
-					$data[$key]['Month'] = $prev_month."-".$month;
+                $data[$key]['Verified'] = $verify_status;
+                $data[$key]['Month'] = $prev_month."-".$month;
 
 
 
-				while (strtotime($start_date) <= strtotime($end_month)) {
-					$j = 1;
+                while (strtotime($start_date) <= strtotime($end_month)) {
+                    $j = 1;
 
-					$presentstatus=false;
+                    $presentstatus=false;
 
-					if(!$punches->isEmpty()){
+                    if(!$punches->isEmpty()){
 
-					foreach($punches as $punch){
-						if($punch->on_date){
-							if($start_date==date("Y-m-d",strtotime($punch->on_date))){
+                        foreach($punches as $punch){
+                            if($punch->on_date){
+                                if($start_date==date("Y-m-d",strtotime($punch->on_date))){
 
-								if($punch->status=="Present"){
+                                    if($punch->status=="Present"){
 
-									$data[$key][$start_date] = "P";
-									$presentstatus=true;
-									break;
-								}elseif($punch->status=="Holiday"){
-									$data[$key][$start_date] = "H";
-									$presentstatus=true;
-									break;
-								}elseif($punch->status=="Week-Off"){
-									$data[$key][$start_date] = "WO";
-									$presentstatus=true;
-									break;
-								}elseif($punch->status=="Leave"){
-									 $punch_date = $punch->on_date;
-									 $leaves = DB::table('applied_leaves as al')
-											->join('leave_types as lt','lt.id','=','al.leave_type_id')
-											->where(['al.user_id'=>$user])
-											->where(function($query)use($punch_date){
-												$query->where('al.from_date','>=',$punch_date)
-													->orWhere('al.to_date','<=',$punch_date);
-											})
-											->first();
-									//e$leaves->name;
-									if($leaves){
-										if($leaves->name=="Sick Leave"){
-											$data[$key][$start_date] = "SL";
-											$presentstatus=true;
-											break;
-										}elseif($leaves->name=="Casual Leave"){
-											$data[$key][$start_date] = "CL";
-											$presentstatus=true;
-											break;
-										}elseif($leaves->name=="Maternity Leave"){
-											$data[$key][$start_date] = "ML";
-											$presentstatus=true;
-											break;
-										}elseif($leaves->name=="Paternity Leave"){
-											$data[$key][$start_date] = "PL";
-											$presentstatus=true;
-											break;
-										}elseif($leaves->name=="Half Leave"){
-											$data[$key][$start_date] = "HL";
-											$presentstatus=true;
-											break;
-										}elseif($leaves->name=="Compensatory Leave"){
-                                            $data[$key][$start_date] = "CompL";
-                                            $presentstatus=true;
-                                            break;
+                                        $data[$key][$start_date] = "P";
+                                        $presentstatus=true;
+                                        break;
+                                    }elseif($punch->status=="Holiday"){
+                                        $data[$key][$start_date] = "H";
+                                        $presentstatus=true;
+                                        break;
+                                    }elseif($punch->status=="Week-Off"){
+                                        $data[$key][$start_date] = "WO";
+                                        $presentstatus=true;
+                                        break;
+                                    }elseif($punch->status=="Leave"){
+                                        $punch_date = $punch->on_date;
+                                        $leaves = DB::table('applied_leaves as al')
+                                            ->join('leave_types as lt','lt.id','=','al.leave_type_id')
+                                            ->where(['al.user_id'=>$user])
+                                            ->where(function($query)use($punch_date){
+                                                $query->where('al.from_date','>=',$punch_date)
+                                                    ->orWhere('al.to_date','<=',$punch_date);
+                                            })
+                                            ->first();
+                                        //e$leaves->name;
+                                        if($leaves){
+                                            if($leaves->name=="Sick Leave"){
+                                                $data[$key][$start_date] = "SL";
+                                                $presentstatus=true;
+                                                break;
+                                            }elseif($leaves->name=="Casual Leave"){
+                                                $data[$key][$start_date] = "CL";
+                                                $presentstatus=true;
+                                                break;
+                                            }elseif($leaves->name=="Maternity Leave"){
+                                                $data[$key][$start_date] = "ML";
+                                                $presentstatus=true;
+                                                break;
+                                            }elseif($leaves->name=="Paternity Leave"){
+                                                $data[$key][$start_date] = "PL";
+                                                $presentstatus=true;
+                                                break;
+                                            }elseif($leaves->name=="Half Leave"){
+                                                $data[$key][$start_date] = "HL";
+                                                $presentstatus=true;
+                                                break;
+                                            }elseif($leaves->name=="Compensatory Leave"){
+                                                $data[$key][$start_date] = "CompL";
+                                                $presentstatus=true;
+                                                break;
+                                            }
                                         }
-									}
-								}
-							}
-						}
+                                    }
+                                }
+                            }
 
-					$j++;
-					}
+                            $j++;
+                        }
 
-					}
-					if(!$presentstatus)
-					{
-						if($start_date<date("Y-m-d",strtotime($req['year'].'-04-01'))){
-							$data[$key][$start_date] = "NA";
-						}else{
-							$data[$key][$start_date] = "A";
-						}
+                    }
+                    if(!$presentstatus)
+                    {
+                        if($start_date<date("Y-m-d",strtotime($req['year'].'-04-01'))){
+                            $data[$key][$start_date] = "NA";
+                        }else{
+                            $data[$key][$start_date] = "A";
+                        }
 
-					}
-				if($key==0)
-				{
-					$start_date = date("d-m-Y",strtotime($start_date));
-					$start_date_heading = date("d",strtotime($start_date));
-					$heading_array[]= $start_date_heading;
-				}
+                    }
+                    if($key==0)
+                    {
+                        $start_date = date("d-m-Y",strtotime($start_date));
+                        $start_date_heading = date("d",strtotime($start_date));
+                        $heading_array[]= $start_date_heading;
+                    }
 
-				$start_date = date ("Y-m-d", strtotime("+1 day", strtotime($start_date)));
+                    $start_date = date ("Y-m-d", strtotime("+1 day", strtotime($start_date)));
 
-				}
+                }
 
-				 $key=$key+1;
+                $key=$key+1;
 
             }
 
@@ -1565,8 +1528,9 @@ class AttendanceController extends Controller
             $export = new AttendanceExport($data, $heading_array);
             return Excel::download($export, 'attendance-punch.xlsx');
 
-		}
+        }
 
+// 		return $req;
         return view('attendances.consolidated_attendance_sheets')->with(['data'=>$data,'employees'=>$employees_po,'req'=>$req, 'login_user'=>$userid]);
 
     }  //end of function
@@ -1579,14 +1543,14 @@ class AttendanceController extends Controller
         $users = [];
         array_push($users,$request->id);
         $punches = Attendance::whereIn('user_id',$users)
-                            ->whereYear('on_date',$request->year)
-                            ->whereMonth('on_date',$request->month)
-                            ->has('attendancePunches')
-                            ->with('user')
-                            ->with('user.employee')
-                            ->with('user.designation')
-                            ->orderBy('on_date','ASC')
-                            ->get();
+            ->whereYear('on_date',$request->year)
+            ->whereMonth('on_date',$request->month)
+            ->has('attendancePunches')
+            ->with('user')
+            ->with('user.employee')
+            ->with('user.designation')
+            ->orderBy('on_date','ASC')
+            ->get();
 
         $user = User::find($request->id);
         $data = [];
@@ -1594,7 +1558,7 @@ class AttendanceController extends Controller
         if(!$punches->isEmpty()){
             foreach ($punches as $key => $value) {
                 $value->attendance_punches = $value->attendancePunches()->orderBy('on_time','ASC')
-                                                                        ->get();
+                    ->get();
 
                 $data[$key]['#'] = $key+1;
                 $data[$key]['employee_code'] = $value->user->employee_code;
@@ -1656,17 +1620,17 @@ class AttendanceController extends Controller
     */
     function calculateAbsentAttendance($user_id,$year,$month)
     {
-		if($month ==1){
-		$year_val = $year-1;
-		$prevmonth = 12;
-		}else{
-			$year_val = $year;
-			$prevmonth = $month -1;
-		}
+        if($month ==1){
+            $year_val = $year-1;
+            $prevmonth = 12;
+        }else{
+            $year_val = $year;
+            $prevmonth = $month -1;
+        }
 
 
         $first_date = date("Y-m-d",strtotime($year_val.'-'.$prevmonth.'-'.'26'));
-		$end_date = date("Y-m-d",strtotime($year.'-'.$month.'-'.'25'));
+        $end_date = date("Y-m-d",strtotime($year.'-'.$month.'-'.'25'));
         //echo $month_end_date = date('Y-m-t', strtotime($first_date));
 
 
@@ -1675,30 +1639,30 @@ class AttendanceController extends Controller
         $absent_count = 0;
         // Iterate over the period
         foreach ($period as $date) {
-             $current_date = $date->format('Y-m-d');
+            $current_date = $date->format('Y-m-d');
 
 
             $attendance =  Attendance::where(['user_id'=>$user_id])
-                            ->where('on_date',$current_date)
-                            ->first();
+                ->where('on_date',$current_date)
+                ->first();
 
-							/* echo $user_id;
-							print_r ($attendance);
-							exit; */
+            /* echo $user_id;
+            print_r ($attendance);
+            exit; */
 
 
             if(empty($attendance)){
 
-				 $leave = DB::table('applied_leaves as al')
-                                ->where('al.from_date','<=',$current_date)
-                                ->where('al.to_date','>=',$current_date)
-                                ->where(['al.final_status'=>'1','al.user_id'=>$user_id])
-                                ->first();
+                $leave = DB::table('applied_leaves as al')
+                    ->where('al.from_date','<=',$current_date)
+                    ->where('al.to_date','>=',$current_date)
+                    ->where(['al.final_status'=>'1','al.user_id'=>$user_id])
+                    ->first();
 
 
-				if(empty($leave)){
-					$absent_count += 1;
-				}
+                if(empty($leave)){
+                    $absent_count += 1;
+                }
 
 
             }elseif($attendance->status == 'Absent') {
@@ -1716,12 +1680,12 @@ class AttendanceController extends Controller
     {
         $user = User::find($user_id);
         //$shift_from_time = date("Y-m-d")." ".$user->employeeProfile->shift->from_time;
-		$shift_from_time = date("Y-m-d")."09:30:00";
+        $shift_from_time = date("Y-m-d")."09:30:00";
         $attendances = Attendance::where(['user_id'=>$user_id])
-                                ->where('status','!=','Absent')
-                                ->whereYear('on_date',$year)
-                                ->whereMonth('on_date',$month)
-                                ->get();
+            ->where('status','!=','Absent')
+            ->whereYear('on_date',$year)
+            ->whereMonth('on_date',$month)
+            ->get();
         $late_count = 0;
 
         if(!$attendances->isEmpty()){
@@ -1731,21 +1695,21 @@ class AttendanceController extends Controller
                 $att_day = date('w', strtotime($att_date));
 
                 $exception_shift_info = ShiftException::where(['user_id'=>$user_id, 'week_day'=>$att_day])
-                ->first();
+                    ->first();
 
                 if($exception_shift_info){
 
                     $shift_id = $exception_shift_info['shift_id'];
 
                     $shift_details = Shift::where(['id'=>$shift_id])
-                                    ->first();
+                        ->first();
 
                     $shift_from_time = date("Y-m-d")." ".$shift_details['from_time'];
 
                 }else{
 
                     //$shift_from_time = date("Y-m-d")." ".$user->employeeProfile->shift->from_time;
-					$shift_from_time = date("Y-m-d")."09:30:00";
+                    $shift_from_time = date("Y-m-d")."09:30:00";
 
                 }
                 $punch = $attendance->attendancePunches()->orderBy('on_time','asc')->first();
@@ -1753,9 +1717,9 @@ class AttendanceController extends Controller
                 if(!empty($punch)){
                     if($attendance->status == 'Leave'){
                         $leave = AppliedLeave::where('from_date','<=',$attendance->on_date)
-                                ->where('to_date','>=',$attendance->on_date)
-                                ->where(['final_status'=>'1','user_id'=>$user_id])
-                                ->first();
+                            ->where('to_date','>=',$attendance->on_date)
+                            ->where(['final_status'=>'1','user_id'=>$user_id])
+                            ->first();
 
                         if(empty($leave)){
                             $attendance->status = 'Present';
@@ -1764,9 +1728,9 @@ class AttendanceController extends Controller
                     }
 
                     $holiday = Holiday::where('holiday_from','<=',$attendance->on_date)
-                           ->where('holiday_to','>=',$attendance->on_date)
-                           ->where('isactive',1)
-                           ->first();
+                        ->where('holiday_to','>=',$attendance->on_date)
+                        ->where('isactive',1)
+                        ->first();
 
                     if(strtotime(date("Y-m-d H:i",strtotime($punch->on_time))) > strtotime(date('Y-m-d H:i',strtotime($shift_from_time)))){
                         if($attendance->status == 'Leave' && $leave->secondary_leave_type == 'Half' && $leave->leave_half == 'First'){
@@ -1856,9 +1820,9 @@ class AttendanceController extends Controller
                 $date = $year.'-'.$month.'-'.'0'.$i;
             }
             $holiday = Holiday::where('holiday_from','<=',$date)
-                        ->where('holiday_to','>=',$date)
-                        ->where('isactive',1)
-                        ->first();
+                ->where('holiday_to','>=',$date)
+                ->where('isactive',1)
+                ->first();
 
             if(!empty($holiday) && date("l",strtotime($date)) != "Sunday"){
                 $holiday_counter += 1;
@@ -1883,22 +1847,22 @@ class AttendanceController extends Controller
         $data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
 
         $travels = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
-                        ->where(function($query)use($year,$month){
-                            $query->orWhere(function($query)use($year,$month){
-                                        $query->whereYear('date_from',$year)
-                                            ->whereMonth('date_from',$month);
-                                    })
-                                    ->orWhere(function($query)use($year,$month){
-                                        $query->whereYear('date_from',$year)
-                                            ->whereMonth('date_to',$month);
-                                    })
-                                    ->orWhere(function($query)use($year,$month){
-                                        $query->whereYear('date_from',$year)
-                                            ->whereMonth('date_from','<',$month)
-                                            ->whereMonth('date_to','>',$month);
-                                    });
-                                })
-                        ->get();
+            ->where(function($query)use($year,$month){
+                $query->orWhere(function($query)use($year,$month){
+                    $query->whereYear('date_from',$year)
+                        ->whereMonth('date_from',$month);
+                })
+                    ->orWhere(function($query)use($year,$month){
+                        $query->whereYear('date_from',$year)
+                            ->whereMonth('date_to',$month);
+                    })
+                    ->orWhere(function($query)use($year,$month){
+                        $query->whereYear('date_from',$year)
+                            ->whereMonth('date_from','<',$month)
+                            ->whereMonth('date_to','>',$month);
+                    });
+            })
+            ->get();
 
         $req['month'] = $month;
         $req['year'] = $year;
@@ -1911,22 +1875,22 @@ class AttendanceController extends Controller
 
 
         $data['paid_leaves'] = DB::table('applied_leave_segregations as als')
-                    ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                    ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
-                    ->where(function($query)use($req){
-                        $query->whereYear('als.to_date',$req['year'])
-                                ->whereMonth('als.to_date',$req['month']);
-                    })
-                    ->sum('als.paid_count');
+            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
+            ->where(function($query)use($req){
+                $query->whereYear('als.to_date',$req['year'])
+                    ->whereMonth('als.to_date',$req['month']);
+            })
+            ->sum('als.paid_count');
 
         $data['unpaid_leaves'] = DB::table('applied_leave_segregations as als')
-                    ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                    ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
-                    ->where(function($query)use($req){
-                        $query->whereYear('als.to_date',$req['year'])
-                                ->whereMonth('als.to_date',$req['month']);
-                    })
-                    ->sum('als.unpaid_count');
+            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
+            ->where(function($query)use($req){
+                $query->whereYear('als.to_date',$req['year'])
+                    ->whereMonth('als.to_date',$req['month']);
+            })
+            ->sum('als.unpaid_count');
 
         $data['total_present_days'] = ($data['workdays']+$data['holidays']+$data['week_offs']) - ($data['absent_days'] + $data['unpaid_leaves']);
         //$data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
@@ -1934,145 +1898,145 @@ class AttendanceController extends Controller
     }//end of function
 
 
-/*
-save in attendanceresult after verification
-*/
- function getAttendanceResult_info($user,$on_date, $total_days)
-{
-	//$total_days = (int)date("t",strtotime($on_date));
-	$split_date = explode("-",$on_date);
-	$year = $split_date[0];
-	$month = $split_date[1];
+    /*
+    save in attendanceresult after verification
+    */
+    function getAttendanceResult_info($user,$on_date, $total_days)
+    {
+        //$total_days = (int)date("t",strtotime($on_date));
+        $split_date = explode("-",$on_date);
+        $year = $split_date[0];
+        $month = $split_date[1];
 
-	$holiday_counter = 0;
-	$weekOff_counter = 0;
-	$leave_counter = 0;
-	$absent_counter = 0;
-	$present_counter = 0;
+        $holiday_counter = 0;
+        $weekOff_counter = 0;
+        $leave_counter = 0;
+        $absent_counter = 0;
+        $present_counter = 0;
 
-	$holiday_array = [];
-	$weekOff_array = [];
-	$leave_array = [];
-	$absent_array = [];
-	$present_array = [];
-	$data = [];
+        $holiday_array = [];
+        $weekOff_array = [];
+        $leave_array = [];
+        $absent_array = [];
+        $present_array = [];
+        $data = [];
 
-	$current_date = date('Y-m-d');
-	$curr_year =  date('Y');
-	$curr_month = date('m');
+        $current_date = date('Y-m-d');
+        $curr_year =  date('Y');
+        $curr_month = date('m');
 
-	if($curr_month==1){
-	$start_year= $curr_year-1;
-	$startmonth = 12;
-	}else{
-	$start_year= $curr_year;
-	$startmonth = $curr_month-1;
-	}
+        if($curr_month==1){
+            $start_year= $curr_year-1;
+            $startmonth = 12;
+        }else{
+            $start_year= $curr_year;
+            $startmonth = $curr_month-1;
+        }
 
-	$date1 = $start_year.'-'.$startmonth.'-'.'26';
-	$date2 = $curr_year.'-'.$curr_month.'-'.'25';
-	$dates_count=1;
-	while (strtotime($date1) <= strtotime($date2)) {
+        $date1 = $start_year.'-'.$startmonth.'-'.'26';
+        $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+        $dates_count=1;
+        while (strtotime($date1) <= strtotime($date2)) {
 
-		$present = Attendance::where('on_date',$date1)
-							->where('user_id',$user->id)
-                            ->where('status','Present')
-                            ->first();
+            $present = Attendance::where('on_date',$date1)
+                ->where('user_id',$user->id)
+                ->where('status','Present')
+                ->first();
 
-		if(!empty($present)){
-			$present_counter += 1;
-			$present_array[] = $date1;
-		}
-
-
-		$holiday = Attendance::where('on_date',$date1)
-							->where('user_id',$user->id)
-                            ->where('status','Holiday')
-                            ->first();
-
-		if(!empty($holiday)){
-			$holiday_counter += 1;
-			$holiday_array[] = $date1;
-		}
-
-		$Week_off = Attendance::where('on_date',$date1)
-					->where('user_id',$user->id)
-					->where('status','Week-Off')
-					->first();
-
-		if(!empty($Week_off)){
-			$weekOff_counter += 1;
-			$weekOff_array[] = $date1;
-		}
-
-		$leave = Attendance::where('on_date',$date1)
-					->where('user_id',$user->id)
-					->where('status','Leave')
-					->first();
-
-		if(!empty($leave)){
-			$leave_counter += 1;
-			$leave_array[] = $date1;
-		}
-
-		$absent = Attendance::where('on_date',$date1)
-					->where('user_id',$user->id)
-					->where('status','Absent')
-					->first();
-
-		if(!empty($absent)){
-			$absent_counter += 1;
-			$absent_array[] = $date1;
-		}
-
-		$date1 = date ("Y-m-d", strtotime("+1 days", strtotime($date1)));
-	}
+            if(!empty($present)){
+                $present_counter += 1;
+                $present_array[] = $date1;
+            }
 
 
+            $holiday = Attendance::where('on_date',$date1)
+                ->where('user_id',$user->id)
+                ->where('status','Holiday')
+                ->first();
 
-	$data['user_id'] = $user->id;
-	$data['department'] = $user->employeeProfile->department->name;
-	$data['employee_name'] = $user->employee->fullname;
-	$data['employee_code'] = $user->employee_code;
-	$data['on_date'] = $on_date;
-	$data['workdays'] = $total_days - ($weekOff_counter + $holiday_counter);
-	//$data['holidays'] = effectiveHolidays($user->employee->joining_date,$holiday_array);
-	$data['holidays'] = $holiday_counter;
-	//$data['week_offs'] = effectiveSundays($user->employee->joining_date,$sunday_array);
-	$data['week_offs'] = $weekOff_counter;
-	//$data['late'] = $this->calculateLateAttendance($user->id,$year,$month);
-	$data['late'] = 0;
-	//$data['absent_days'] = $this->calculateAbsentAttendance($user->id,$year,$month); // - ($holiday_counter);
-	$absent_days = ($data['workdays'] - $present_counter - $leave_counter );
-	$data['absent_days'] = $absent_days + $absent_counter;
-	$data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
+            if(!empty($holiday)){
+                $holiday_counter += 1;
+                $holiday_array[] = $date1;
+            }
 
-	$date1 = $start_year.'-'.$startmonth.'-'.'26';
-	$date2 = $curr_year.'-'.$curr_month.'-'.'25';
+            $Week_off = Attendance::where('on_date',$date1)
+                ->where('user_id',$user->id)
+                ->where('status','Week-Off')
+                ->first();
 
-	 $data['paid_leaves'] = DB::table('applied_leave_segregations as als')
-								->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
-							->where(function($query)use($date1, $date2){
-								 $query	->whereBetween('als.to_date', [$date1, $date2])
-									->orWhereBetween('als.from_date', [$date1, $date2]);
-							 })
-                            ->sum('als.paid_count');
+            if(!empty($Week_off)){
+                $weekOff_counter += 1;
+                $weekOff_array[] = $date1;
+            }
 
-    $data['unpaid_leaves'] = DB::table('applied_leave_segregations as als')
-								->join('applied_leaves as al','al.id','=','als.applied_leave_id')
-                            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
-							->where(function($query)use($date1, $date2){
-								 $query	->whereBetween('als.to_date', [$date1, $date2])
-									->orWhereBetween('als.from_date', [$date1, $date2]) ;
-							 })
-                            ->sum('als.unpaid_count');
+            $leave = Attendance::where('on_date',$date1)
+                ->where('user_id',$user->id)
+                ->where('status','Leave')
+                ->first();
+
+            if(!empty($leave)){
+                $leave_counter += 1;
+                $leave_array[] = $date1;
+            }
+
+            $absent = Attendance::where('on_date',$date1)
+                ->where('user_id',$user->id)
+                ->where('status','Absent')
+                ->first();
+
+            if(!empty($absent)){
+                $absent_counter += 1;
+                $absent_array[] = $date1;
+            }
+
+            $date1 = date ("Y-m-d", strtotime("+1 days", strtotime($date1)));
+        }
 
 
-	$data['total_present_days'] = ($data['workdays']+$data['holidays']+$data['week_offs']) - ($data['absent_days'] + $data['unpaid_leaves']);
-	//$data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
-	return $data;
-}
+
+        $data['user_id'] = $user->id;
+        $data['department'] = $user->employeeProfile->department->name;
+        $data['employee_name'] = $user->employee->fullname;
+        $data['employee_code'] = $user->employee_code;
+        $data['on_date'] = $on_date;
+        $data['workdays'] = $total_days - ($weekOff_counter + $holiday_counter);
+        //$data['holidays'] = effectiveHolidays($user->employee->joining_date,$holiday_array);
+        $data['holidays'] = $holiday_counter;
+        //$data['week_offs'] = effectiveSundays($user->employee->joining_date,$sunday_array);
+        $data['week_offs'] = $weekOff_counter;
+        //$data['late'] = $this->calculateLateAttendance($user->id,$year,$month);
+        $data['late'] = 0;
+        //$data['absent_days'] = $this->calculateAbsentAttendance($user->id,$year,$month); // - ($holiday_counter);
+        $absent_days = ($data['workdays'] - $present_counter - $leave_counter );
+        $data['absent_days'] = $absent_days + $absent_counter;
+        $data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
+
+        $date1 = $start_year.'-'.$startmonth.'-'.'26';
+        $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+
+        $data['paid_leaves'] = DB::table('applied_leave_segregations as als')
+            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
+            ->where(function($query)use($date1, $date2){
+                $query	->whereBetween('als.to_date', [$date1, $date2])
+                    ->orWhereBetween('als.from_date', [$date1, $date2]);
+            })
+            ->sum('als.paid_count');
+
+        $data['unpaid_leaves'] = DB::table('applied_leave_segregations as als')
+            ->join('applied_leaves as al','al.id','=','als.applied_leave_id')
+            ->where(['al.final_status'=>'1','al.user_id'=>$user->id])
+            ->where(function($query)use($date1, $date2){
+                $query	->whereBetween('als.to_date', [$date1, $date2])
+                    ->orWhereBetween('als.from_date', [$date1, $date2]) ;
+            })
+            ->sum('als.unpaid_count');
+
+
+        $data['total_present_days'] = ($data['workdays']+$data['holidays']+$data['week_offs']) - ($data['absent_days'] + $data['unpaid_leaves']);
+        //$data['absent_days'] = ($data['absent_days'] < 0) ? 0 : $data['absent_days'];
+        return $data;
+    }
 
 
 
@@ -2085,15 +2049,15 @@ save in attendanceresult after verification
 
         //dd($request->all());
 
-		//$on_date =  date("Y-m-d", strtotime( date( "Y-m-d", strtotime( $request->on_date ) ) . "+1 month" ) );
+        //$on_date =  date("Y-m-d", strtotime( date( "Y-m-d", strtotime( $request->on_date ) ) . "+1 month" ) );
 
         $on_date =  date("Y-m-d", strtotime( date( "Y-m-d", strtotime( $request->on_date ) )) );
         //dump($on_date);
 
         $user = User::where('id',$request->user_id)
-                ->with('employee')
-                ->with('employeeProfile')
-                ->first();
+            ->with('employee')
+            ->with('employeeProfile')
+            ->first();
 
         $user_id = $request->user_id;
 
@@ -2125,26 +2089,26 @@ save in attendanceresult after verification
         while (strtotime($date1) <= strtotime($date2)) {
 
             $attendance = $user->attendances()
-                        ->where(['on_date'=>$date1])
-                        ->has('attendancePunches')
-                        ->with('attendancePunches')
-                        ->first();
+                ->where(['on_date'=>$date1])
+                ->has('attendancePunches')
+                ->with('attendancePunches')
+                ->first();
 
             $onAttendanceHoliday = Attendance::where(['on_date'=> $date1,'user_id' =>$user_id])->where('status', 'Holiday')->first();
 
-			$attendance_status = $user->attendances()
-                        ->where(['on_date'=>$date1])
-                        ->first();
-                       // print_r('dumping attendance status');
-           // dump($attendance_status);
+            $attendance_status = $user->attendances()
+                ->where(['on_date'=>$date1])
+                ->first();
+            // print_r('dumping attendance status');
+            // dump($attendance_status);
 
             /*if($date1=='2020-10-02'){
                 echo "##############";
                 dump($onAttendanceHoliday);
             }*/
             if((is_null($attendance_status) || empty($attendance_status)) && date('D', strtotime($date1)) != 'Sun' && is_null($onAttendanceHoliday)){
-               $result['error'] = "Some days are missing with any of status for this month " . $date1;
-               return $result;
+                $result['error'] = "Some days are missing with any of status for this month " . $date1;
+                return $result;
             }
 
 
@@ -2155,21 +2119,21 @@ save in attendanceresult after verification
         }
 
         $verification = $user->attendanceVerifications()
-                ->where(['on_date'=>$on_date])
-                ->first();
+            ->where(['on_date'=>$on_date])
+            ->first();
 
-       // dd($verification);
+        // dd($verification);
 
         //if(empty($verification) && strtotime(date("Y-m-d")) ==strtotime($on_date)){ //do =
-          if(empty($verification)){
-             $verification_create = $user->attendanceVerifications()->create(['manager_id'=>$request->manager_id,'on_date'=>$on_date]);
+        if(empty($verification)){
+            $verification_create = $user->attendanceVerifications()->create(['manager_id'=>$request->manager_id,'on_date'=>$on_date]);
 
-             $verification_exist= $user->attendanceVerifications()->where(['on_date'=>$on_date])->first();
+            $verification_exist= $user->attendanceVerifications()->where(['on_date'=>$on_date])->first();
 
-             if($verification_exist){
+            if($verification_exist){
                 $verification_exist->isverified = 1;
                 $verification_exist->save();
-             }
+            }
 
             $result['error'] = "";
             $dates_count = $dates_count-1;
@@ -2192,8 +2156,8 @@ save in attendanceresult after verification
         $current_month = date("n");
 
         $leave_status_current= LeaveDetail::where('user_id', $user_id)
-                        ->whereMonth('month_info',$current_month)
-                        ->first();
+            ->whereMonth('month_info',$current_month)
+            ->first();
 
         if(!$leave_status_current){
 
@@ -2201,21 +2165,21 @@ save in attendanceresult after verification
                 ->whereMonth('month_info', $current_month-1)
                 ->first();
 
-           /* $accumlated_casual = $leave_status_prev->accumalated_casual_leave +2;
-            $accumlated_sick = $leave_status_prev->accumalated_sick_leave +1;
+            /* $accumlated_casual = $leave_status_prev->accumalated_casual_leave +2;
+             $accumlated_sick = $leave_status_prev->accumalated_sick_leave +1;
 
-            $balance_casual  = $leave_status_prev->balance_casual_leave - 2;
-            $balance_sick = $leave_status_prev->balance_sick_leave - 1;
+             $balance_casual  = $leave_status_prev->balance_casual_leave - 2;
+             $balance_sick = $leave_status_prev->balance_sick_leave - 1;
 
-            $balance_maternity = $leave_status_prev->balance_maternity_leave;
-            $balance_paternity = $leave_status_prev->balance_paternity_leave;
+             $balance_maternity = $leave_status_prev->balance_maternity_leave;
+             $balance_paternity = $leave_status_prev->balance_paternity_leave;
 
-            $unpaid_casual = $leave_status_prev->unpaid_casual;
-            $paid_casual = $leave_status_prev->paid_casual;
-            $unpaid_sick = $leave_status_prev->unpaid_sick;
-            $paid_sick = $leave_status_prev->paid_sick;
-            $compensatory_count = $leave_status_prev->compensatory_count;
-          */
+             $unpaid_casual = $leave_status_prev->unpaid_casual;
+             $paid_casual = $leave_status_prev->paid_casual;
+             $unpaid_sick = $leave_status_prev->unpaid_sick;
+             $paid_sick = $leave_status_prev->paid_sick;
+             $compensatory_count = $leave_status_prev->compensatory_count;
+           */
 
 
             if($get_user_designation->designation_id  == 4){
@@ -2240,21 +2204,21 @@ save in attendanceresult after verification
 
 
             $approval_data = [
-                                'user_id' => $user_id,
-                                'month_info' => $date2,
-                                'accumalated_casual_leave' => $accumlated_casual,
-                                'accumalated_sick_leave' => $accumlated_sick,
-                                'balance_casual_leave' => $balance_casual,
-                                'balance_sick_leave' => $balance_sick,
-                                'balance_maternity_leave' => $balance_maternity,
-                                'balance_paternity_leave' => $balance_paternity,
-                                'unpaid_casual' => $unpaid_casual,
-                                'paid_casual' => $paid_casual,
-                                'unpaid_sick' => $unpaid_sick,
-                                'paid_sick' => $paid_sick,
-                                'compensatory_count' => $compensatory_count,
-                                'isactive' => 1
-                                ];
+                'user_id' => $user_id,
+                'month_info' => $date2,
+                'accumalated_casual_leave' => $accumlated_casual,
+                'accumalated_sick_leave' => $accumlated_sick,
+                'balance_casual_leave' => $balance_casual,
+                'balance_sick_leave' => $balance_sick,
+                'balance_maternity_leave' => $balance_maternity,
+                'balance_paternity_leave' => $balance_paternity,
+                'unpaid_casual' => $unpaid_casual,
+                'paid_casual' => $paid_casual,
+                'unpaid_sick' => $unpaid_sick,
+                'paid_sick' => $paid_sick,
+                'compensatory_count' => $compensatory_count,
+                'isactive' => 1
+            ];
 
             LeaveDetail::create($approval_data);
             $result['error'] = "";
@@ -2265,7 +2229,7 @@ save in attendanceresult after verification
             $result['error'] = "You can verify current month's attendance only on month end last day.";
         }    */
 
-          return $result;
+        return $result;
     }
     /*
     * Apply the system generated late coming leave.
@@ -2358,9 +2322,9 @@ save in attendanceresult after verification
             foreach ($request->dates as $key => $date) {
                 $date = date("Y-m-d",strtotime($date));
                 $holiday = Holiday::where('holiday_from','<=',$date)
-                           ->where('holiday_to','>=',$date)
-                           ->where('isactive',1)
-                           ->first();
+                    ->where('holiday_to','>=',$date)
+                    ->where('isactive',1)
+                    ->first();
 
                 if(!empty($holiday)){
                     $result['error'] .= date("d/m/Y",strtotime($date))." is marked as a holiday.<br>";
@@ -2374,9 +2338,9 @@ save in attendanceresult after verification
                         $result['error'] .= date("d/m/Y",strtotime($date))." is marked as a leave day.<br>";
                     }else{
                         $travel = TravelApproval::where(['isactive'=>1,'status'=>'approved','user_id'=>$user->id])
-                                    ->where('date_from','<=',$date)
-                                    ->where('date_to','>=',$date)
-                                    ->first();
+                            ->where('date_from','<=',$date)
+                            ->where('date_to','>=',$date)
+                            ->first();
 
                         if(!empty($travel)){
                             $result['error'] .= date("d/m/Y",strtotime($date))." is marked as a travel day.<br>";
@@ -2428,10 +2392,10 @@ save in attendanceresult after verification
         $request_date = date('Y-m-d', strtotime($request->dates));
         $prev_two_days_date = date('Y-m-d', strtotime($current_date. ' - 2 days'));
 
-         if((strtotime($request_date) > strtotime($current_date)) || (strtotime($request_date)<strtotime($prev_two_days_date))){
+        if((strtotime($request_date) > strtotime($current_date)) || (strtotime($request_date)<strtotime($prev_two_days_date))){
 
-                $error = "You cannot request for an attendance change of dates before 2 days. ";
-                return redirect()->back()->with('error',$error);
+            $error = "You cannot request for an attendance change of dates before 2 days. ";
+            return redirect()->back()->with('error',$error);
 
         }
 
@@ -2445,10 +2409,10 @@ save in attendanceresult after verification
         $user = Auth::user();
         $hod = $user->leaveAuthorities()->where(['priority'=>'2','isactive'=>1])->first();
         $next_user = User::permission('it-attendance-approver')
-                                    ->whereHas('employeeProfile',function(Builder $query){
-                                        $query->where('department_id',2); //IT
-                                    })
-                                    ->first();
+            ->whereHas('employeeProfile',function(Builder $query){
+                $query->where('department_id',2); //IT
+            })
+            ->first();
 
         if(empty($hod)){
             $error = 'You do not have a HOD. Please contact the HR.';
@@ -2515,10 +2479,10 @@ save in attendanceresult after verification
         $user = Auth::user();
 
         $changes = $user->attendanceChanges()->where(['final_status'=>$status])
-                        ->with('attendanceChangeDates')
-                        ->with('attendanceChangeApprovals')
-                        ->orderBy('created_at','DESC')
-                        ->get();
+            ->with('attendanceChangeDates')
+            ->with('attendanceChangeApprovals')
+            ->orderBy('created_at','DESC')
+            ->get();
 
         if(!$changes->isEmpty()){
             foreach ($changes as $key => $change) {
@@ -2573,29 +2537,29 @@ save in attendanceresult after verification
 
         $user = Auth::user();
         $approvals = AttendanceChangeApproval::where(['manager_id'=>$user->id,'status'=>$status])
-                                ->whereHas('attendanceChange', function(Builder $query){
-                                    $query->where(['isactive'=>1]);
-                                })
-                                ->with('attendanceChange.attendanceChangeDates')
-                                ->with('user.employee')
-                                ->orderBy('created_at','DESC')
-                                ->get();
+            ->whereHas('attendanceChange', function(Builder $query){
+                $query->where(['isactive'=>1]);
+            })
+            ->with('attendanceChange.attendanceChangeDates')
+            ->with('user.employee')
+            ->orderBy('created_at','DESC')
+            ->get();
 
         if(!$approvals->isEmpty()){
             foreach ($approvals as $key => $approval) {
                 $user_id = $approval->user_id;
                 foreach ($approval->attendanceChange->attendanceChangeDates as $key2 => $value) {
                     $attendance = Attendance::where(['on_date'=>$value->on_date,'user_id'=>$user_id])
-                                ->first();
+                        ->first();
 
                     if(!empty($attendance) && !$attendance->attendancePunches->isEmpty()){
                         $value->first_punch = $attendance->attendancePunches()
-                                        ->orderBy('on_time','asc')
-                                        ->value('on_time');
+                            ->orderBy('on_time','asc')
+                            ->value('on_time');
 
                         $value->last_punch = $attendance->attendancePunches()
-                                        ->orderBy('on_time','desc')
-                                        ->value('on_time');
+                            ->orderBy('on_time','desc')
+                            ->value('on_time');
 
                         $value->first_punch = date("h:i A",strtotime($value->first_punch));
                         $value->last_punch = date("h:i A",strtotime($value->last_punch));
@@ -2629,10 +2593,10 @@ save in attendanceresult after verification
         ]);
         $session_message='';
         $attendance_change_approval = AttendanceChangeApproval::where('id',$request->acaId)
-                                                                ->with('attendanceChange')
-                                                                ->with('user')
-                                                                ->with('manager')
-                                                                ->first();
+            ->with('attendanceChange')
+            ->with('user')
+            ->with('manager')
+            ->first();
 
         $user = $attendance_change_approval->user;
         $attendance_change = $attendance_change_approval->attendanceChange;
@@ -2653,10 +2617,10 @@ save in attendanceresult after verification
         if($attendance_change_approval->priority == '1'){  //HOD
             if($request->status == '1'){
                 $next_user = User::permission('it-attendance-approver')
-                                ->whereHas('employeeProfile',function(Builder $query){
-                                    $query->where('department_id',2); //IT
-                                })
-                                ->first();
+                    ->whereHas('employeeProfile',function(Builder $query){
+                        $query->where('department_id',2); //IT
+                    })
+                    ->first();
 
                 if(!empty($next_user)){
                     $change_approval_data = [
@@ -2776,11 +2740,11 @@ save in attendanceresult after verification
     {
         $attendance_change = AttendanceChange::find($request->attendance_change_id);
         $messages = $attendance_change->messages()
-                                ->where('label','Change Attendance Comment')
-                                ->orderBy('created_at','DESC')
-                                ->with('sender.employee:id,user_id,fullname')
-                                ->with('receiver.employee:id,user_id,fullname')
-                                ->get();
+            ->where('label','Change Attendance Comment')
+            ->orderBy('created_at','DESC')
+            ->with('sender.employee:id,user_id,fullname')
+            ->with('receiver.employee:id,user_id,fullname')
+            ->get();
 
         $view = View::make('attendances.list_messages',['data' => $messages]);
         $contents = $view->render();
@@ -2789,42 +2753,44 @@ save in attendanceresult after verification
 
     }//end of function
 
-     /**********add leave and approve from calander by reporting manager***********/
+    /**********add leave and approve from calander by reporting manager***********/
 
 
     function addLeave(Request $request){
 
-       // dd($request->all());
+//         dd($request->all());
 
         $t_date = date("Y-m-d",strtotime($request->to_date));
 
         $userid = $request->user_id;
 
         $user = User::where(['id'=>$userid])
-                        ->with('employee')
-                        ->with('userManager')
-                        ->first();
+            ->with('employee')
+            ->with('userManager')
+            ->first();
 
         $arr_underlaying_emp = array();
 
         $designation_user_data = DB::table('designation_user as du')
 
-                                ->where('du.user_id','=',$userid)
+            ->where('du.user_id','=',$userid)
 
-                                ->select('du.id', 'du.user_id','du.designation_id')->first();
+            ->select('du.id', 'du.user_id','du.designation_id')->first();
 
         $designation_user = $designation_user_data->designation_id;
+
+
 
         //check for po reporting manager exist
         if($designation_user==3 ){
 
             $user_state = EmployeeProfile::where(['user_id' => $designation_user_data->user_id])
-                                    ->first();
+                ->first();
 
             $user_state_id = $user_state->state_id;
 
             $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
-                                    ->get();
+                ->get();
 
             foreach($employees_under_states as $employees_state){
 
@@ -2832,25 +2798,25 @@ save in attendanceresult after verification
 
                 $empDesg_under_state = DB::table('designation_user as du')
 
-                            ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+                    ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
 
-                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+                    ->select('du.id', 'du.user_id','du.designation_id')->first();
 
 
-                            if($empDesg_under_state!=""){
-                                $arr_underlaying_emp[] = $empDesg_under_state;
-                            }
+                if($empDesg_under_state!=""){
+                    $arr_underlaying_emp[] = $empDesg_under_state;
+                }
             }
         }
 
         //check for po-IT reporting manager exist
         if($designation_user==5 ){
             $user_state = EmployeeProfile::where(['user_id' => $designation_user_data->user_id])
-                                    ->first();
+                ->first();
 
             $user_state_id = $user_state->state_id;
             $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
-                                    ->get();
+                ->get();
 
             foreach($employees_under_states as $employees_state){
 
@@ -2858,15 +2824,15 @@ save in attendanceresult after verification
 
                 $empDesg_under_state = DB::table('designation_user as du')
 
-                            ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
+                    ->where(['du.user_id'=>$employeeId_under_state, 'du.designation_id'=>2])
 
-                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+                    ->select('du.id', 'du.user_id','du.designation_id')->first();
 
 
-                            if($empDesg_under_state!=""){
+                if($empDesg_under_state!=""){
 
-                                $arr_underlaying_emp[] = $empDesg_under_state;
-                            }
+                    $arr_underlaying_emp[] = $empDesg_under_state;
+                }
             }
         }
 
@@ -2875,17 +2841,17 @@ save in attendanceresult after verification
 
             $user_district = DB::table('location_user as lu')
 
-                            ->where('lu.user_id','=',$designation_user_data->user_id)
+                ->where('lu.user_id','=',$designation_user_data->user_id)
 
-                            ->select('lu.id', 'lu.user_id','lu.location_id')->first();
+                ->select('lu.id', 'lu.user_id','lu.location_id')->first();
 
             $user_district_id = $user_district->location_id;
 
             $employeesDistrict = DB::table('location_user as lu')
 
-                            ->where(['lu.location_id'=>$user_district_id])
+                ->where(['lu.location_id'=>$user_district_id])
 
-                            ->select('lu.id', 'lu.user_id','lu.location_id')->get();
+                ->select('lu.id', 'lu.user_id','lu.location_id')->get();
 
             if($employeesDistrict)
             {
@@ -2893,12 +2859,12 @@ save in attendanceresult after verification
                     $user_id = $empDistrict->user_id;
                     $empDesg_under_district = DB::table('designation_user as du')
 
-                                            ->where(['du.user_id'=>$user_id])
-                                             ->where(function($query){
-                                                 $query->where('du.designation_id','=',5)
-                                                    ->orWhere('du.designation_id','=', 3);
-                                            })
-                                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+                        ->where(['du.user_id'=>$user_id])
+                        ->where(function($query){
+                            $query->where('du.designation_id','=',5)
+                                ->orWhere('du.designation_id','=', 3);
+                        })
+                        ->select('du.id', 'du.user_id','du.designation_id')->first();
 
                     if($empDesg_under_district!="")
                     {
@@ -2917,31 +2883,34 @@ save in attendanceresult after verification
         if($designation_user==2){
 
 
-                $empDesg_NPA = DB::table('designation_user as du')
+            $empDesg_NPA = DB::table('designation_user as du')
 
-                            ->where('du.designation_id','=',1)
+                ->where('du.designation_id','=',1)
 
-                            ->select('du.id', 'du.user_id','du.designation_id')->first();
+                ->select('du.id', 'du.user_id','du.designation_id')->first();
 
-                            if($empDesg_NPA!=""){
-                                $arr_underlaying_emp[] = $empDesg_NPA;
-                            }
+            if($empDesg_NPA!=""){
+                $arr_underlaying_emp[] = $empDesg_NPA;
+            }
 
 
         }
+
+
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
 
         }else{
-            $manager_error = "You do not have reporting manger under Your area.";
 
-            return redirect()->back()->with('error',$manager_error);
+            $manager_error = "You do not have reporting manger under Your area.";
+//            return redirect()->back()->with('error',$manager_error);
         }
 
-         $check_dates =  [
-                                'from_date' => $request->on_date,
-                                'to_date' => $request->on_date,
-                                'isactive' => 1
-                            ];
+
+        $check_dates =  [
+            'from_date' => $request->on_date,
+            'to_date' => $request->on_date,
+            'isactive' => 1
+        ];
 
         $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
 
@@ -2949,7 +2918,7 @@ save in attendanceresult after verification
             $unique_error = "You have already applied for leave on the given dates.";
             return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
         }
-         if($request->secondaryLeaveType=="Half"){
+        if($request->secondaryLeaveType=="Half"){
             $days = 0.5;
 
         }else{
@@ -2962,52 +2931,52 @@ save in attendanceresult after verification
         if($request->leaveTypeId == '1' || $request->leaveTypeId == '2'){
 
             $leave_data = [
-                        'leave_type_id' => $request->leaveTypeId,
-                        'reason' => $request->reasonLeave,
-                        'number_of_days' => $days,
-                        "secondary_leave_type" => $request->secondaryLeaveType,
-                        'from_date' => $request->on_date,
-                        'to_date' => $request->on_date,
-                        'final_status' => '1'
-                    ];
+                'leave_type_id' => $request->leaveTypeId,
+                'reason' => $request->reasonLeave,
+                'number_of_days' => $days,
+                "secondary_leave_type" => $request->secondaryLeaveType,
+                'from_date' => $request->on_date,
+                'to_date' => $request->on_date,
+                'final_status' => '1'
+            ];
         }
 
         if($request->leaveTypeId == '4' || $request->leaveTypeId == '7'){
 
             $leave_data = [
-                        'leave_type_id' => $request->leaveTypeId,
-                        'reason' => $request->reasonLeave,
-                        'number_of_days' => $days,
-                        "secondary_leave_type" => $request->secondaryLeaveType,
-                        'from_date' => $request->on_date,
-                        'to_date' => $t_date,
-                        'final_status' => '1'
-                    ];
+                'leave_type_id' => $request->leaveTypeId,
+                'reason' => $request->reasonLeave,
+                'number_of_days' => $days,
+                "secondary_leave_type" => $request->secondaryLeaveType,
+                'from_date' => $request->on_date,
+                'to_date' => $t_date,
+                'final_status' => '1'
+            ];
 
         }
 
         $applied_leave = $user->appliedLeaves()->create($leave_data);
 
         $segregation_data = [
-                                'from_date' => $request->on_date,
-                                'to_date' => $request->on_date,
-                                'number_of_days' => $days,
-                                'paid_count' => '0',
-                                'unpaid_count' => '0',
-                                'compensatory_count' => '0'
+            'from_date' => $request->on_date,
+            'to_date' => $request->on_date,
+            'number_of_days' => $days,
+            'paid_count' => '0',
+            'unpaid_count' => '0',
+            'compensatory_count' => '0'
 
-                            ];
+        ];
         // comment by hitesh...
         $applied_leave->appliedLeaveSegregations()->create($segregation_data);
 
         $reporting_manager = $arr_underlaying_emp[0]->user_id;
 
         $approval_data = [
-                            'user_id' => $userid,
-                            'supervisor_id' => $reporting_manager,
-                            'priority' => '1',
-                            'leave_status' => '1'
-                         ];
+            'user_id' => $userid,
+            'supervisor_id' => $reporting_manager,
+            'priority' => '1',
+            'leave_status' => '1'
+        ];
         $applied_leave->appliedLeaveApprovals()->create($approval_data);
 
         if($applied_leave->final_status == '1'){
@@ -3025,7 +2994,7 @@ save in attendanceresult after verification
 
                 while (strtotime($request->on_date) <= strtotime($t_date)) {
 
-                        Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
+                    Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
 
                     $request->on_date = date ("Y-m-d", strtotime("+1 days", strtotime($request->on_date)));
                     $i++;
@@ -3040,26 +3009,27 @@ save in attendanceresult after verification
 
             // When po add paternity leave condition
 
-           /* if(!empty($request->to_date)){
-               // dd("if");
-                $i=0;
-                while ($request->on_date <= $t_date) {
+            /* if(!empty($request->to_date)){
+                // dd("if");
+                 $i=0;
+                 while ($request->on_date <= $t_date) {
 
-                    $rr  = Attendance::create(['user_id'=>$user_id,'on_date'=>$request->on_date,'status'=>"Leave"]);
+                     $rr  = Attendance::create(['user_id'=>$user_id,'on_date'=>$request->on_date,'status'=>"Leave"]);
 
-                    $from_date = date ("Y-m-d", strtotime("+1 days",$request->on_date));
+                     $from_date = date ("Y-m-d", strtotime("+1 days",$request->on_date));
 
-                    $i++;
-                }
-            }else{
+                     $i++;
+                 }
+             }else{
 
-                //  when po add casual or sick leave..
-                $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-            }*/
+                 //  when po add casual or sick leave..
+                 $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
+             }*/
 
         }
 
         $probation_data = array();
+
         leaveRelatedCalculations($probation_data,$applied_leave);
 
         /************************notify ************************/
@@ -3067,7 +3037,7 @@ save in attendanceresult after verification
         $message = "Your applied leave, of ".date('d/m/Y',strtotime($applied_leave->from_date)).' has been approved.';
 
         $user_data = Employee::where(['user_id'=>$userid])
-                                    ->with('user')->first();
+            ->with('user')->first();
 
         //$mail_data['to_email'] = $user_data->user->email;
         $mail_data['to_email'] = "xeam.richa@gmail.com";
@@ -3081,7 +3051,7 @@ save in attendanceresult after verification
         //to manager
 
         $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
-                                    ->with('user')->first();
+            ->with('user')->first();
         //$mail_data['to_email'] = $reporting_manager_data->user->email;
         $mail_data['to_email'] = "xeam.richa@gmail.com";
         $mail_data['subject'] = "Leave Application Approval";
@@ -3112,7 +3082,7 @@ save in attendanceresult after verification
     }//end of function
 
     function addAttendance(){
-       $users_po_vccm = User::with('designation')->get();
+        $users_po_vccm = User::with('designation')->get();
         /*echo"<PRE>";
         print_r($users_po_vccm);
         exit;*/
@@ -3129,21 +3099,21 @@ save in attendanceresult after verification
                 $emp_exist = Attendance::where(['user_id'=>$user->id, 'on_date'=>'2020-08-19'])->first();
                 if(!$emp_exist){
                     $attendance_data = [
-                                    'user_id' => $user->id,
-                                    'on_date' => "2020-08-19",
-                                    'status' => "Present"
-                                ];
-                     $attendance_create = Attendance::create($attendance_data);
-                     echo $user->id." attendance has been created";
-                     echo"<br/>";
+                        'user_id' => $user->id,
+                        'on_date' => "2020-08-19",
+                        'status' => "Present"
+                    ];
+                    $attendance_create = Attendance::create($attendance_data);
+                    echo $user->id." attendance has been created";
+                    echo"<br/>";
 
-                      $attendance_data = [
-                                    'attendance_id' => $attendance_create->id,
-                                    'on_time' => "10:14:28",
-                                    'punched_by' => "Present",
-                                    'type' => 'Check-in'
-                                ];
-                     $attendance_punch_create = AttendancePunch::create($attendance_data);
+                    $attendance_data = [
+                        'attendance_id' => $attendance_create->id,
+                        'on_time' => "10:14:28",
+                        'punched_by' => "Present",
+                        'type' => 'Check-in'
+                    ];
+                    $attendance_punch_create = AttendancePunch::create($attendance_data);
                 }
             }
 
