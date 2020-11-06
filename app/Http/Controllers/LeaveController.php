@@ -117,7 +117,11 @@ class LeaveController extends Controller
 
         $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
 
-        return view('leaves.apply_leave_form')->with(['data'=>$data]);
+        $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
+            ->whereMonth
+        ('month_info', date('m'))->first();
+
+        return view('leaves.apply_leave_form', compact('leaveDetail'))->with(['data'=>$data]);
 
     }//end of function
 
