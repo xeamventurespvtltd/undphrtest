@@ -303,7 +303,6 @@ class LeaveController extends Controller
             return redirect('leaves/apply-leave')->with('leaveError',$days_error);
         }
 
-
         $user = Auth::user();
         $userid = $user->id;
 
@@ -426,8 +425,14 @@ class LeaveController extends Controller
             if($empDesg_NPA!=""){
                 $arr_underlaying_emp[] = $empDesg_NPA;
             }
+        }
 
 
+//        date('m', strtotime($request->fromDate));
+
+        if($designation_login_user==3 ){
+            AppliedLeave::where('user_id', $user->id)->whereYear('to_date', date('Y', strtotime
+            ($request->fromDate)))->whereMonth('to_date', date('m', strtotime($request->fromDate)))->select('num_of_days')->sum();
         }
 
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
@@ -454,6 +459,9 @@ class LeaveController extends Controller
             ->where(['isactive'=>1])
             ->orderBy('id','DESC')
             ->first();
+
+
+
 
         if(!empty($last_applied_leave)){
             $created_at = new Carbon($last_applied_leave->created_at);
