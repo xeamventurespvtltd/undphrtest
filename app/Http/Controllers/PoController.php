@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class PoController extends Controller
 {
     public function index(){
+
         $pos = \DB::table('location_user as lu')
             ->join('employees as emp', 'emp.user_id', '=', 'lu.user_id')
             ->join('designation_user as du', 'du.user_id', '=', 'emp.user_id')

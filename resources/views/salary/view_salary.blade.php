@@ -16,7 +16,7 @@
 
         <li><a href="{{ url('employees/dashboard') }}"><i class="fa fa-dashboard"></i> Home</a></li>
 
-        <li><a href="{{ url('salary/view-salary') }}">View salary</a></li> 
+        <li><a href="{{ url('salary/view-salary') }}">View salary</a></li>
 
       </ol>
 
@@ -40,7 +40,7 @@
 
           <div class="nav-tabs-custom">
 
-            
+
 
             <div class="tab-content">
 
@@ -52,7 +52,7 @@
 
                 @include('admins.validation_errors')
 
-               
+
 
             <div class="box-header with-border leave-form-title-bg">
               <h3 class="box-title"> View Salary Slip</h3>
@@ -66,11 +66,11 @@
               {{ csrf_field() }}
 
               <div class="box-body">
-               
+
                  <h4>Select Month to view salary slip</h4>
 
                 <hr>
-              
+
                 <div class="form-group">
                    <select class="form-control input-sm basic-detail-input-style" name="salary_month" id="task_type">
 
@@ -85,7 +85,7 @@
                         <option value="8">Jul-Aug</option>
                         <option value="9">Aug-Sep</option>
                         <option value="10">Sep-Oct</option>
-                        <option value="11">Sep-Nov</option>
+                        <option value="11">oct-Nov</option>
                         <option value="12">Nov-Dec</option>
 
 
@@ -93,7 +93,7 @@
                 </div>
 
 
-                    
+
 
               </div>
 
@@ -107,22 +107,22 @@
 
           </div>
 
-        </div> 
+        </div>
 
     <!-- Add Project Tab end -->
 
 
- 
+
 
                 <!-- Add Contact Tab end -->
 
-            </div>  
+            </div>
 
             <!-- tab-content End -->
 
-          </div>  
+          </div>
 
-          <!-- Custom Tabs End -->   
+          <!-- Custom Tabs End -->
 
       </div>
 
@@ -152,7 +152,7 @@
 
   <script>
 
-   
+
 
   </script>
 
