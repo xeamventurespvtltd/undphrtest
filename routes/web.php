@@ -1,7 +1,31 @@
 <?php
 
+use App\Employee;
 use App\LeaveDetail;
+use App\SalarySlip;
+use App\User;
 use Illuminate\Http\Request;
+
+Route::get('update-salary-slip', function(){
+    $salarySlips = SalarySlip::whereNUll('user_id')->get();
+    $salarySlipIds = [];
+    foreach ($salarySlips as $salarySlip){
+        $user = User::where('employee_code', $salarySlip->emp_code)->first();
+        $employee = Employee::where('employee_id', $salarySlip->emp_code)->first();
+        if(isset($user)){
+            $salarySlip->user_id = $user->id;
+            $salarySlip->update();
+        }
+        elseif(isset($employee)){
+            $salarySlip->user_id = $employee->user_id;
+            $salarySlip->update();
+        }else{
+            $salarySlipIds[] = $salarySlip->emp_code;
+        }
+    }
+    echo "Salary SLips Record Not Match".'=>';
+    print_r($salarySlipIds);
+});
 
 Route::get('test', function () {
     for($i = 1; $i < 31; $i++) {
