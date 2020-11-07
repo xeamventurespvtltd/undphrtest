@@ -1219,9 +1219,10 @@ class LeaveController extends Controller
                                 $approval_data = [
                                     'user_id' => $user->id,
                                     'month_info' => '2020-10-26',
-                                    'accumalated_casual_leave' => isset($balance_sick_leave) ? $accumlated_casual : 0,
-                                    'accumalated_sick_leave' => isset($balance_sick_leave) ? $accumlated_sick : 0,
-                                    'balance_casual_leave' => isset($balance_casual_leave_leave) ? $balance_sick_leave : 0,
+                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+                                    'balance_casual_leave' => isset($balance_casual_leave) ?
+                                        $balance_casual_leave : 0,
                                     'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
                                     'balance_maternity_leave' => '180',
                                     'balance_paternity_leave' => '15',
@@ -1285,9 +1286,9 @@ class LeaveController extends Controller
                                 $approval_data = [
                                     'user_id' => $user->id,
                                     'month_info' => '2020-11-26',
-                                    'accumalated_casual_leave' => isset($balance_sick_leave) ? $accumlated_casual : 0,
-                                    'accumalated_sick_leave' => isset($balance_sick_leave) ? $accumlated_sick : 0,
-                                    'balance_casual_leave' => isset($balance_casual_leave_leave) ? $balance_sick_leave : 0,
+                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+                                    'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
                                     'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
                                     'balance_maternity_leave' => '180',
                                     'balance_paternity_leave' => '15',
