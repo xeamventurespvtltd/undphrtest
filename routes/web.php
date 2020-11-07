@@ -529,7 +529,12 @@ Route::group(['middleware' => 'App\Http\Middleware\RestrictEmployee'],function()
     Route::get('leads-management/get-comments/', ['as' => 'leads-management.get-comments', 'uses' => 'LeadsManagementController@getComments']);
 
     Route::any('leads-management/follow-up', ['as' => 'leads-management.follow-up', 'uses' => 'LeadsManagementController@followUp']);
-});//end of Lead Management routes
+});
+
+Route::resource('po', 'PoController', ['names' => 'po.location'])->middleware('auth');
+Route::get('duplicate-po', 'PoController@poWithMultipleLocations')->name('po.location.duplicate')->middleware('auth');
+
+//end of Lead Management routes
 /*Route::group(['prefix' => 'leads', 'middleware' => 'App\Http\Middleware\RestrictEmployee'], function () {
     Route::get('create-lead', function () {
         return view('leads.create_lead_form');

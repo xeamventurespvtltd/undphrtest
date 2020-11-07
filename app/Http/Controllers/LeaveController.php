@@ -119,7 +119,7 @@ class LeaveController extends Controller
 
         $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
             ->whereMonth
-        ('month_info', date('m'))->first();
+            ('month_info', date('m'))->first();
 
         return view('leaves.apply_leave_form', compact('leaveDetail'))->with(['data'=>$data]);
 
@@ -1169,9 +1169,14 @@ class LeaveController extends Controller
         $count = 0;
         if (count($data)) {
             foreach ($data[0] as $key => $record) {
+//                return $record;
+                $empCode = $record['emp_code'];
+                $accumulatedCl = $record['actual_balance_cl_sept_oct_20'];
+                $accumulatedSl = $record['sick_leave'];
+
 //                if($key != 0) {
-                if($record['emp_code'] != ''){
-                    $user = User::where("employee_code", $record['emp_code'])->with('designation')->first();
+                if($empCode != ''){
+                    $user = User::where("employee_code", $empCode)->with('designation')->first();
                     if(isset($user->designation[0])) {
                         $designation = $user->designation[0]->id;
                     }
@@ -1179,32 +1184,33 @@ class LeaveController extends Controller
                     if (isset($user)) {
                         $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '10')->first();
                         if ($leaveDetail != '') {
-                            $count++;
+                            $userOctLeavePoolUpdate[] = $user->employee_code;
                             LeaveDetail::where('id', $leaveDetail->id)->update([
-                                'accumalated_casual_leave' => $record['accumulate_cl'],
-                                'accumalated_sick_leave' => $record['sick_leave'],
+                                'accumalated_casual_leave' => $accumulatedCl,
+                                'accumalated_sick_leave' => $accumulatedSl,
                             ]);
                         }else{
+
                             $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
 
                             if($designation==4){    // for vccm
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
-                                $balance_sick_leave = $record['sick_leave'];
+                                $balance_sick_leave = $accumulatedSl;
                             }elseif ($designation==3 || $designation==5) {  // for PO
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
-                                $balance_sick_leave = $record['sick_leave'];
+                                $balance_sick_leave = $accumulatedSl;
 
                             }elseif ($designation==2){    // for SPO
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-                                $balance_sick_leave = $record['sick_leave'];
+                                $balance_sick_leave = $accumulatedSl;
                             }
                             $approval_data = [
                                 'user_id' =>  $user->id,
                                 'month_info' => '2020-10-26',
-                                'accumalated_casual_leave' => $record['accumulate_cl'],
-                                'accumalated_sick_leave' => $record['sick_leave'],
+                                'accumalated_casual_leave' => $accumulatedCl,
+                                'accumalated_sick_leave' => $accumulatedSl,
                                 'balance_casual_leave' => $balance_casual_leave,
-                                'balance_sick_leave' => $record['sick_leave'],
+                                'balance_sick_leave' => $accumulatedSl,
                                 'balance_maternity_leave' => '180',
                                 'balance_paternity_leave' => '15',
                                 'unpaid_casual' => 0,
@@ -1215,43 +1221,48 @@ class LeaveController extends Controller
                                 'isactive' => 1
                             ];
                             LeaveDetail::create($approval_data);
+                            $userOctLeavePoolCreate[] = $user->employee_code;
+
                         }
 
 
                         $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
                         if ($leaveDetail != '') {
                             if($designation==4){    // for vccm
-                                $accumlated_casual = $record['accumulate_cl'] + 1.5;
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl + 1.5;
+                                $accumlated_sick = $accumulatedSl;
                             }elseif ($designation==3 || $designation==5) {  // for PO
-                                $accumlated_casual = $record['accumulate_cl'] + 2;
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl + 2;
+                                $accumlated_sick = $accumulatedSl;
                             }elseif ($designation==2){    // for SPO
-                                $accumlated_casual = $record['accumulate_cl'];
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl;
+                                $accumlated_sick = $accumulatedSl;
                             }
 
                             LeaveDetail::where('id', $leaveDetail->id)->update([
                                 'accumalated_casual_leave' => $accumlated_casual,
                                 'accumalated_sick_leave' => $accumlated_sick,
                             ]);
+
+                            $userNovLeavePoolUpdate[] = $user->employee_code;
+
                         }else{
                             $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
 
                             if($designation==4){    // for vccm
-                                $accumlated_casual = $record['accumulate_cl'] + 1.5;
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl + 1.5;
+                                $accumlated_sick = $accumulatedSl;
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
                                 $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
                             }elseif ($designation==3 || $designation==5) {  // for PO
-                                $accumlated_casual = $record['accumulate_cl'] + 2;
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl + 2;
+                                $accumlated_sick = $accumulatedSl;
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
                                 $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
 
                             }elseif ($designation==2){    // for SPO
-                                $accumlated_casual = $record['accumulate_cl'];
-                                $accumlated_sick = $record['sick_leave'];
+                                $accumlated_casual = $accumulatedCl;
+                                $accumlated_sick = $accumulatedSl;
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
                                 $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
                             }
@@ -1272,12 +1283,40 @@ class LeaveController extends Controller
                                 'isactive' => 1
                             ];
                             LeaveDetail::create($approval_data);
+
+                            $userNovLeavePoolCreate[] = $user->employee_code;
                         }
+                    }else{
+                        $userNotExist[] = $empCode;
                     }
                 }
             }
         }
-        return $count;
+        if(isset($userNotExist)) {
+            echo "User Not Exist" . '=>' . ' ';
+            print_r($userNotExist);
+            echo "<br/>";
+        }
+        if(isset($userOctLeavePoolUpdate)) {
+            echo "User Oct Leave Pool Update" . '=>'. ' ';
+            print_r($userOctLeavePoolUpdate);
+            echo "<br/>";
+        }
+        if(isset($userOctLeavePoolCreate)) {
+            echo "User Oct Leave Pool Create" . '=>' . ' ';
+            print_r($userOctLeavePoolCreate);
+            echo "<br/>";
+        }
+        if(isset($userNovLeavePoolUpdate)) {
+            echo "User Nov Leave Pool Update" . '=>' . ' ';
+            print_r($userNovLeavePoolUpdate);
+            echo "<br/>";
+        }
+        if(isset($userNovLeavePoolCreate)) {
+            echo "User Nov Leave Pool Create" . '=>' . ' ';
+            print_r($userNovLeavePoolCreate);
+            echo "<br/>";
+        }
     }
 
     public function exportLeavePool(Request $request)
