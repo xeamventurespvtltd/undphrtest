@@ -220,16 +220,16 @@
                     </div>
                   </div> -->
 
-                                    @if(@$data['user_designation'] ==4)
-                                        <div class="col-md-6 col-sm-6 col-xs-6 leave-label-470">
-                                            <div class="panel panel-danger leave-type-sectn">
-                                                <div class="panel-heading leave-heading">You are not allowed to apply for Casual leave more  than 5 days in a month.
+{{--                                    @if(@$data['user_designation'] ==4)--}}
+{{--                                        <div class="col-md-6 col-sm-6 col-xs-6 leave-label-470">--}}
+{{--                                            <div class="panel panel-danger leave-type-sectn">--}}
+{{--                                                <div class="panel-heading leave-heading">You are not allowed to apply for Casual leave more  than 5 days in a month.--}}
 
-                                                </div>
+{{--                                                </div>--}}
 
-                                            </div>
-                                        </div>
-                                    @endif
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    @endif--}}
 
                                 </div>
 
