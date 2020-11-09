@@ -895,7 +895,6 @@
                     success: function(result){
                         if(result.error){
                             swal( result.error)
-
                         }else{
                             swal( "Attendance verified successfully", 'success')
                             location.reload(true);

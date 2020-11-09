@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AttendanceVerification;
 use App\Exports\LeavePoolExport;
 use App\Imports\LeaveDetailImport;
 use App\Imports\SalarySheetImport;
@@ -443,6 +444,7 @@ class LeaveController extends Controller
 
         // Chk Previous Leave Pending Or Approved..
 
+//        return $userid;
         $pending_leave = AppliedLeaveApproval::where(['user_id'=>$userid,'leave_status'=>'0'])
             ->whereHas('appliedLeave',function(Builder $query){
                 $query->where('isactive',1);
@@ -775,6 +777,19 @@ class LeaveController extends Controller
         $approver = User::where(['id'=>Auth::id()])->first();
 
         $leave_approval->leave_status = $request->leaveStatus;
+
+        $currentYear = date('Y');
+        $lastMonth = date('m', strtotime('-1 month',strtotime($applied_leave->from_date)));
+
+        if($currentYear != 2020 AND $lastMonth = 10) {
+            $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+                ->whereYear('on_date', $currentYear)->whereMonth('on_date', $lastMonth)
+                ->first();
+            if(!isset($lastMonthAttendanceVerification)){
+                $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
+                return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
+            }
+        }
 
         // Comment By Hitesh
         $leave_approval->save();

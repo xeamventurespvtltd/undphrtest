@@ -2052,7 +2052,8 @@ class AttendanceController extends Controller
 
     function verifyMonthAttendance(Request $request){
 
-        //dd($request->all());
+//        return date("Y-m-d", strtotime("+1 month", strtotime('2020-11-25')));
+//        dd($request->all());
 
         //$on_date =  date("Y-m-d", strtotime( date( "Y-m-d", strtotime( $request->on_date ) ) . "+1 month" ) );
 
@@ -2082,7 +2083,6 @@ class AttendanceController extends Controller
         }else{
             $start_year= $curr_year;
             $startmonth = $curr_month-1;
-            //dd($startmonth);
         }
 
         $date1 = $start_year.'-'.$startmonth.'-'.'26';
@@ -2151,8 +2151,6 @@ class AttendanceController extends Controller
         if(empty($check_result)){
             $result = $this->getAttendanceResult_info($user, $on_date, $dates_count);
             $user->attendanceResults()->create($result);
-
-
         }else{
             $result = $this->getAttendanceResult_info($user,$on_date, $dates_count);
             $check_result->update($result);
@@ -2164,7 +2162,10 @@ class AttendanceController extends Controller
             ->whereMonth('month_info',$current_month)
             ->first();
 
-        if(!$leave_status_current){
+//        return $on_date;
+//        return $leave_status_current;
+
+        if(isset($leave_status_current)){
 
             $leave_status_prev = LeaveDetail::where('user_id', $user_id)
                 ->whereMonth('month_info', $current_month-1)
@@ -2186,20 +2187,21 @@ class AttendanceController extends Controller
              $compensatory_count = $leave_status_prev->compensatory_count;
            */
 
+            // Change $leave_status_prev to $leave_status_current to get current month leave detail
 
             if($get_user_designation->designation_id  == 4){
-                $accumlated_casual = $leave_status_prev->accumalated_casual_leave +1.5;
-                $accumlated_sick = $leave_status_prev->accumalated_sick_leave +0.5;
+                $accumlated_casual = $leave_status_current->accumalated_casual_leave +1.5;
+                $accumlated_sick = $leave_status_current->accumalated_sick_leave;
             }else{
-                $accumlated_casual = $leave_status_prev->accumalated_casual_leave +2;
-                $accumlated_sick = $leave_status_prev->accumalated_sick_leave +1;
+                $accumlated_casual = $leave_status_current->accumalated_casual_leave +2;
+                $accumlated_sick = $leave_status_current->accumalated_sick_leave;
             }
 
-            $balance_casual  = $leave_status_prev->balance_casual_leave;
-            $balance_sick = $leave_status_prev->balance_sick_leave;
+            $balance_casual  = $leave_status_current->balance_casual_leave;
+            $balance_sick = $leave_status_current->balance_sick_leave;
 
-            $balance_maternity = $leave_status_prev->balance_maternity_leave;
-            $balance_paternity = $leave_status_prev->balance_paternity_leave;
+            $balance_maternity = $leave_status_current->balance_maternity_leave;
+            $balance_paternity = $leave_status_current->balance_paternity_leave;
 
             $unpaid_casual = 0;
             $paid_casual = 0;
@@ -2207,10 +2209,15 @@ class AttendanceController extends Controller
             $paid_sick = 0;
             $compensatory_count = 0;
 
+//            return $date2;
+            // Next Month Date
+            $nextMonth = date("Y-m-d", strtotime("+1 month", strtotime($date2)));
+            $nextMonth = date("Y-m-d", strtotime("+1 day", strtotime($nextMonth)));
 
+            // Create Accumulation of leave for next month
             $approval_data = [
                 'user_id' => $user_id,
-                'month_info' => $date2,
+                'month_info' => $nextMonth,
                 'accumalated_casual_leave' => $accumlated_casual,
                 'accumalated_sick_leave' => $accumlated_sick,
                 'balance_casual_leave' => $balance_casual,
