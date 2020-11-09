@@ -268,8 +268,8 @@ class AttendanceController extends Controller
 
         $verify['verifier'] = Auth::id();
 
-        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth
-        ('month_info', date('m'))->first();
+        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', $req['year'])->whereMonth
+        ('month_info', $req['month'])->first();
 
         return view('attendances.view_attendance', compact('leaveDetail'))->with(['user'=>$user,'req'=>$req,
             'verify'=>$verify,
