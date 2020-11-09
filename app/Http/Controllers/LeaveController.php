@@ -431,10 +431,10 @@ class LeaveController extends Controller
 
 //        date('m', strtotime($request->fromDate));
 
-        if($designation_login_user==3 ){
-            AppliedLeave::where('user_id', $user->id)->whereYear('to_date', date('Y', strtotime
-            ($request->fromDate)))->whereMonth('to_date', date('m', strtotime($request->fromDate)))->select('num_of_days')->sum();
-        }
+//        if($designation_login_user==3 ){
+//            AppliedLeave::where('user_id', $user->id)->whereYear('to_date', date('Y', strtotime
+//            ($request->fromDate)))->whereMonth('to_date', date('m', strtotime($request->fromDate)))->select('num_of_days')->sum();
+//        }
 
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
         }else{
