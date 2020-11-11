@@ -491,12 +491,16 @@
                                         <div class="a-last-absent">
                                             <h3 class="a-employe-name">
                                                 <?php
+<<<<<<< HEAD
                                                 $user = getEmployeeProfileData(Auth::user()->id);
                                                 
+=======
+                                                $employee = getEmployeeProfileData(Auth::user()->id);
+>>>>>>> 59f1dcf44eeebd3914cb4749c738b201bca346d2
                                                 ?>
 
-                                                @if(!empty($user))
-                                                    {{ $user->fullname }}
+                                                @if(!empty($employee))
+                                                        {{ $employee->fullname }} - {{@$user->designation[0]->name}}
                                                 @endif
                                             </h3>
                                             <!-- <span class="a-last-absent-span1">Last Absent:</span>
