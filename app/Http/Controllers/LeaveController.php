@@ -1179,6 +1179,7 @@ class LeaveController extends Controller
 
     public function uploadLeavePool(Request $request)
     {
+//        return "Dg";
         $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
 
         $count = 0;
@@ -1207,9 +1208,13 @@ class LeaveController extends Controller
                     }
 
                     if (isset($user)) {
-                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '10')->first();
+
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')
+                            ->whereMonth('month_info', '10')->first();
+
                         if ($leaveDetail != '') {
                             $userOctLeavePoolUpdate[] = $user->employee_code;
+//                            return $leaveDetail->id;
                             LeaveDetail::where('id', $leaveDetail->id)->update([
                                 'accumalated_casual_leave' => $accumulatedCl,
                                 'accumalated_sick_leave' => $accumulatedSl,

@@ -492,6 +492,7 @@
                                             <h3 class="a-employe-name">
                                                 <?php
                                                 $user = getEmployeeProfileData(Auth::user()->id);
+                                                
                                                 ?>
 
                                                 @if(!empty($user))
@@ -586,7 +587,7 @@
                                                                                 $cDayTime = $cYear.'-'.$cMonth.'-'.$day;
 
                                                                                 //if(strtotime(date("Y-m-d")) >= mktime(0,0,0,$cMonth,$day,$cYear)){
-                                                                                $attendanceArray = getAttendanceInfo($date1, $user->id);
+                                                                                $attendanceArray = getAttendanceInfo($date1, $user->user_id);
 
                                                                                 //}
 
