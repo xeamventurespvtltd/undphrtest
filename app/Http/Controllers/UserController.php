@@ -268,6 +268,8 @@ class UserController extends Controller
 
 
 
+
+//	          return $user->email;
 	          Mail::to($user->email)->send(new ForgotPassword($user));
 
 
