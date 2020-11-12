@@ -491,16 +491,11 @@
                                         <div class="a-last-absent">
                                             <h3 class="a-employe-name">
                                                 <?php
-<<<<<<< HEAD
-                                                $user = getEmployeeProfileData(Auth::user()->id);
-                                                
-=======
                                                 $employee = getEmployeeProfileData(Auth::user()->id);
->>>>>>> 59f1dcf44eeebd3914cb4749c738b201bca346d2
                                                 ?>
 
                                                 @if(!empty($employee))
-                                                        {{ $employee->fullname }} - {{@$user->designation[0]->name}}
+                                                    {{ $employee->fullname }} - {{@$user->designation[0]->name}}
                                                 @endif
                                             </h3>
                                             <!-- <span class="a-last-absent-span1">Last Absent:</span>
@@ -591,7 +586,7 @@
                                                                                 $cDayTime = $cYear.'-'.$cMonth.'-'.$day;
 
                                                                                 //if(strtotime(date("Y-m-d")) >= mktime(0,0,0,$cMonth,$day,$cYear)){
-                                                                                $attendanceArray = getAttendanceInfo($date1, $user->user_id);
+                                                                                $attendanceArray = getAttendanceInfo($date1, $user->id);
 
                                                                                 //}
 
