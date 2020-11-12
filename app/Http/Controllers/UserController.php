@@ -1449,7 +1449,15 @@ class UserController extends Controller
 
         }
 
-$request->password = "@".$request->employeeXeamCode."@";
+
+        $user = User::where('employee_code', $request->employeeXeamCode)->first();
+        if(isset($user)){
+            return back()->with('errors', 'Employee Code Already Exist');
+        }
+
+        $request->password = "@".$request->employeeXeamCode."@";
+
+
 
         $user_data = [
 
