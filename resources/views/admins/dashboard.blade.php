@@ -622,21 +622,33 @@
                                                                                             <?php if($status) { ?>
                                                                                             <div class="leave-type-onnly">
                                                                                                 <a class="fc-day-grid-event fc-h-event fc-event fc-start fc-end draggable_status cal_leave_custom @if($status == 'Present'){{'calender-day-present'}}@elseif($status == 'Holiday'){{'calender-day-holiday'}}@elseif($status == 'Absent' || $status == 'Week-Off'){{'calender-day-absent'}}@endif">
-                                                 <span>
-                                            			 <?php if($status == 'Absent'){
-                                                         $status = "A";
-                                                     }elseif($status == 'Week-Off'){
-                                                         $status = "WO";
-                                                     }elseif($status == 'Holiday'){
-                                                         $status = "H";
-                                                     }elseif($status == 'Present'){
-                                                         $status = "P";
-                                                     }
-                                                     echo  $status; ?>
-                                                  </span>
+                                                                                                    <span>
+                                                                                                         <?php
+                                                                                                        if($status == 'Absent'){
+                                                                                                            $status = "A";
+                                                                                                        }elseif($status == 'Week-Off'){
+                                                                                                            $status = "WO";
+                                                                                                        }elseif($status == 'Holiday'){
+                                                                                                            $status = "H";
+                                                                                                        }elseif($status == 'Present'){
+                                                                                                            $status = "P";
+                                                                                                        }
+                                                                                                        echo  $status;
+                                                                                                        ?>
+                                                                                                  </span>
                                                                                                 </a>
                                                                                             </div>
+
                                                                                             <?php } ?>
+                                                                                                @if(@$user->designation[0]->id == 3)
+                                                                                                @if(strtotime($date1) <= strtotime(date("Y-m-d")))
+                                                                                                <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
+                                                                                                    <!--<i class="fa fa-clock-o a-icon5"></i>-->
+                                                                                                    <i class="fa fa-user-times" aria-hidden="true"></i>
+                                                                                                    <span class="status-tooltiptext">Change Status</span>
+                                                                                                </div>
+                                                                                                    @endif
+                                                                                                    @endif
 
                                                                                         </div>
                                                                                     </td>
@@ -655,7 +667,7 @@
                                                                                 }
                                                                                 ?>
 
-                                                                                </thead>
+                                                                                {{--                                                                                </thead>--}}
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
@@ -951,13 +963,64 @@
             </div>
         </section>
 
-
-
         <!-- /.content -->
 
-
-
     </div>
+
+    <div class="modal fade" id="modal-changeStatus">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close attendance-close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-center">Change Status</h4>
+                </div>
+
+                <form id="changeStatusForm" method="POST" action="{{url('attendances/change-status')}}">
+                    {{ csrf_field() }}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4 attendance-column1">
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select name="attendanceStatus" id="attendanceStatus" class="form-control input-sm basic-detail-input-style">
+                                        <option value="Present">Present</option>
+                                        <option value="Absent">Absent</option>
+                                        <option value="Holiday">Holiday</option>
+                                        <option value="Week-Off">Week-Off</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 attendance-column2">
+                                <div class="form-group">
+                                    <label>On-Date</label>
+                                    <input type="text" class="form-control input-sm basic-detail-input-style" name="on_date" id="change_on_date" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 attendance-column4">
+                                <div class="form-group">
+                                    <div class="change_on_time">
+                                        <!--<label>On-Time</label>-->
+                                        <input type="text" class="form-control input-sm basic-detail-input-style hide" name="on_time" id="change_on_time" placeholder="Ex: 09:30 AM" value="09:30 AM">
+                                    </div>
+                                </div>
+                                <input type="hidden" name="user_id" value="{{$user->id}}">
+                                <input type="hidden" id="change_url" name="url" value="">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer in-out-footer">
+                        <button type="submit" id="saveStatus" class="btn btn-primary" name="saveStatus" value="Save">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
     <script type="text/javascript">
 
@@ -1022,13 +1085,9 @@
                     labels[i].innerHTML = dayNames[i];
 
                 }
-
                 setText(nextSunday);
-
             }
-
         });
-
 
     </script>
 
@@ -1036,6 +1095,160 @@
 
 @endsection
 @section('extra_foot')
+    <script type="text/javascript">
+
+        $(".leave-tooltip").on('click',function(){
+
+            var date = $(this).data('date');
+
+            var user_id = $(this).data('userid');
+
+            $("#leave_date").val(date);
+
+            var leave_url = window.location.href;
+            $("#change_url_leave").val(leave_url);
+
+
+            $("#modal-addLeave").modal('show');
+        });
+
+        var defYear = "{{$_REQUEST["year"]}}";
+        var defMonth = "{{$_REQUEST["month"]}}";
+
+        if(defYear != '0'){
+            $('#year').val(defYear);
+        }
+
+        if(defMonth != '0'){
+            $('#month').val(defMonth);
+        }
+
+        $(".eye-tooltip").on('click',function(){
+            var date = $(this).data('date');
+            var user_id = $(this).data('userid');
+
+            $(".append-punches").empty("");
+            var info = "";
+
+            var params = '?id='+user_id+'&date='+date;
+            var mapUrl = "{{url('attendances/view-map')}}" + params;
+
+            $.ajax({
+                type: 'POST',
+                url: '{{url("/attendances/multiple-punches")}}',
+                data: {date: date, user_id: user_id},
+                success: function(result){
+                    result.forEach(function(item, index){
+                        if(index % 2 == 0){
+                            info += '<div><button type="button" class="btn modal-check-in">'+item.on_time;
+                        }else{
+                            info += '<div><button type="button" class="btn modal-check-out">'+item.on_time;
+                        }
+
+                        if(item.punched_by == 0){
+                            info += ' (Biometric)</button>';
+                        }else if(item.punched_by == user_id){
+                            info += ' (App)</button>';
+                        }else if(item.punched_by != user_id){
+                            info += ' (Verifier)</button>';
+                        }
+
+                        if(item.type == 'Check-In'){
+                            info += '<a href="'+mapUrl+'" target="_blank"><span class="label label-warning"> Check-In  &nbsp;<i class="fa fa-map-marker" aria-hidden="true"></i></span></a></div>';
+                        }else if(item.type == 'Check-Out'){
+                            info += '<a href="'+mapUrl+'" target="_blank"><span class="label label-danger"> Check-Out  &nbsp;<i class="fa fa-map-marker" aria-hidden="true"></i></span></a></div>';
+                        }else{
+                            info += '</div>';
+                        }
+                    });
+
+                    date = new Date(date);
+                    date = moment(date).format('DD-MM-YYYY');
+                    $(".multiple-in-outs").text(date);
+                    $(".append-punches").append(info);
+                }
+            });
+
+            $("#modal-in-outs").modal('show');
+        });
+
+
+        $(".edit-tooltip").on('click',function(){
+            var date = $(this).data('date');
+            var user_id = $(this).data('userid');
+            var remarks = $(this).data('remarks');
+
+            $('#on_date').val(date);
+            $('#remarks').val(remarks);
+            var url = window.location.href;
+            $("#url").val(url);
+
+            date = new Date(date);
+            date = moment(date).format('DD-MM-YYYY');
+            $(".user-remarks").text(date);
+
+            $("#modal-remarks").modal('show');
+        });
+
+
+        $(".status-tooltip").on('click',function(){
+            var date = $(this).data('date');
+            var user_id = $(this).data('userid');
+            var status = $(this).data('status');
+
+            $("#change_on_date").val(date);
+
+            if(status){
+                if(status == 'Absent'){
+                    $(".change_on_time").hide();
+                }else if(status == 'Present'){
+                    $(".change_on_time").show();
+                }else if(status == 'Holiday'){
+                    $(".change_on_time").hide();
+                }else if($(this).val() == 'Week-Off'){
+                    $(".change_on_time").hide();
+                }
+
+                $("#attendanceStatus").val(status);
+            }
+
+            var url = window.location.href;
+            $("#change_url").val(url);
+
+            $("#modal-changeStatus").modal('show');
+        });
+
+
+        $("#attendanceStatus").on('change',function(){
+            if($(this).val() == 'Absent'){
+                $(".change_on_time").hide();
+            }else if($(this).val() == 'Present'){
+                $(".change_on_time").show();
+            }else if($(this).val() == 'Holiday'){
+                $(".change_on_time").hide();
+            }else if($(this).val() == 'Week-Off'){
+                $(".change_on_time").hide();
+            }
+        });
+
+        function changeFunc() {
+
+            var selectBox = document.getElementById("attendanceStatusLeave");
+            var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+            if(selectedValue == 1 ||  selectedValue == 2){
+                $('#cas_sick').show();
+                $('#pat_mat').hide();
+
+            }
+            if(selectedValue == 7 || selectedValue == 4){
+                $('#cas_sick').hide();
+                $('#pat_mat').show();
+            }
+
+        }
+
+    </script>
+
     <script type="text/javascript">
         $(function () {
             $('.datepick').datepicker({
