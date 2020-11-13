@@ -2186,9 +2186,8 @@ class UserController extends Controller
         if(!empty($request->locationId)) {
             $locationId = $request->locationId;
             $locationUser = \DB::select("SELECT * FROM `location_user`  WHERE `user_id` in (SELECT `user_id` FROM `designation_user` WHERE `designation_id` = 3) AND `location_id` = $locationId");
-            if (isset($locationUser)) {
+            if (isset($locationUser->id)) {
                 $employee = Employee::where('user_id', $locationUser[0]->user_id)->first();
-//                return redirect('/employees/create/projectDetailsTab')->with('error', $employee->fullname . ' Is already assigned as PO At Selected Location');
                 return redirect('employees/create/projectDetailsTab')->with('poError', $employee->fullname . ' Is already assigned as PO At Selected Location');
 
             }
