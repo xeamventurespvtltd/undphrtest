@@ -606,13 +606,10 @@ class LeaveController extends Controller
             'final_status' => '0'
         ];
 
-
-
         $applied_leave = $user->appliedLeaves()->create($leave_data);
 
         if(!empty($request->fileNames)){
             $documents = $request->fileNames;
-
             foreach($documents as $doc) {
                 $document = round(microtime(true)).str_random(5).'.'.$doc->getClientOriginalExtension();
                 $doc->move(config('constants.uploadPaths.uploadAppliedLeaveDocument'), $document);

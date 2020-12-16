@@ -163,7 +163,7 @@
                                                 if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
                                                   if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
-                                                 $curr_month = $_REQUEST["month"];
+                                                $curr_month = $_REQUEST["month"];
                                                 if(date("d", strtotime($current_date))>25){
                                                     $curr_month = $curr_month+1;
                                                    }
@@ -183,7 +183,8 @@
                                                 $date2 = $curr_year.'-'.$startmonth.'-'.'25';
 
                                             @endphp
-                                            <h2><?php echo $monthNames[$startmonth-2];
+                                            <h2><?php
+                                                echo $monthNames[$startmonth-2];
                                                 echo "-";
                                                 echo $monthNames[$startmonth - 1];
                                                 echo " ".$cYear;
@@ -197,6 +198,7 @@
                                         @if($_REQUEST["month"] == date('n'))
                                             @if($verify['isverified'] == 0 )
                                                 @if($verify['verifier']!=$user->id)
+
                                                     <button type="button" class="btn btn-primary verify-btn-calender verifyMonthAttendance" data-userid="{{$user->id}}" data-managerid="{{$verify['verifier']}}" data-ondate="{{$cYear.'-'.$cMonth.'-'.'25'}}">Verify Attendance</button>
                                                 @endif
                                             @elseif($verify['isverified'] == 1)
@@ -498,7 +500,6 @@
             </div>
             <!-- /.modal -->
 
-
             <div class="modal fade" id="modal-changeStatus">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -554,7 +555,6 @@
             </div>
             <!-- /.modal -->
 
-
             <!-- add leave model starts -->
             <div class="modal fade" id="modal-addLeave">
                 <div class="modal-dialog">
@@ -577,7 +577,6 @@
                                                 <option value="2">Sick Leave</option>
                                                 <option value="7">Paternity Leave</option>
                                                 <option value="5">Compensatory Leave</option>
-
                                                 <!-- <option value="4">Maternity Leave</option>-->
                                             </select>
                                         </div>
@@ -586,7 +585,6 @@
                                             <input type="radio" name="secondaryLeaveType" value="Full" checked>Full
                                             <input type="radio" name="secondaryLeaveType" value="Half">Half
                                         </div>
-
                                     </div>
 
                                     <div class="col-md-6 attendance-column4" style="padding-left: 5px;">
@@ -599,7 +597,6 @@
                                             <label>To-Date</label>
                                             <input type="text" class="form-control datepicker" name="to_date" id="leave_date" autocomplete="off">
                                         </div>
-
                                     </div>
 
                                     <div class="col-md-12">
@@ -607,7 +604,6 @@
                                             <label>Reason</label><br>
                                             <textarea name="reasonLeave" id="reasonLeave" style="width: 100%"></textarea>
                                         </div>
-
                                     </div>
 
                                     <div class="col-md-4 attendance-column4">
@@ -621,7 +617,6 @@
                                         <input type="hidden" id="change_url_leave" name="url" value="">
                                     </div>
                                 </div>
-
                             </div>
                             <div class="modal-footer in-out-footer">
                                 <button type="submit" id="saveStatus" class="btn btn-primary" name="saveStatus" value="Save">Save</button>
@@ -896,6 +891,8 @@
                         if(result.error){
                             swal( result.error)
                         }else{
+                            // console.log(result.success);
+                            // swal( result.success);
                             swal( "Attendance verified successfully", 'success')
                             location.reload(true);
                         }

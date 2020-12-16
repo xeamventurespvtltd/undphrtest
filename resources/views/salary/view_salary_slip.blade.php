@@ -89,9 +89,9 @@
                         $prev_month = $sal_month-1;
                          $prev_year =  $sal_year;
                     }
-                    $start_date =  date('Y-m-d', strtotime("26-".$prev_month."-".$prev_year));
-                    $end_date =  date('Y-m-d', strtotime("25-".$sal_month."-".$sal_year));
 
+                $start_date =  date('d-m-Y', strtotime("26-".$prev_month."-".$prev_year));
+                    $end_date =  date('d-m-Y', strtotime("25-".$sal_month."-".$sal_year));
                     @endphp
                     <span class="text-primary "> {{$start_date}}</span> to
                     <span class="text-primary"> {{$end_date}}</span>

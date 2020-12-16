@@ -47,7 +47,7 @@
                                                         Employee</option>
                                                     @foreach($employees as $employee)
                                                         <option
-                                                            value="{{$employee->user_id}}">{{$employee->fullname}}</option>
+                                                            value="{{$employee->user_id}}">{{$employee->fullname}} </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -160,7 +160,7 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td>
-                                            <span>{{$po->fullname}}</span>
+                                            <span>{{$po->fullname}} ({{ $po->employee_code }})</span>
                                         </td>
                                         <td>
                                             <span>{{$po->designation}}</span>

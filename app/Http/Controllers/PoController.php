@@ -12,12 +12,13 @@ class PoController extends Controller
     public function index(){
 
         $pos = \DB::table('location_user as lu')
+            ->join('users as us', 'us.id', '=', 'lu.user_id')
             ->join('employees as emp', 'emp.user_id', '=', 'lu.user_id')
             ->join('designation_user as du', 'du.user_id', '=', 'emp.user_id')
             ->join('designations as dsg', 'dsg.id', '=', 'du.designation_id')
             ->join('locations as lc', 'lc.id', '=', 'lu.location_id')
             ->join('states as st', 'st.id', '=', 'lc.state_id')
-            ->select('lu.id as location_user_id','emp.fullname','dsg.name as designation', 'lc.name as location', 'st.name as state')
+            ->select('us.employee_code as employee_code', 'lu.id as location_user_id','emp.fullname','dsg.name as designation', 'lc.name as location', 'st.name as state')
             ->where('du.designation_id', '3')
             ->get();
 
