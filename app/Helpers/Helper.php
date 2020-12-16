@@ -947,9 +947,10 @@ function getAttendanceInfo($date,$user_id)
 
     $user = User::where(['id'=>$user_id])->with('employee')
         ->with('employeeProfile')
+        ->with('employee')
         ->first();
 
-
+    //dd($user);
     $dayofweek = date('w', strtotime($date));
 
     $exception_shift_info = ShiftException::where(['user_id'=>$user_id, 'week_day'=>$dayofweek])
