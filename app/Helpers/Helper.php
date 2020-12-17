@@ -180,7 +180,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             $balance_maternity = $leave_status_prev->balance_maternity_leave;
             $balance_paternity = $leave_status_prev->balance_paternity_leave;
 
-            //if count == 1   this conition not satisfied think So.....
             //$count is previous month leave
             if($count==1){
                 if($designation==4){
@@ -326,16 +325,18 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
         }else{
             //if leave detail has entry for current month
-//             dd("current month");
 
             // if current month Case:
 
             $leave_status_after = LeaveDetail::where('user_id', $userId)
                 ->whereMonth('month_info',$current_month)  //works with to_date as well
                 ->first();
+
             $id_to_update = $leave_status_after->id;
+
             // chk accumulated casual
             $accumlated_casual = $leave_status_after->accumalated_casual_leave;
+
             // chk accumulated Sick
             $accumlated_sick = $leave_status_after->accumalated_sick_leave;
 
