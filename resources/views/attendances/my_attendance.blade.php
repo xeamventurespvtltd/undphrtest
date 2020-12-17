@@ -27,19 +27,20 @@
     <!-- Main content -->
 
     <section class="content">
-	 
+
 
       <!-- Small boxes (Stat box) -->
 
       <div class="row">
         <div class="col-md-12">
-          <div class="box box-primary"> 
+          <div class="box box-primary">
               <form id="employee_Attendance" method="GET">
                   <div class="row select-detail-below">
                       <div class="col-md-2 attendance-column1">
                         <label>Year<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                             <option value="" selected disabled>Please select Year</option>
+                            <option value="2021">2021</option>
                             <option value="2020">2020</option>
                             <option value="2019">2019</option>
                             <option value="2018">2018</option>
@@ -65,7 +66,7 @@
                             <option value="11">Oct-Nov</option>
                             <option value="12">Nov-Dec</option>
                         </select>
-                      </div>                  
+                      </div>
 
                       <div class="col-md-2 attendance-column4">
                           <div class="form-group">
@@ -76,21 +77,21 @@
                   <br>
               </form>
 
-              <?php 
-                  $monthNames = Array("January", "February", "March", "April", "May", "June", "July", 
+              <?php
+                  $monthNames = Array("January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December");
-                  
+
                   if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
-                  if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");   
+                  if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
                   $cMonth = $_REQUEST["month"];
                   $cYear = $_REQUEST["year"];
-                   
+
                   $prev_year = $cYear;
                   $next_year = $cYear;
                   $prev_month = $cMonth-1;
                   $next_month = $cMonth+1;
-                   
+
                   if ($prev_month == 0 ) {
                       $prev_month = 12;
                       $prev_year = $cYear - 1;
@@ -98,7 +99,7 @@
                   if ($next_month == 13 ) {
                       $next_month = 1;
                       $next_year = $cYear + 1;
-                  }  
+                  }
 
               ?>
               <hr class="attendance-hr">
@@ -110,7 +111,7 @@
                     <li class="attendance-rectangle present-only">Present</li>
                     <li class="attendance-rectangle absent-only">Absent</li>
                     <li class="attendance-rectangle check-in-only">Check-In</li>
-                    
+
                   </ul>
                 </div>
                 <div class="a-last-absent">
@@ -141,9 +142,9 @@
                     $current_date = date('Y-m-d');
 
 
-                  
-                    //$today_date = date('d');  
-                    
+
+                    //$today_date = date('d');
+
                     if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
                     if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
@@ -162,17 +163,18 @@
                     $start_year= $curr_year;
                     $startmonth = $curr_month-1;
                     }
-                     $date1 = $start_year.'-'.$startmonth.'-'.'26';
-                     $date2 = $curr_year.'-'.$curr_month.'-'.'25';
+                      $date1 = $start_year.'-'.$startmonth.'-'.'26';
+                      $date2 = $curr_year.'-'.$curr_month.'-'.'25';
 
-                 
                   @endphp
-                    <h2><?php echo $monthNames[$curr_month-2];
-                    echo "-";
-                    echo $monthNames[$curr_month-1];
-                    echo " ".$cYear; 
-                    ?>
-                    </h2></div>
+                    <h2>
+                        <?php echo $monthNames[$startmonth - 1];
+                  echo "-";
+                   echo $monthNames[$curr_month - 1];
+                 echo " ".$cYear;
+                         ?>
+                    </h2>
+                </div>
                 <div class="fc-clear"></div>
             </div>
 
@@ -207,22 +209,22 @@
                         <div class="fc-scroller fc-day-grid-container" style="overflow: hidden; height: 666px;">
                             <div class="fc-day-grid fc-unselectable">
                                 <div class="fc-row fc-week fc-widget-content" style="height: 96px;">
-                                    
+
                                     <div class="fc-bg">
                                         <table>
                                             <thead>
 
     <?php
-      $timestamp = mktime(0,0,0,$cMonth,1,$cYear);    
+      $timestamp = mktime(0,0,0,$cMonth,1,$cYear);
       $maxday = date("t",$timestamp);
       $thismonth = getdate ($timestamp);
       $startday = $thismonth['wday'];
-	  
-	  
-	
-	$timestamp = strtotime($date1); 	
+
+
+
+	$timestamp = strtotime($date1);
 	 $thismonth = getdate ($timestamp);
-	 $startday = $thismonth['wday']; 
+	 $startday = $thismonth['wday'];
 
      $i=0;
       while (strtotime($date1) <= strtotime($date2)) {
@@ -232,21 +234,21 @@
         //if(strtotime(date("Y-m-d")) >= mktime(0,0,0,$cMonth,$day,$cYear)){
           $attendanceArray = getAttendanceInfo($date1, $user->id);
 
-        //} 
+        //}
 
         $status = $attendanceArray['status'];
 
-        if(($i % 7) == 0 ){ 
+        if(($i % 7) == 0 ){
           // if(empty($status)){
           //   $status = "Week-Off";
           // }else{
             //$status = "Week-Off";
           //}
           //$attendanceArray['secondary_leave_type'] = "";
-    ?> 
-      <tr>  
+    ?>
+      <tr>
 
-    <?php }if($i < $startday) { ?> 
+    <?php }if($i < $startday) { ?>
       <td class="fc-day-top fc-sun fc-other-month fc-past" data-date=""></td>
 
     <?php }else{ ?>
@@ -254,43 +256,43 @@
 	   <?php $date_month = Date('d M',strtotime($date1)); ?>
       <span class="fc-day-number"><?php echo $date_month ?></span>
       <div class="three-icon-box">
-          
+
             @if(!empty($attendanceArray['description']))
             <div class="info-tooltip">
               <i class="fa fa-info-circle a-icon1"></i>
               <span class="info-tooltiptext">{{$attendanceArray['description']}}</span>
-            </div>  
-            @endif  
-            
-          
+            </div>
+            @endif
+
+
             @if(!empty($attendanceArray['first_punch']))
             <div class="eye-tooltip" data-date="{{$date1}}" data-userid="{{$user->id}}">
               <i class="fa fa-eye a-icon2"></i>
               <span class="eye-tooltiptext">View In-Outs{{$verify['isverified']}}</span>
             </div>
-            @endif  
-          
+            @endif
+
           <div class="edit-tooltip" data-date="{{$date1}}" data-remarks="{{$attendanceArray['remarks']}}" data-userid="{{$user->id}}">
               <i class="fa @if(!empty($attendanceArray['remarks'])){{'fa-edit a-icon4'}}@else{{'fa-plus a-icon3'}}@endif"></i>
               <span class="edit-tooltiptext">@if(!empty($attendanceArray['remarks'])){{'View Remarks'}}@else{{'Add Remarks'}}@endif</span>
           </div>
-		
-		
+
+
 		 @if(($user->user_designation!=4) AND ($verify['isverified'] == 0))
-		
+
 		  <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
 		  <!--<i class="fa fa-clock-o a-icon5"></i>-->
 		  <i class="fa fa-user-times" aria-hidden="true"></i>
 		  <span class="status-tooltiptext">Change Status</span>
 		  </div>
 		@endif
-		  
+
       </div>
 
           <?php if($status) { ?>
           <div class="leave-type-onnly">
           <a class="fc-day-grid-event fc-h-event fc-event fc-start fc-end fc-draggable @if($status == 'Present'){{'calender-day-present'}}@elseif($status == 'Holiday'){{'calender-day-holiday'}}@elseif($status == 'Absent' || $status == 'Week-Off'){{'calender-day-absent'}}@endif">
-             <span><?php echo  $status; ?></span> 
+             <span><?php echo  $status; ?></span>
           </a>
             <div>
             <a><span class="label label-warning full-short-half"><?php echo  $attendanceArray['secondary_leave_type']; ?></span></a>
@@ -300,29 +302,29 @@
           <?php } ?>
   </td>
 
-<?php   
+<?php
 	$date1 = date ("Y-m-d", strtotime("+1 days", strtotime($date1)));
-  } if(($i % 7) == 6 ){ 
+  } if(($i % 7) == 6 ){
 
 ?>
 
 </tr>
 
- <?php 
-  } 
+ <?php
+  }
 $i++;
 }
-?> 
+?>
 
 
-                                               
+
                                                 </thead>
-												
+
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                     </td>
@@ -361,7 +363,7 @@ $i++;
         <h4 class="modal-title text-center">Multiple In-Outs &nbsp;&nbsp;<span class="multiple-in-outs"></span></h4>
       </div>
       <div class="modal-body attendance-present-modal append-punches">
-        
+
       </div>
       <div class="modal-footer in-out-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -385,14 +387,14 @@ $i++;
       <form id="attendanceRemarkForm" method="POST" action="{{url('attendances/save-remarks')}}">
         {{ csrf_field() }}
       <div class="modal-body">
-        
+
         <p>Remark:</p>
         <textarea rows="2" cols="4" placeholder="Your remarks" id="remarks" name="remarks" class="add-remark-textarea"></textarea>
 
         <input type="hidden" name="user_id" value="{{$user->id}}">
         <input type="hidden" id="on_date" name="on_date" value="">
         <input type="hidden" id="url" name="url" value="">
-        
+
       </div>
       <div class="modal-footer in-out-footer">
         <button type="submit" id="saveRemarks" class="btn btn-primary" name="saveRemarks" value="Save">Save</button>
@@ -447,7 +449,7 @@ $i++;
               <input type="hidden" id="change_url" name="url" value="">
             </div>
           </div>
-        
+
       </div>
       <div class="modal-footer in-out-footer">
         <button type="submit" id="saveStatus" class="btn btn-primary" name="saveStatus" value="Save">Save</button>
@@ -507,7 +509,7 @@ $(document).ready(function(){
           }
       }
   });
-  
+
     $("#changeStatusForm").validate({
     rules :{
           "attendanceStatus" : {
@@ -532,7 +534,7 @@ $(document).ready(function(){
           }
       }
   });
-  
+
 });
 </script>
 
@@ -547,7 +549,7 @@ $(document).ready(function(){
   if(defMonth != '0'){
     $('#month').val(defMonth);
   }
-    
+
   $(".eye-tooltip").on('click',function(){
     var date = $(this).data('date');
     var user_id = $(this).data('userid');
@@ -614,14 +616,14 @@ $(document).ready(function(){
 
     $("#modal-remarks").modal('show');
   });
-  
+
      $(".status-tooltip").on('click',function(){
      var date = $(this).data('date');
     var user_id = $(this).data('userid');
     var status = $(this).data('status');
 
      $("#change_on_date").val(date);
-    
+
      if(status){
        if(status == 'Absent'){
         $(".change_on_time").hide();
@@ -641,7 +643,7 @@ $(document).ready(function(){
 
     $("#modal-changeStatus").modal('show');
   });
-  
+
     $("#attendanceStatus").on('change',function(){
     if($(this).val() == 'Absent'){
         $(".change_on_time").hide();
@@ -654,7 +656,7 @@ $(document).ready(function(){
     }
   });
 
-  
+
 </script>
 
 @endsection
