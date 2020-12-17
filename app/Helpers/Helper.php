@@ -114,7 +114,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
     // Get Leave applier designation id
 
-   $designation_data = User::where(['id' =>  $applied_leave->user_id])
+    $designation_data = User::where(['id' =>  $applied_leave->user_id])
         ->with('designation')
         ->first();
 
@@ -240,6 +240,9 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             $accumlated_casual_after = $leave_status_after->accumalated_casual_leave;
             $accumlated_sick_after = $leave_status_after->accumalated_sick_leave;
 
+            $balance_maternity = $leave_status_after->balance_maternity_leave;
+            $balance_paternity = $leave_status_after->balance_paternity_leave;
+
             // Unpaid casual and sick leave
             $unpaid_casual = $leave_status_after->unpaid_casual;
             $paid_casual = $leave_status_after->paid_casual;
@@ -248,7 +251,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             $unpaid_sick = $leave_status_after->unpaid_sick;
             $paid_sick = $leave_status_after->paid_sick;
 
-           $compensatory_count = $leave_status_after->compensatory_count;
+            $compensatory_count = $leave_status_after->compensatory_count;
 
 
             if($applied_leave->leave_type_id==1){ // For Casual Leave
@@ -458,31 +461,10 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                     $unpaid_sick_now = abs($remain_accumulate_sick);
                     $unpaid_sick = $unpaid_sick + $unpaid_sick_now;
 
-                    //$paid_sick_now = $applied_leave->number_of_days - $unpaid_sick;
-
-                    //Paid Sick not changed
-                    //$paid_sick = $paid_sick;
-
-                    //    2 leaves paid sick
-
-                    //if($accumlated_sick == 0){
-
-                    //if($unpaid_sick_now > 0){
 
                     if($unpaid_sick_now == abs($remain_accumulate_sick)){
                         $paid_sick = $accumlated_sick_old_val + $paid_sick;
                     }
-
-                    /*if($unpaid_sick_now == 0.5 && ){
-                        $paid_sick = $unpaid_sick_now + $paid_sick;
-                    }else{
-                        $paid_sick = $paid_sick;
-                    }*/
-                    //dd($paid_sick);
-                    /*}else{
-                        $paid_sick = $unpaid_sick + $paid_sick;
-                    }
-                    */
 
                 }
 
@@ -692,7 +674,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
 
 function saveLeaveSegration($applied_leave, $paid_count, $unpaid_count){
-     $leaveSegregations = $applied_leave->appliedLeaveSegregations;
+    $leaveSegregations = $applied_leave->appliedLeaveSegregations;
 
     if(count($leaveSegregations) > 1) {
         foreach ($leaveSegregations as $key => $leaveSegregation) {
@@ -719,12 +701,12 @@ function saveLeaveSegration($applied_leave, $paid_count, $unpaid_count){
                     'compensatory_count' => $applied_leave->number_of_days
                 ]);
             }else{
-            \App\AppliedLeaveSegregation::where('id', $leaveSegregation->id)->update([
-                'paid_count' => $paidLeaveUse,
-                'unpaid_count' => $unpaidLeave,
-                'compensatory_count' => 0
-            ]);
-             }
+                \App\AppliedLeaveSegregation::where('id', $leaveSegregation->id)->update([
+                    'paid_count' => $paidLeaveUse,
+                    'unpaid_count' => $unpaidLeave,
+                    'compensatory_count' => 0
+                ]);
+            }
         }
     }else {
         if($applied_leave->leave_type_id == 5){
