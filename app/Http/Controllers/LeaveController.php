@@ -491,7 +491,7 @@ class LeaveController extends Controller
                 ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
                 ->first();
             if(!empty($chk_existing_date)){
-                $unique_error = "You have already applied for leave on given dt.";
+                $unique_error = "You have already applied for leave on given date.";
                 return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
             }
         }
