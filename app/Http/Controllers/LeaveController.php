@@ -118,7 +118,7 @@ class LeaveController extends Controller
 
         $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
 
-         $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
+        $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
             ->whereMonth
             ('month_info', date('m'))->first();
 
@@ -498,8 +498,8 @@ class LeaveController extends Controller
 
 
         if($request->leaveTypeId == '4'){  //check for maternity leave
-            if($request->noDays > 90){
-                $maternity_error = "You cannot take maternity leave for more than 90 days.";
+            if($request->noDays != 180){
+                $maternity_error = "You can take maternity leave for 180 days only.";
             }else{
                 $already_applied_leave = $user->appliedLeaves()
                     ->where(['final_status'=>'1','leave_type_id'=>4,'isactive'=>1])
@@ -522,7 +522,7 @@ class LeaveController extends Controller
         // chk for paternity leave not more than 15  days in a month.
 
         if($request->leaveTypeId == '7'){
-            if($request->noDays > 15 || $request->noDays != 15){
+            if($request->noDays != 15){
                 $paternity_error = "You cannot take Paternity leave for less than or more than 15 days.";
             }else{
                 $already_applied_leave = $user->appliedLeaves()
@@ -542,24 +542,6 @@ class LeaveController extends Controller
                 return redirect('leaves/apply-leave')->with('leaveError',$paternity_error);
             }
         }
-
-        /////////////////5 days capping for vccm for casual leave/////////////////
-//        if($request->leaveTypeId == '1'  AND $designation_login_user==4){
-//
-//            $current_month_leave = $this->calculateMonthLeave($from_date,$to_date);
-//
-//            if(!isset($total)){
-//                $total=0;
-//            }
-//
-//            if($total + $current_month_leave>5 ){
-//                $more_than_5_error = "You are not allowed to apply for leave more than 5 days in a month. You have already taken" ."$current_month_leave"." leaves.";
-//                return redirect('leaves/apply-leave')->with('leaveError',$more_than_5_error);
-//
-//            }
-//        }
-
-
 
         /////////////////////////Create Leave///////////////////////
 
@@ -748,7 +730,6 @@ class LeaveController extends Controller
 
         // Comment By Hitesh
         $leave_approval->save();
-
         $applier = $leave_approval->user;
 
         $message_data = [
