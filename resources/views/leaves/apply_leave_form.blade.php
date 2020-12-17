@@ -98,6 +98,19 @@
                     </div>
                 </div>
 
+                <div class="col-sm-3 col-xs-3 leaves1">
+                    <div class="panel panel-danger leave-type-sectn">
+                        <div class="panel-heading leave-heading">Paid Compensatory Leave Taken:
+                            <span class="label label-info">
+                                {{ isset($leaveDetail) ? $leaveDetail->compensatory_count : '0' }}
+                            </span>
+                        </div>
+                        <!-- <div class="panel-body leave-content"> -->
+
+                        <!-- </div> -->
+                    </div>
+                </div>
+
                 <div class="col-sm-3 col-xs-3 leaves2">
                     <div class="panel panel-success leave-type-sectn">
                         <div class="panel-heading leave-heading">UnPaid Leave Taken:

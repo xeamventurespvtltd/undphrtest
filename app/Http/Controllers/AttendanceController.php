@@ -737,7 +737,6 @@ class AttendanceController extends Controller
     */
     function consolidatedAttendanceSheets(Request $request)
     {
-
         $user_with_no_designation = $has_no_designation = 0;
 
 
@@ -802,25 +801,20 @@ class AttendanceController extends Controller
             $month_last_date = date("Y-m-t", strtotime($req['year'] . '-' . $req['month'] . '-01'));
             $employees = DB::table('projects as p')
                 ->join('project_user as pu', 'p.id', '=', 'pu.project_id')
-                //->join('companies as c','c.id','p.company_id')
                 ->join('employee_profiles as ep', 'ep.user_id', '=', 'pu.user_id')
                 ->join('employees as e', 'ep.user_id', '=', 'e.user_id')
                 ->join('users as u', 'ep.user_id', '=', 'u.id')
-                //->join('departments as d','d.id','=','ep.department_id')
                 ->where('p.id', $req['project_sign'], $req['project'])
-                //->where('p.company_id',$req['company_sign'],$req['company'])
-                //->where('d.id',$req['department_sign'],$req['department'])
                 ->where('e.user_id', '!=', 1)
                 ->whereDate('e.joining_date', '<=', $month_last_date)
                 ->where(['pu.isactive' => 1, 'p.isactive' => 1, 'p.approval_status' => '1', 'e.approval_status' => '1', 'e.isactive' => (int)$req['employee_status']]);
 
 
             $employees = $employees->select('ep.user_id', 'e.fullname', 'e.employee_id', 'u.employee_code', 'e.joining_date', 'ep.state_id')->get();
-            //$employees = $employees->select('*')->get();
+
         } else {
             $employees = collect();
         }
-
 
         if (!empty($req['year'])) {
             $year = $req['year'];
@@ -872,20 +866,7 @@ class AttendanceController extends Controller
                 }
 
             }
-            //exit;
-
-
-            //$data['holidays'] = $holiday_counter;
-
-
-            //$data['sundays'] = $sunday_counter;
-
-            //$data['workdays'] = $total_days - ($sunday_counter + $holiday_counter);
-
             $data['department_name'] = $department_name;
-
-            //exit;
-
         }
 
         $data['isverified'] = 1;
@@ -893,24 +874,7 @@ class AttendanceController extends Controller
         if (!$employees->isEmpty()) {
             foreach ($employees as $key => $value) {
 
-                /*$attendance_result = AttendanceResult::where(['user_id'=>$value->user_id,'on_date'=>date("Y-m-d",strtotime($req['year'].'-'.$req['month'].'-'.'25'))])->first();*/
-
-                /*if(empty($attendance_result)){*/
-                //echo "if";
                 $value->on_date = date("d/m/Y", strtotime($req['year'] . '-' . $req['month'] . '-' . '25'));
-
-                //$value->holidays = effectiveHolidays($value->joining_date,$holiday_array);
-                //$value->sundays = effectiveSundays($value->joining_date,$sunday_array);
-                //$value->workdays = $data['workdays'];
-
-                //$value->late = $this->calculateLateAttendance($value->user_id,$req['year'],$req['month']);
-
-                //$value->absent_days = $this->calculateAbsentAttendance($value->user_id,$req['year'],$req['month']); // - ($value->holidays);
-
-                //$value->absent_days = ($value->workdays < $value->absent_days) ? $value->workdays : $value->absent_days;
-
-                //$value->absent_days = ($value->absent_days < 0) ? 0 : $value->absent_days;
-
 
                 if ($req['month'] == 1) {
                     $start_year = $req['year'] - 1;
@@ -927,15 +891,11 @@ class AttendanceController extends Controller
                     $value->state_name = $state_data->name;
                 }
 
-                //echo"<br/>";
                 $start_month = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
-                //echo"<br/>";
+
                 $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
 
-
-//                if($value->user_id == 517) {
-
-                $value->paid_leaves = DB::table('applied_leave_segregations as als')
+                $paid_leaves_count = DB::table('applied_leave_segregations as als')
                     ->join('applied_leaves as al', 'al.id', '=', 'als.applied_leave_id')
                     ->where(['al.final_status' => '1', 'al.user_id' => $value->user_id])
                     ->where(function ($query) use ($start_month, $end_month) {
@@ -945,10 +905,19 @@ class AttendanceController extends Controller
                     ->select('als.paid_count')
                     ->orderBy('als.applied_leave_id', 'DESC')
                     ->sum('paid_count');
-//                }
 
-                // ->sum('als.paid_count');
-                //dd($value->paid_leaves);
+                $compensatory_leaves_count =  DB::table('applied_leave_segregations as als')
+                    ->join('applied_leaves as al', 'al.id', '=', 'als.applied_leave_id')
+                    ->where(['al.final_status' => '1', 'al.user_id' => $value->user_id])
+                    ->where(function ($query) use ($start_month, $end_month) {
+                        $query->where('als.to_date', '>=', $start_month)
+                            ->where('als.to_date', '<=', $end_month);
+                    })
+                    ->select('als.compensatory_count')
+                    ->orderBy('als.applied_leave_id', 'DESC')
+                    ->sum('compensatory_count');
+
+                $value->paid_leaves = $paid_leaves_count + $compensatory_leaves_count;
 
                 $value->unpaid_leaves = DB::table('applied_leave_segregations as als')
                     ->join('applied_leaves as al', 'al.id', '=', 'als.applied_leave_id')
@@ -959,27 +928,7 @@ class AttendanceController extends Controller
                     })
                     ->select('als.unpaid_count')
                     ->orderBy('als.applied_leave_id', 'DESC')->sum('unpaid_count');
-                // ->limit(1)->first();
-                // ->sum('als.unpaid_count');
-
-                //$value->total = ($value->workdays+$value->holidays+$value->sundays) - ($value->absent_days + $value->unpaid_leaves);
-                $value->verification = "No";
-                /*} else {
-					$state_data = State::where('id',$value->state_id)
-										->first();
-
-                    $value->state_name =	$state_data->name;
-                    $value->on_date = date("d/m/Y",strtotime($attendance_result->on_date));
-                    $value->holidays = $attendance_result->holidays;
-                    $value->sundays = $attendance_result->week_offs;
-                    $value->workdays = $attendance_result->workdays;
-                    $value->late = $attendance_result->late;
-                    $value->absent_days = $attendance_result->absent_days;
-                    $value->travel_days = $attendance_result->travel_days;
-                    $value->paid_leaves = $attendance_result->paid_leaves;
-                    $value->unpaid_leaves = $attendance_result->unpaid_leaves;
-                    $value->total = $attendance_result->total_present_days;
-                }*/
+                     $value->verification = "No";
 
                 $verification = AttendanceVerification::where(['on_date' => date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-' . '25')), 'user_id' => $value->user_id])->first();
 
@@ -1072,7 +1021,6 @@ class AttendanceController extends Controller
                     }
 
                 } else {
-                    //dd($employee);
                     $user_with_no_designation = $employee->employee_id;
                     $has_no_designation = 1;
                     break;
@@ -1297,9 +1245,6 @@ class AttendanceController extends Controller
                 }
 
             } else {
-
-                //dd("++++++++");
-
                 foreach ($employees as $employee) {
 
                     if ($employee->state_id == $login_user_state_id and ($employee->designation_id == 3 or $employee->designation_id == 5)) {
@@ -1323,13 +1268,7 @@ class AttendanceController extends Controller
         if ((!isset($employees_po) or empty($employees_po)) and $token == 0) {
             $employees_po = $employees;
         }
-        //return $employees_po;
-        /* echo"<PRE>";
-                print_r($employees_po);
-                exit; */
-//        if($value->user_id == 517) {
-//            return $data;
-//        }
+
         if($request->submit == 'Attendance sheet'){
 
             $users = [];
@@ -1354,7 +1293,6 @@ class AttendanceController extends Controller
 
 
                 $user = $emp->user_id;
-//                if($user == 324){
                     $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
                     $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
 
@@ -1416,15 +1354,6 @@ class AttendanceController extends Controller
                     $data[$key]['Reporting head'] = $logged_in_user->employee->fullname;
                     $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
 
-                    /*if(isset($emp->reporting_head) && isset($emp->reporting_head_uId)){
-                        $data[$key]['Reporting head'] = 	$emp->reporting_head;
-                        $data[$key]['Reporting head UId'] = $emp->reporting_head_uId;
-                    }else{
-
-                        $data[$key]['Reporting head'] = 	"Not assigned";
-                        $data[$key]['Reporting head UId'] = "Null";
-                    }*/
-
                     $data[$key]['Verified'] = $verify_status;
                     $data[$key]['Month'] = $prev_month . "-" . $month;
 
@@ -1464,9 +1393,6 @@ class AttendanceController extends Controller
                                                     ->Where('al.to_date','>=',$punch_date);
                                             })->first();
 
-//                                            print_r($leaves);
-//                                            return "dsg";
-                                            //e$leaves->name;
                                             if ($leaves) {
                                                 if ($leaves->name == "Sick Leave") {
                                                     $data[$key][$start_date] = "SL";
@@ -1530,7 +1456,6 @@ class AttendanceController extends Controller
         }
 
 
-// 		return $req;
         return view('attendances.consolidated_attendance_sheets')->with(['data'=>$data,'employees'=>$employees_po,'req'=>$req, 'login_user'=>$userid]);
 
     }  //end of function

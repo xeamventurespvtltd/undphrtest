@@ -118,7 +118,7 @@ class LeaveController extends Controller
 
         $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
 
-        $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
+       $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
             ->whereMonth
             ('month_info', date('m'))->first();
 
@@ -773,6 +773,7 @@ class LeaveController extends Controller
             }
 
             $probation_data = probationCalculations($applier);
+
 
             /*
              * Leave calculation update segregation
