@@ -428,23 +428,12 @@ class LeaveController extends Controller
             }
         }
 
-
-//        date('m', strtotime($request->fromDate));
-
-//        if($designation_login_user==3 ){
-//            AppliedLeave::where('user_id', $user->id)->whereYear('to_date', date('Y', strtotime
-//            ($request->fromDate)))->whereMonth('to_date', date('m', strtotime($request->fromDate)))->select('num_of_days')->sum();
-//        }
-
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
         }else{
             $manager_error = "You do not have reporting manger under Your area.";
             return redirect('leaves/apply-leave')->with('leaveError',$manager_error);
         }
 
-        // Chk Previous Leave Pending Or Approved..
-
-//        return $userid;
         $pending_leave = AppliedLeaveApproval::where(['user_id'=>$userid,'leave_status'=>'0'])
             ->whereHas('appliedLeave',function(Builder $query){
                 $query->where('isactive',1);
@@ -453,7 +442,6 @@ class LeaveController extends Controller
 
         if(!empty($pending_leave)){
             $pending_error = "The approval status of your previously applied leave is pending with one or more authorities. Please contact the concerned person and clear it first.";
-
             return redirect('leaves/apply-leave')->with('leaveError',$pending_error);
         }
 
@@ -461,9 +449,6 @@ class LeaveController extends Controller
             ->where(['isactive'=>1])
             ->orderBy('id','DESC')
             ->first();
-
-
-
 
         if(!empty($last_applied_leave)){
             $created_at = new Carbon($last_applied_leave->created_at);
@@ -475,11 +460,6 @@ class LeaveController extends Controller
             }else{
                 $leave_time_difference = false;
             }
-
-            /* if($leave_time_difference){
-                 $wait_error = "You have to wait for some time before you can apply for leave again.";
-                 //return redirect('leaves/apply-leave')->with('leaveError',$wait_error);
-             }*/
         }
 
         $from_date = date("Y-m-d",strtotime($request->fromDate));
@@ -499,25 +479,20 @@ class LeaveController extends Controller
 
 
         $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
-        //dd($already_applied_leave->id);
 
         if(!empty($already_applied_leave)){
             $unique_error = "You have already applied for leave on the given dates.";
             return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
         }
 
-
-
         if(!empty($last_applied_leave)){
 
             $chk_existing_date = DB::table('applied_leaves')
                 ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
                 ->first();
-            //dd($chk_existing_date);
             if(!empty($chk_existing_date)){
                 $unique_error = "You have already applied for leave on given dt.";
                 return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
-
             }
         }
 
@@ -525,7 +500,6 @@ class LeaveController extends Controller
         if($request->leaveTypeId == '4'){  //check for maternity leave
             if($request->noDays > 90){
                 $maternity_error = "You cannot take maternity leave for more than 90 days.";
-
             }else{
                 $already_applied_leave = $user->appliedLeaves()
                     ->where(['final_status'=>'1','leave_type_id'=>4,'isactive'=>1])
@@ -548,9 +522,8 @@ class LeaveController extends Controller
         // chk for paternity leave not more than 15  days in a month.
 
         if($request->leaveTypeId == '7'){
-            if($request->noDays > 15){
-                $paternity_error = "You cannot take Paternity leave for more than 15 days.";
-
+            if($request->noDays > 15 || $request->noDays != 15){
+                $paternity_error = "You cannot take Paternity leave for less than or more than 15 days.";
             }else{
                 $already_applied_leave = $user->appliedLeaves()
                     ->where(['final_status'=>'1','leave_type_id'=>7,'isactive'=>1])
@@ -571,27 +544,22 @@ class LeaveController extends Controller
         }
 
         /////////////////5 days capping for vccm for casual leave/////////////////
-        if($request->leaveTypeId == '1'  AND $designation_login_user==4){
-
-            $current_month_leave = $this->calculateMonthLeave($from_date,$to_date);
-            // dump($current_month_leave);
-            if(!isset($total)){
-                $total=0;
-            }
-
-            if($total + $current_month_leave>5 ){
-
-                //dd("s");
-
-                $more_than_5_error = "You are not allowed to apply for leave more than 5 days in a month. You have already taken" ."$current_month_leave"." leaves.";
-
-                return redirect('leaves/apply-leave')->with('leaveError',$more_than_5_error);
-
-            }
-        }
+//        if($request->leaveTypeId == '1'  AND $designation_login_user==4){
+//
+//            $current_month_leave = $this->calculateMonthLeave($from_date,$to_date);
+//
+//            if(!isset($total)){
+//                $total=0;
+//            }
+//
+//            if($total + $current_month_leave>5 ){
+//                $more_than_5_error = "You are not allowed to apply for leave more than 5 days in a month. You have already taken" ."$current_month_leave"." leaves.";
+//                return redirect('leaves/apply-leave')->with('leaveError',$more_than_5_error);
+//
+//            }
+//        }
 
 
-        //dd("+++")
 
         /////////////////////////Create Leave///////////////////////
 
@@ -619,19 +587,12 @@ class LeaveController extends Controller
             }
         }
 
-
         //////////////////////////Segregation///////////////////////////
-
         if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
-            $new_all_dates_array = explode(",",$request->newAllDatesArray);
 
-            $month_wise_array = [];
-            $counter = 0;
-            $key2 = 0;
-            $days_counter = 0;
             if(date("d",strtotime($request->toDate)) > 25 || date("m",strtotime($request->toDate)) > date("m",strtotime($request->fromDate)))
             {
-                $date = explode('/',$request->fromDate);
+                 $date = explode('/',$request->fromDate);
                 $year = $date[2];
                 $month = $date[0];
                 $firstEndDate = $year.'-'.$month.'-25';
@@ -663,7 +624,7 @@ class LeaveController extends Controller
                 $applied_leave->appliedLeaveSegregations()->create($segregation_data);
 
                 $secondFromDate = $year.'-'.$month.'-26';
-                echo  $secondSegregation = $secondFromDate.' - '. $request->toDate;
+                  $secondSegregation = $secondFromDate.' - '. $request->toDate;
                 $date3 = Carbon::createFromDate($secondFromDate);
                 $date4 = Carbon::createFromDate($request->toDate);
 
@@ -675,6 +636,7 @@ class LeaveController extends Controller
                         $numberOfDays = $numberOfDays - 1;
                     }
                 }
+
                 $segregation_data = [
                     'from_date' => date("Y-m-d", strtotime($secondFromDate)),
                     'to_date' => date("Y-m-d", strtotime($request->toDate)),
@@ -684,10 +646,12 @@ class LeaveController extends Controller
                     'compensatory_count' => '0'
                 ];
                 $applied_leave->appliedLeaveSegregations()->create($segregation_data);
-            }else {
+
+            }
+            else {
                 $segregation_data = [
-                    'from_date' => date("Y-m-d", strtotime($request->toDate)),
-                    'to_date' => date("Y-m-d", strtotime($request->fromDate)),
+                    'from_date' => date("Y-m-d", strtotime($request->fromDate)),
+                    'to_date' => date("Y-m-d", strtotime($request->toDate)),
                     'number_of_days' => $request->noDays,
                     'paid_count' => '0',
                     'unpaid_count' => '0',
@@ -695,7 +659,6 @@ class LeaveController extends Controller
                 ];
                 $applied_leave->appliedLeaveSegregations()->create($segregation_data);
             }
-//            }
         }else{  //For Short and Half Day leave
 
             $segregation_data =  [
@@ -765,11 +728,6 @@ class LeaveController extends Controller
         $leave_approval = AppliedLeaveApproval::find($request->alaId);
 
         $applied_leave = $leave_approval->appliedLeave;
-
-        /////////////////Checks////////////////////////
-        $current_date = date('Y-m-d');
-        $restriction_date = config('constants.restriction.approveLeave');
-        $current_month_start_date = date("Y-m-01");
 
         $approver = User::where(['id'=>Auth::id()])->first();
 
