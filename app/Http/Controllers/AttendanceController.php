@@ -231,13 +231,6 @@ class AttendanceController extends Controller
         $req['year'] = 0;
         $req['month'] = 0;
 
-//        if($request->month==1){
-//            $req['month'] = 12;
-//        }else{
-//            // cooment by HK
-//            //$req['month'] = $request->month+1;
-//            $req['month'] = $request->month;
-//        }
 
         if($request->year){
             $req['year'] = $request->year;
@@ -2776,8 +2769,6 @@ class AttendanceController extends Controller
 
     function addLeave(Request $request){
 
-//         dd($request->all());
-
         $t_date = date("Y-m-d",strtotime($request->to_date));
 
         $userid = $request->user_id;
@@ -2945,8 +2936,7 @@ class AttendanceController extends Controller
         }
 
 
-
-        if($request->leaveTypeId == '1' || $request->leaveTypeId == '2'){
+        if($request->leaveTypeId == '1' || $request->leaveTypeId == '2' || $request->leaveTypeId == '7'){
 
             $leave_data = [
                 'leave_type_id' => $request->leaveTypeId,
@@ -2959,7 +2949,7 @@ class AttendanceController extends Controller
             ];
         }
 
-        if($request->leaveTypeId == '4' || $request->leaveTypeId == '7'){
+        if($request->leaveTypeId == '5' || $request->leaveTypeId == '4' ){
 
             $leave_data = [
                 'leave_type_id' => $request->leaveTypeId,
@@ -2982,8 +2972,8 @@ class AttendanceController extends Controller
             'paid_count' => '0',
             'unpaid_count' => '0',
             'compensatory_count' => '0'
-
         ];
+
         // comment by hitesh...
         $applied_leave->appliedLeaveSegregations()->create($segregation_data);
 

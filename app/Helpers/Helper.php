@@ -114,7 +114,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
     // Get Leave applier designation id
 
-    $designation_data = User::where(['id' =>  $applied_leave->user_id])
+   $designation_data = User::where(['id' =>  $applied_leave->user_id])
         ->with('designation')
         ->first();
 
@@ -146,7 +146,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
     // previous month entry set h...
 
     if(isset($leave_status_prev) && !empty($leave_status_prev)){
-// dd('IF Date of Joining not in current month');
         // IF Date of Joining not in current month
         //if no leaves in current month..
         if(!$leave_status_current_month){
@@ -181,7 +180,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             $balance_maternity = $leave_status_prev->balance_maternity_leave;
             $balance_paternity = $leave_status_prev->balance_paternity_leave;
 
-            //if count == 1   this conition not satisfied think So.....
             //$count is previous month leave
             if($count==1){
                 if($designation==4){
@@ -206,19 +204,8 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 }
             }
 
-            // Unpai & Paid Casual
-
-            // In that  case fresh  entry coming so unpaide and paid casual 0  date => 13-10-2020
-
-            //$unpaid_casual = $leave_status_prev->unpaid_casual;
-            //$paid_casual = $leave_status_prev->paid_casual;
-
             $unpaid_casual = 0;
             $paid_casual = 0;
-
-            // Unpai & Paid Sick
-            //$unpaid_sick = $leave_status_prev->unpaid_sick;
-            //$paid_sick = $leave_status_prev->paid_sick;
 
             $unpaid_sick = 0;
             $paid_sick = 0;
@@ -338,16 +325,18 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
         }else{
             //if leave detail has entry for current month
-//             dd("current month");
 
             // if current month Case:
 
             $leave_status_after = LeaveDetail::where('user_id', $userId)
                 ->whereMonth('month_info',$current_month)  //works with to_date as well
                 ->first();
+
             $id_to_update = $leave_status_after->id;
+
             // chk accumulated casual
             $accumlated_casual = $leave_status_after->accumalated_casual_leave;
+
             // chk accumulated Sick
             $accumlated_sick = $leave_status_after->accumalated_sick_leave;
 
@@ -439,7 +428,8 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 }
                 saveLeaveSegration($applied_leave,  $paid_count, $unpaid_count);
 
-            }elseif($applied_leave->leave_type_id==2){ // For Sick Leave Condition
+            }
+            elseif($applied_leave->leave_type_id==2){ // For Sick Leave Condition
 
                 // In Casual Condition 	Accumulated Casual are not Changed
                 $current_accumlated_casual = $leave_status_after->accumalated_casual_leave;
@@ -514,7 +504,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             }elseif($applied_leave->leave_type_id==5){
 
                 // Balance Compensatory Leave
-                $compensatory_count = $compensatory_count - $applied_leave->number_of_days;
+                $compensatory_count = $compensatory_count + $applied_leave->number_of_days;
             }
 
             $update_approval_data = [
@@ -545,7 +535,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 ->whereMonth('month_info',$current_month)  //works with to_date as well
                 ->first();
 
-            dd($leave_status);
 
             $id_to_update = $leave_status->id;
 
@@ -680,22 +669,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
             LeaveDetail::where('id', $id_to_update)->update($update_approval_data);
         }
     }
-
-
-    //if( isset($leave_status_current_month) ){
-    $leave_status_final = LeaveDetail::where('user_id', $userId)
-        ->whereMonth('month_info',$current_month)
-        ->first();
-
-    // $paid_count = $leave_status_final->paid_casual + $leave_status_final->paid_sick;
-
-    // $unpaid_count = $leave_status_final->unpaid_casual + $leave_status_final->unpaid_sick;
-
-    // $compensatory_count = $leave_status_final->compensatory_count;
-
-// return $applied_leave->leave_type_id;
-
-    //}
 }
 
 function saveLeaveSegration($applied_leave, $paid_count, $unpaid_count){
