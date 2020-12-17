@@ -15,24 +15,6 @@
 
             <!-- <small>Control panel</small> -->
             <div class="row leave-type1">
-            <!--<div class="col-sm-4 col-xs-4 leaves1">
-          <div class="panel panel-danger leave-type-sectn">
-            <div class="panel-heading leave-heading">Balance Casual Leave:
-{{--              <span class="label label-danger">{{ $leaveDetail->balance_casual_leave }}</span>--}}
-                </div>
-
-              </div>
-            </div>
-            <div class="col-sm-4 col-xs-4 leaves2">
-              <div class="panel panel-success leave-type-sectn">
-                <div class="panel-heading leave-heading">Balance Sick Leaves:
-{{--              <span class="label label-success">{{$leaveDetail->balance_sick_leave ?? 0}}</span>--}}
-                </div>
-
-              </div>
-            </div>
--->
-
             </div>
 
             <div class="row leave-type1">
@@ -121,8 +103,8 @@
                         <div class="panel-heading leave-heading">UnPaid Leave Taken:
                             <span class="label label-info">
                                 {{
-                                 isset($leaveDetail) ? $leaveDetail->unpaid_sick : '0'  +
-                                 isset($leaveDetail) ? $leaveDetail->unpaid_casual : '0'
+                                 isset($leaveDetail) ? '0' : $leaveDetail->unpaid_sick  +
+                                 isset($leaveDetail) ? '0' : $leaveDetail->unpaid_casual
                                 }}
                             </span>
                         </div>

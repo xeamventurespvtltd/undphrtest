@@ -63,6 +63,7 @@ strong {
                             <label>Year<sup class="ast">*</sup></label>
                             <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                                 <option value="" disabled>Please select Year</option>
+                                <option value="2021">2021</option>
                                 <option value="2020">2020</option>
                                 <option value="2019">2019</option>
                                 <option value="2018">2018</option>
