@@ -38,7 +38,7 @@
 
                 </div>
 
-        @endif
+            @endif
 
         <!-- Small boxes (Stat box) -->
 
@@ -55,6 +55,7 @@
                                     <label>Year<sup class="ast">*</sup></label>
                                     <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                                         <option value="" selected disabled>Please select Year</option>
+                                        <option value="2021">2021</option>
                                         <option value="2020">2020</option>
                                         <option value="2019">2019</option>
                                         <option value="2018">2018</option>
@@ -69,7 +70,7 @@
                                         <option value="" selected disabled>Please select Month</option>
                                         <option value="1">Dec-Jan</option>
                                         <option value="2">Jan-Feb</option>
-                                        <option value="3">Feb-Mar</option>
+                                        <option value="3">Feb-March</option>
                                         <option value="4">Mar-Apr</option>
                                         <option value="5">Apr-May</option>
                                         <option value="6">May-June</option>
@@ -114,8 +115,6 @@
                             $next_month = 1;
                             $next_year = $cYear + 1;
                         }
-                        $verifyAttendanceButton = config('constants.restriction.verifyAttendanceButton');
-                        $secondDayOfNextMonth = date($verifyAttendanceButton, strtotime('+1 months', strtotime($cYear.'-'.$cMonth.'-'.'03')));
 
                         ?>
                         <hr class="attendance-hr">
@@ -156,19 +155,26 @@
                                             </div>
                                             <!-- <button type="button" class="fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled" disabled="">today</button> -->
                                         </div>
+
+
                                         <div class="fc-center">
                                             @php
-
                                                 $current_date = date('Y-m-d');
+
+
+
+                                                //$today_date = date('d');
+
                                                 if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
-                                                  if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
+                                                if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
                                                 $curr_month = $_REQUEST["month"];
-                                                if(date("d", strtotime($current_date))>25){
-                                                    $curr_month = $curr_month+1;
-                                                   }
 
-                                                  $curr_year = $_REQUEST["year"];
+                                                if(date("d", strtotime($current_date))>25){
+                                                  $curr_month = $curr_month+1;
+                                                 }
+
+                                                $curr_year = $_REQUEST["year"];
 
                                                 if($curr_month==1){
                                                 $start_year= $curr_year-1;
@@ -177,20 +183,20 @@
                                                 $start_year= $curr_year;
                                                 $startmonth = $curr_month-1;
                                                 }
-                                               $startmonth = $startmonth;
-                                                 $date1 = $start_year.'-'.$startmonth.'-'.'26';
-                                               $startmonth = $startmonth + 1;
-                                                $date2 = $curr_year.'-'.$startmonth.'-'.'25';
+                                                  $date1 = $start_year.'-'.$startmonth.'-'.'26';
+                                                  $date2 = $curr_year.'-'.$curr_month.'-'.'25';
 
                                             @endphp
-                                            <h2><?php
-                                                echo $monthNames[$startmonth-2];
+                                            <h2>
+                                                <?php echo $monthNames[$startmonth - 1];
                                                 echo "-";
-                                                echo $monthNames[$startmonth - 1];
+                                                echo $monthNames[$curr_month - 1];
                                                 echo " ".$cYear;
                                                 ?>
                                             </h2>
                                         </div>
+
+
                                         <!--&& $verify['verifier'] != 0 -->
                                         <!--if(strtotime($on_date) < strtotime(date("Y-m-d")) && $verify['isverified'] == 0  ) unverified  -->
 
@@ -647,8 +653,6 @@
         $(document).ready(function(){
 
             //Date picker
-
-
             $('.datepicker').datepicker({
                 autoclose: true,
                 orientation: "bottom",
@@ -906,11 +910,13 @@
 
             var selectBox = document.getElementById("attendanceStatusLeave");
             var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+
             if(selectedValue == 1 ||  selectedValue == 2){
                 $('#cas_sick').show();
                 $('#pat_mat').hide();
 
             }
+
             if(selectedValue == 7 || selectedValue == 4){
                 $('#cas_sick').hide();
                 $('#pat_mat').show();
