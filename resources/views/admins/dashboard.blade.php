@@ -640,15 +640,21 @@
                                                                                             </div>
 
                                                                                             <?php } ?>
-                                                                                                @if(@$user->designation[0]->id == 3)
+                                                                                            @if(@$user->designation[0]->id == 3)
+                                                                                                {{--                                                                                                    @if($status == 'Leave')--}}
+                                                                                                {{--                                                                                                    {{ $status }}--}}
+                                                                                                {{--                                                                                                    @endif--}}
                                                                                                 @if(strtotime($date1) <= strtotime(date("Y-m-d")))
-                                                                                                <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
-                                                                                                    <!--<i class="fa fa-clock-o a-icon5"></i>-->
-                                                                                                    <i class="fa fa-user-times" aria-hidden="true"></i>
-                                                                                                    <span class="status-tooltiptext">Change Status</span>
-                                                                                                </div>
+                                                                                                    @if($status != 'Leave')
+
+                                                                                                        <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
+                                                                                                            <!--<i class="fa fa-clock-o a-icon5"></i>-->
+                                                                                                            <i class="fa fa-user-times" aria-hidden="true"></i>
+                                                                                                            <span class="status-tooltiptext">Change Status</span>
+                                                                                                        </div>
                                                                                                     @endif
-                                                                                                    @endif
+                                                                                                @endif
+                                                                                            @endif
 
                                                                                         </div>
                                                                                     </td>
@@ -768,27 +774,32 @@
                 </div>
         </section>
 
-        <section>
-            <!-- Leave detail starts here -->
-            <div class="row">
-                <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
-                    <div class="outer-border text-center">
-                        <h3>Attendance</h3>
-                        <button class="btn btn-danger" onclick="window.location.href='/employees/dashboard?type=checkin';" title="Click to checkin" style="cursor: pointer;" style="padding: 20px 50px;">Check In</button>
-                        <button class="btn btn-info hide" onclick="window.location.href='/employees/dashboard?type=checkout';" title="Click to checkout" style="cursor: pointer;" style="padding: 20px 50px;">Check Out</button>
+        @if($status != 'Leave')
+            <section>
+                <!-- Leave detail starts here -->
+                <div class="row">
+                    <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
+                        <div class="outer-border text-center">
+                            <h3>Attendance</h3>
+                            <button class="btn btn-danger" onclick="window.location.href='/employees/dashboard?type=checkin';" title="Click to checkin" style="cursor: pointer;" style="padding: 20px 50px;">Check In</button>
+                            <button class="btn btn-info hide" onclick="window.location.href='/employees/dashboard?type=checkout';" title="Click to checkout" style="cursor: pointer;" style="padding: 20px 50px;">Check Out</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
+                        <div class="outer-border text-center">
+                            <h3 class="text-center">Mark Your Days Off</h3>
+                            <button class="btn btn-danger" onclick="window.location.href='/attendances/change-offs-status?status=Holiday';" title="Click to add Holiday" style="cursor: pointer;" style="padding: 20px 50px;">Holiday</button>
+                            <button class="btn btn-info" onclick="window.location.href='/attendances/change-offs-status?status=Week-Off';" title="Click to add Week-Off" style="cursor: pointer;" style="padding: 20px 50px;">Week-off</button>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
-                    <div class="outer-border text-center">
-                        <h3 class="text-center">Mark Your Days Off</h3>
-                        <button class="btn btn-danger" onclick="window.location.href='/attendances/change-offs-status?status=Holiday';" title="Click to add Holiday" style="cursor: pointer;" style="padding: 20px 50px;">Holiday</button>
-                        <button class="btn btn-info" onclick="window.location.href='/attendances/change-offs-status?status=Week-Off';" title="Click to add Week-Off" style="cursor: pointer;" style="padding: 20px 50px;">Week-off</button>
-                    </div>
-                </div>
+                <!-- Leave detail ends here -->
+            </section>
+        @else
+            <div>
+                <h3>Today Your Mark Attendance Is Leave</h3>
             </div>
-            <!-- Leave detail ends here -->
-        </section>
-
+        @endif
         <section class="leave-detail-sec hide">
             <!-- Leave detail starts here -->
             <div class="row">
