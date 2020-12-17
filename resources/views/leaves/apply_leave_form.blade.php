@@ -102,10 +102,10 @@
                     <div class="panel panel-success leave-type-sectn">
                         <div class="panel-heading leave-heading">UnPaid Leave Taken:
                             <span class="label label-info">
-                                {{
-                                 isset($leaveDetail) ? '0' : $leaveDetail->unpaid_sick  +
-                                 isset($leaveDetail) ? '0' : $leaveDetail->unpaid_casual
-                                }}
+                                @php
+                                echo ( isset($leaveDetail) ? $leaveDetail->unpaid_sick : '0' )  +
+                                 ( isset($leaveDetail) ? $leaveDetail->unpaid_casual : '0' )
+                               @endphp
                             </span>
                         </div>
                         <!-- <div class="panel-body leave-content"> -->
