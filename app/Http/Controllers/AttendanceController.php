@@ -231,16 +231,20 @@ class AttendanceController extends Controller
         $req['year'] = 0;
         $req['month'] = 0;
 
-        if($request->month==1){
-            $req['month'] = 12;
-        }else{
-            // cooment by HK
-            //$req['month'] = $request->month+1;
-            $req['month'] = $request->month;
-        }
+//        if($request->month==1){
+//            $req['month'] = 12;
+//        }else{
+//            // cooment by HK
+//            //$req['month'] = $request->month+1;
+//            $req['month'] = $request->month;
+//        }
 
         if($request->year){
             $req['year'] = $request->year;
+        }
+
+        if($request->month){
+            $req['month'] = $request->month;
         }
 
         $verify['isverified'] = 0; //not verified
