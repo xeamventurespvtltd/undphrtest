@@ -72,13 +72,13 @@ class UserController extends Controller
     function replaceAuthority()
     {
         $all_users = Employee::whereNotIn('user_id',[1])
-                            ->with('user:id,employee_code')
-                            ->get();
+            ->with('user:id,employee_code')
+            ->get();
 
         $active_users = Employee::where(['isactive'=>1,'approval_status'=>'1'])
-                                ->whereNotIn('user_id',[1])
-                                ->with('user:id,employee_code')
-                                ->get();
+            ->whereNotIn('user_id',[1])
+            ->with('user:id,employee_code')
+            ->get();
 
         return view('employees.replace_authority_form')->with(['all_users'=>$all_users,'active_users'=>$active_users]);
     }
@@ -102,42 +102,42 @@ class UserController extends Controller
                 $query = UserManager::where('manager_id',$request->previous_user);
 
                 $updated_users = $query->pluck('user_id')
-                                        ->toArray();
+                    ->toArray();
 
                 if(!empty($updated_users)){
                     $update = $query->update(['manager_id'=>$request->new_user]);
                     $log_data = [
-                                'log_id' => $log->id,
-                                'data' => 'replaced manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
-                            ];
+                        'log_id' => $log->id,
+                        'data' => 'replaced manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
+                    ];
                     $flag = 1;
                 }
             }elseif ($request->authority === 'SO2') {
                 $query = LeaveAuthority::where(['manager_id'=>$request->previous_user,'priority'=>'2']);
 
                 $updated_users = $query->pluck('user_id')
-                                        ->toArray();
+                    ->toArray();
 
                 if(!empty($updated_users)){
                     $update = $query->update(['manager_id'=>$request->new_user]);
                     $log_data = [
-                                'log_id' => $log->id,
-                                'data' => 'replaced priority level 2 manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
-                            ];
+                        'log_id' => $log->id,
+                        'data' => 'replaced priority level 2 manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
+                    ];
                     $flag = 1;
                 }
             }elseif ($request->authority === 'SO3') {
                 $query = LeaveAuthority::where(['manager_id'=>$request->previous_user,'priority'=>'3']);
 
                 $updated_users = $query->pluck('user_id')
-                                        ->toArray();
+                    ->toArray();
 
                 if(!empty($updated_users)){
                     $update = $query->update(['manager_id'=>$request->new_user]);
                     $log_data = [
-                                'log_id' => $log->id,
-                                'data' => 'replaced priority level 3 manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
-                            ];
+                        'log_id' => $log->id,
+                        'data' => 'replaced priority level 3 manager_id of users '.implode(',',$updated_users).' from '.$request->previous_user.' to '.$request->new_user
+                    ];
                     $flag = 1;
                 }
             }
@@ -189,10 +189,10 @@ class UserController extends Controller
     {
 
         $data = [
-                    'name' => 'it-attendance-approver',
+            'name' => 'it-attendance-approver',
 
-                    'guard_name' => 'web',
-                ];
+            'guard_name' => 'web',
+        ];
 
         Permission::firstOrCreate($data);
 
@@ -212,75 +212,75 @@ class UserController extends Controller
 
     {
 
-    	$request->validate([
+        $request->validate([
 
-	        'email' => 'required|email'
+            'email' => 'required|email'
 
-	    ]);
-
-
-
-	    $user = User::where(['email'=>$request->email])->with('employee')->first();
+        ]);
 
 
 
-	    if(empty($user)){
-
-	    	return redirect()->back()->with('error_attempt',"Email is incorrect!");
+        $user = User::where(['email'=>$request->email])->with('employee')->first();
 
 
 
-	    }else{
+        if(empty($user)){
+
+            return redirect()->back()->with('error_attempt',"Email is incorrect!");
 
 
 
-	    	$new_forgot_token = str_random(20);
+        }else{
 
 
 
-	    	if(!$user->employee->isactive){
-
-	          return redirect()->back()->with('error_attempt',"Your account has been disabled. Please contact administrator.");
+            $new_forgot_token = str_random(20);
 
 
 
-	        }elseif($user->employee->approval_status == '0'){
+            if(!$user->employee->isactive){
 
-	          return redirect()->back()->with('error_attempt',"Your account has not been approved yet. Please contact administrator.");
-
-
-
-	        }else{
+                return redirect()->back()->with('error_attempt',"Your account has been disabled. Please contact administrator.");
 
 
 
-	          $forgot_data = ['forgot_password_token' => $new_forgot_token];
+            }elseif($user->employee->approval_status == '0'){
 
-	          $user->update($forgot_data);
-
-
-
-	          $new_forgot_token = encrypt($new_forgot_token);
+                return redirect()->back()->with('error_attempt',"Your account has not been approved yet. Please contact administrator.");
 
 
 
-	          $user->url = url('/forgot-password')."/".$new_forgot_token;
+            }else{
+
+
+
+                $forgot_data = ['forgot_password_token' => $new_forgot_token];
+
+                $user->update($forgot_data);
+
+
+
+                $new_forgot_token = encrypt($new_forgot_token);
+
+
+
+                $user->url = url('/forgot-password')."/".$new_forgot_token;
 
 
 
 
 //	          return $user->email;
-	          Mail::to($user->email)->send(new ForgotPassword($user));
+                Mail::to($user->email)->send(new ForgotPassword($user));
 
 
 
-	          return redirect('/')->with('error_attempt',"Your forgot password email has been sent successfully.");
+                return redirect('/')->with('error_attempt',"Your forgot password email has been sent successfully.");
 
 
 
-	        }
+            }
 
-	    }
+        }
 
     }// end of function
 
@@ -291,7 +291,7 @@ class UserController extends Controller
     function forgotPasswordForm($encrypted_token)
     {
 
-    	$token = decrypt($encrypted_token);
+        $token = decrypt($encrypted_token);
 
 
 
@@ -303,11 +303,11 @@ class UserController extends Controller
 
 
 
-          $data['token'] = $encrypted_token;
+            $data['token'] = $encrypted_token;
 
-          $data['expire_status'] = "no";
+            $data['expire_status'] = "no";
 
-          $data['url'] = "";
+            $data['url'] = "";
 
 
 
@@ -315,13 +315,13 @@ class UserController extends Controller
 
 
 
-          $expire_token = "NA";
+            $expire_token = "NA";
 
-          $data['token'] = encrypt($expire_token);
+            $data['token'] = encrypt($expire_token);
 
-          $data['expire_status'] = "yes";
+            $data['expire_status'] = "yes";
 
-          $data['url'] = url("/forgot-password");
+            $data['url'] = url("/forgot-password");
 
 
 
@@ -339,7 +339,7 @@ class UserController extends Controller
 
     {
 
-    	$request->validate([
+        $request->validate([
 
             'new_password'  => 'bail|required|max:20|min:6',
             'confirm_password'  => 'bail|required|max:20|min:6|same:new_password'
@@ -364,7 +364,7 @@ class UserController extends Controller
 
             $user->forgot_password_token = "";
 
-      		$user->save();
+            $user->save();
 
 
 
@@ -429,22 +429,22 @@ class UserController extends Controller
 
         */
 
-    	$request->validate([
+        $request->validate([
 
-	        'employee_code' => 'required',
+            'employee_code' => 'required',
 
-	        'password' => 'bail|required|min:4|max:20'
+            'password' => 'bail|required|min:4|max:20'
 
-	    ]);
+        ]);
 
 
-    	$request->validate([
+        $request->validate([
 
-	        'employee_code' => 'required',
+            'employee_code' => 'required',
 
-	        'password' => 'bail|required|min:4|max:20'
+            'password' => 'bail|required|min:4|max:20'
 
-	    ]);
+        ]);
 
         if($request->has('remember_me')){
             $remember = true;
@@ -452,68 +452,68 @@ class UserController extends Controller
             $remember = false;
         }
 
-    	if(Auth::attempt(['employee_code'=>$request->employee_code,'password'=>$request->password, 'isactive'=>1], $remember)){
+        if(Auth::attempt(['employee_code'=>$request->employee_code,'password'=>$request->password, 'isactive'=>1], $remember)){
 
-	        $user = Auth::user();
+            $user = Auth::user();
 
-	        $employee = $user->employee->first();
+            $employee = $user->employee->first();
 
-	        $user_filled = Employee::where(['user_id'=>$user->id])->first();
+            $user_filled = Employee::where(['user_id'=>$user->id])->first();
 
             $profile_filled =  $user_filled->is_complete;
 
-	        if($employee->isactive && $employee->approval_status == '1'){
+            if($employee->isactive && $employee->approval_status == '1'){
 
-	         //  	$employeeMixedData = $this->employeeModel->mixedEmployeeData($employeeId);
+                //  	$employeeMixedData = $this->employeeModel->mixedEmployeeData($employeeId);
 
-	         //  	$probationData =  $this->commonModel->probationCalculations($employeeId);
+                //  	$probationData =  $this->commonModel->probationCalculations($employeeId);
 
 
 
-	         //  	if(!empty($probationData->probationEndDate)){
+                //  	if(!empty($probationData->probationEndDate)){
 
-		        //     if($probationData->probationEndOrNot == '0' && $empProfile->probation_status == '0'){
+                //     if($probationData->probationEndOrNot == '0' && $empProfile->probation_status == '0'){
 
-		        //       $this->commonModel->notifyProbationApprovers($probationData,$employeeMixedData);
+                //       $this->commonModel->notifyProbationApprovers($probationData,$employeeMixedData);
 
-		        //     }
+                //     }
 
-		        // }
+                // }
 
                 if($profile_filled==0 AND $user->id!=1){
 
                     return redirect('profile-detail-form');
                 }
 
-		        return redirect('employees/dashboard');
+                return redirect('employees/dashboard');
 
 
 
-	        }elseif($employee->approval_status == '0'){
+            }elseif($employee->approval_status == '0'){
 
-	          	Auth::logout();
+                Auth::logout();
 
-	          	return redirect('/')->with('error_attempt',"Your account has not been approved yet. Please contact administrator.");
-
-
-
-	        }elseif(!$employee->isactive){
-
-	          	Auth::logout();
-
-	          	return redirect('/')->with('error_attempt',"Your account has been disabled. Please contact administrator.");
+                return redirect('/')->with('error_attempt',"Your account has not been approved yet. Please contact administrator.");
 
 
 
-	        }
+            }elseif(!$employee->isactive){
+
+                Auth::logout();
+
+                return redirect('/')->with('error_attempt',"Your account has been disabled. Please contact administrator.");
 
 
 
-    	}else{
+            }
 
-    		return redirect('/')->with('error_attempt',"Employee Code or Password is incorrect!");
 
-    	}
+
+        }else{
+
+            return redirect('/')->with('error_attempt',"Employee Code or Password is incorrect!");
+
+        }
 
     }//end of function
 
@@ -522,7 +522,7 @@ class UserController extends Controller
         Show the dashboard page with necessary data
     */
 
-     function dashboard(Request $request)
+    function dashboard(Request $request)
 
     {
         $user_info = User::where(['id'=>Auth::id()])->first();
@@ -531,15 +531,15 @@ class UserController extends Controller
 
         $profile_filled =  $user_filled->is_complete;
 
-         if($profile_filled==0 AND $user_info->id!=1){
+        if($profile_filled==0 AND $user_info->id!=1){
 
-                return redirect('profile-detail-form');
-            }
+            return redirect('profile-detail-form');
+        }
 
         if($request->type){
             $attendance=Attendance::where('user_id',Auth::id())
-                                ->where('on_date', date('Y-m-d'))
-                                ->first();
+                ->where('on_date', date('Y-m-d'))
+                ->first();
             $attendance_id=0;
             if(isset($attendance->id)){
                 $attendance_id=$attendance->id;
@@ -575,38 +575,38 @@ class UserController extends Controller
         }
 
         $data['user'] = User::where(['id'=>Auth::id()])
-                        ->with(['employee', 'employeeProfile', 'roles:id,name'])
-                        ->first();
+            ->with(['employee', 'employeeProfile', 'roles:id,name'])
+            ->first();
         $designation = DB::table('designation_user as du')
             ->join('designations', 'du.designation_id', '=', 'designations.id')
-        ->where('du.user_id', Auth::user()->id)->first();
+            ->where('du.user_id', Auth::user()->id)->first();
 
         $data['designation'] = $designation->name;
 
         $data['tasks'] =  TaskUser::where('user_id', Auth::id())
-                        ->with('task')
-                        ->where('status', 'Inprogress')
-                        ->paginate(4);
+            ->with('task')
+            ->where('status', 'Inprogress')
+            ->paginate(4);
 
         $data['holidays'] = Holiday::orderBy('holiday_from', 'asc')
-                            ->take(4)
-                            ->where('isactive', '1')
-                            ->whereDate('holiday_from', '>', Carbon::now())
-                            ->get();
+            ->take(4)
+            ->where('isactive', '1')
+            ->whereDate('holiday_from', '>', Carbon::now())
+            ->get();
 
         $data['birthdays'] = Employee::whereRaw('DAYOFYEAR(curdate()) <= DAYOFYEAR(birth_date) AND DAYOFYEAR(curdate()) + 30 >=  dayofyear(birth_date)' )
-        ->orderByRaw('DATE_FORMAT(birth_date, "%m-%d")', 'asc')
-        ->where('isactive', '1')
-        ->get();
+            ->orderByRaw('DATE_FORMAT(birth_date, "%m-%d")', 'asc')
+            ->where('isactive', '1')
+            ->get();
 
         $data['independence_day'] = Holiday::whereRaw('YEAR(curdate()) = YEAR(holiday_from) AND DAY(holiday_from)=15' )->first();
 
         $data['probation_data'] = probationCalculations($user_info);
         $data['attendances_info'] = DB::table("employees")->select('id', 'user_id', 'fullname', 'mobile_number')->whereNotIn('user_id',function($query) {
-                                $query->select('user_id')->where('on_date', date("Y-m-d"))->from('attendances');
-                                })
-                                ->where('isactive', 1)
-                                ->get();
+            $query->select('user_id')->where('on_date', date("Y-m-d"))->from('attendances');
+        })
+            ->where('isactive', 1)
+            ->get();
 
         $data['missed_punch_count'] =   count($data['attendances_info']);
 
@@ -624,30 +624,30 @@ class UserController extends Controller
 
     {
 
-      	session(['last_inserted_employee' => 0,'last_inserted_project' => 0,'last_tabname' => ""]);
+        session(['last_inserted_employee' => 0,'last_inserted_project' => 0,'last_tabname' => ""]);
 
-      	Auth::logout();
+        Auth::logout();
 
-    	return redirect('/');
+        return redirect('/');
 
     }
 
     function list_all(){
 
-         $user = Auth::user();
+        $user = Auth::user();
 
 
 
         /*if($user->hasRole('MD') || $user->hasRole('AGM')){*/
 
-                $query = DB::table('employees as emp')
-                ->join('users as u','emp.user_id','=','u.id');
+        $query = DB::table('employees as emp')
+            ->join('users as u','emp.user_id','=','u.id');
 
-                //$query = $query->where('pu.project_id',$req['project_id']);
-            //}
-            $employees_po = $query->select('u.*','emp.*')
-                            ->orderBy('emp.created_at','DESC')
-                            ->get();
+        //$query = $query->where('pu.project_id',$req['project_id']);
+        //}
+        $employees_po = $query->select('u.*','emp.*')
+            ->orderBy('emp.created_at','DESC')
+            ->get();
 
 
         //}
@@ -666,9 +666,9 @@ class UserController extends Controller
     */
     function list(Request $request)
     {
-    	$user = Auth::user();
+        $user = Auth::user();
 
-    	if(empty($request->project_id)){
+        if(empty($request->project_id)){
             $req['project_id'] = 1;
         }else{
             $req['project_id'] = $request->project_id;
@@ -680,25 +680,25 @@ class UserController extends Controller
             $req['department_id'] = $request->department_id;
         }
 
-    	if($user->hasRole('MD') || $user->hasRole('AGM')){
+        if($user->hasRole('MD') || $user->hasRole('AGM')){
             if($req['project_id'] == 'All'){
                 $query = DB::table('employees as emp')
-                ->join('users as u','emp.user_id','=','u.id');
+                    ->join('users as u','emp.user_id','=','u.id');
             }else{
                 $query = DB::table('employees as emp')
-                ->join('users as u','emp.user_id','=','u.id')
-                ->join('project_user as pu','emp.user_id','=','pu.user_id');
+                    ->join('users as u','emp.user_id','=','u.id')
+                    ->join('project_user as pu','emp.user_id','=','pu.user_id');
 
                 if(!empty($request->department_id)){
                     $query = $query->join('employee_profiles as empp','empp.user_id','=','u.id')
-                                    ->where(['empp.department_id'=>$request->department_id]);
+                        ->where(['empp.department_id'=>$request->department_id]);
                 }
 
                 $query = $query->where('pu.project_id',$req['project_id']);
             }
             $employees_po = $query->select('u.*','emp.*')
-                            ->orderBy('emp.created_at','DESC')
-                            ->get();
+                ->orderBy('emp.created_at','DESC')
+                ->get();
 
 
         }else{
@@ -707,9 +707,9 @@ class UserController extends Controller
 
             $data = DB::table('employees as emp')
 
-            	->join('users as u','emp.user_id','=','u.id')
+                ->join('users as u','emp.user_id','=','u.id')
 
-            	->join('employee_profiles as empp','empp.user_id','=','u.id')
+                ->join('employee_profiles as empp','empp.user_id','=','u.id')
 
                 ->where(['emp.isactive'=>1])
 
@@ -718,206 +718,206 @@ class UserController extends Controller
                 ->orderBy('emp.created_at','DESC')
 
                 ->get();
-				$userid = Auth::id();
-				$designation_login_data = DB::table('designation_user as du')
+            $userid = Auth::id();
+            $designation_login_data = DB::table('designation_user as du')
 
-							->where('du.user_id','=',$userid)
+                ->where('du.user_id','=',$userid)
 
-							->select('du.id', 'du.user_id','du.designation_id')->first();
+                ->select('du.id', 'du.user_id','du.designation_id')->first();
 
-				$designation_login_user = $designation_login_data->designation_id;
-				$token = 0;
-				$employees_po = array();
-				$i=0;
-				foreach($data as $key=>$value){
-
-
-					/* $designation_user_data = DB::table('designation_user as du')
-
-										->where('du.user_id','=',$value->user_id)
-
-										->select('du.id', 'du.user_id','du.designation_id')->first(); */
-
-					$designation_data = User::where(['id' => $value->user_id])
-										->with('designation')
-										->first();
-					if(!$designation_data->designation->isEmpty()){
-						$designation_user = $designation_data->designation[0]->id;
-						 $designation_name = $designation_data->designation[0]->name;
-
-					}else{
-						$designation_user ="";
-						$designation_name = "";
-					}
+            $designation_login_user = $designation_login_data->designation_id;
+            $token = 0;
+            $employees_po = array();
+            $i=0;
+            foreach($data as $key=>$value){
 
 
-					/* echo"<PRE>";
-					print_r($designation_user_data);
-					exit; */
+                /* $designation_user_data = DB::table('designation_user as du')
 
-					//$designation_user = $designation_user_data->designation_id;
+                                    ->where('du.user_id','=',$value->user_id)
 
-					$data[$key]->designation_id = $designation_user;
-					$data[$key]->designation_name = $designation_name;
+                                    ->select('du.id', 'du.user_id','du.designation_id')->first(); */
 
-					$district_listed_user = DB::table('location_user as lu')
+                $designation_data = User::where(['id' => $value->user_id])
+                    ->with('designation')
+                    ->first();
+                if(!$designation_data->designation->isEmpty()){
+                    $designation_user = $designation_data->designation[0]->id;
+                    $designation_name = $designation_data->designation[0]->name;
 
-									->where('lu.user_id','=',$value->user_id)
+                }else{
+                    $designation_user ="";
+                    $designation_name = "";
+                }
 
-									->select('lu.id', 'lu.user_id','lu.location_id')->first();
 
-					if(!empty($district_listed_user) AND $district_listed_user->location_id){
-						$listed_user_district_id = $district_listed_user->location_id;
-						$data[$key]->district_id = $listed_user_district_id;
-					}else{
-						$data[$key]->district_id = "";
-					}
-/* 					if($i<100){
-						$listed_user_district_id = $district_listed_user->location_id;
-						$data[$key]->district_id = $listed_user_district_id;
-					}
- */
+                /* echo"<PRE>";
+                print_r($designation_user_data);
+                exit; */
+
+                //$designation_user = $designation_user_data->designation_id;
+
+                $data[$key]->designation_id = $designation_user;
+                $data[$key]->designation_name = $designation_name;
+
+                $district_listed_user = DB::table('location_user as lu')
+
+                    ->where('lu.user_id','=',$value->user_id)
+
+                    ->select('lu.id', 'lu.user_id','lu.location_id')->first();
+
+                if(!empty($district_listed_user) AND $district_listed_user->location_id){
+                    $listed_user_district_id = $district_listed_user->location_id;
+                    $data[$key]->district_id = $listed_user_district_id;
+                }else{
+                    $data[$key]->district_id = "";
+                }
+                /* 					if($i<100){
+                                        $listed_user_district_id = $district_listed_user->location_id;
+                                        $data[$key]->district_id = $listed_user_district_id;
+                                    }
+                 */
 
 //$i++;
 
-					$state_listed_user = EmployeeProfile::where(['user_id' => $value->user_id])
-											->first();
+                $state_listed_user = EmployeeProfile::where(['user_id' => $value->user_id])
+                    ->first();
 
-					$listed_user_state_id = $state_listed_user->state_id;
-					$data[$key]->state_id = $listed_user_state_id;
-				}
+                $listed_user_state_id = $state_listed_user->state_id;
+                $data[$key]->state_id = $listed_user_state_id;
+            }
 
-				 if($designation_login_user==5){ //po-it
-					$token=5;
-					$district_login_user = DB::table('location_user as lu')
+            if($designation_login_user==5){ //po-it
+                $token=5;
+                $district_login_user = DB::table('location_user as lu')
 
-									->where('lu.user_id','=',$designation_login_data->user_id)
+                    ->where('lu.user_id','=',$designation_login_data->user_id)
 
-									->select('lu.id', 'lu.user_id','lu.location_id')->get();
-					$login_user_district_id = array();
-					foreach($district_login_user as $district){
-						if(!empty($district) AND $district->location_id){
+                    ->select('lu.id', 'lu.user_id','lu.location_id')->get();
+                $login_user_district_id = array();
+                foreach($district_login_user as $district){
+                    if(!empty($district) AND $district->location_id){
 
-							$login_user_district_id[] = $district->location_id;
-						}else{
-							$login_user_district_id[] ="";
-						}
+                        $login_user_district_id[] = $district->location_id;
+                    }else{
+                        $login_user_district_id[] ="";
+                    }
 
-					}
-
-
-					$i=0;
-					 foreach($data as $employee){
-
-						 if($employee->designation_id==4)
-						 {
-							 foreach($login_user_district_id as $district_id){
-								if($employee->district_id==$district_id  ){
-									 $employees_po[$i] = $employee;
-									 $i++;
-									 break;
-								}
-							}
-						 }
+                }
 
 
+                $i=0;
+                foreach($data as $employee){
 
-					}
-				}
-				if($designation_login_user==3){
-
-					$token=3;
-					$district_login_user = DB::table('location_user as lu')
-
-									->where('lu.user_id','=',$designation_login_data->user_id)
-
-									->select('lu.id', 'lu.user_id','lu.location_id')->get();
-
-					$login_user_district_id = array();
-					foreach($district_login_user as $district){
-						if(!empty($district) AND $district->location_id){
-							$login_user_district_id[] = $district->location_id;
-						}else{
-							$login_user_district_id[] ="";
-						}
-
-					}
-
-					$i=0;
+                    if($employee->designation_id==4)
+                    {
+                        foreach($login_user_district_id as $district_id){
+                            if($employee->district_id==$district_id  ){
+                                $employees_po[$i] = $employee;
+                                $i++;
+                                break;
+                            }
+                        }
+                    }
 
 
 
-					foreach($data as $employee){
+                }
+            }
+            if($designation_login_user==3){
 
-						 if($employee->designation_id==4)
-						 {
-							 foreach($login_user_district_id as $district_id){
-								if($employee->district_id==$district_id  ){
-									 $employees_po[$i] = $employee;
-									 $i++;
-									 break;
-								}
-							}
-						 }
+                $token=3;
+                $district_login_user = DB::table('location_user as lu')
+
+                    ->where('lu.user_id','=',$designation_login_data->user_id)
+
+                    ->select('lu.id', 'lu.user_id','lu.location_id')->get();
+
+                $login_user_district_id = array();
+                foreach($district_login_user as $district){
+                    if(!empty($district) AND $district->location_id){
+                        $login_user_district_id[] = $district->location_id;
+                    }else{
+                        $login_user_district_id[] ="";
+                    }
+
+                }
+
+                $i=0;
 
 
 
-					}
+                foreach($data as $employee){
+
+                    if($employee->designation_id==4)
+                    {
+                        foreach($login_user_district_id as $district_id){
+                            if($employee->district_id==$district_id  ){
+                                $employees_po[$i] = $employee;
+                                $i++;
+                                break;
+                            }
+                        }
+                    }
 
 
-					 /* foreach($data as $employee){
 
-						 if($employee->district_id==$login_user_district_id AND $employee->designation_id==4){
+                }
 
-							if(!empty($employee)){
-								$employees_po[$i] = $employee;
-							}
 
-							 $i++;
-						 }
+                /* foreach($data as $employee){
 
-					} */
-				}
-				if($designation_login_user==4){
-					$token=4;
-					$employees_po=array();
-				}
-				if($designation_login_user==1){
-					$token++;
-					$employees_po=$data;
+                    if($employee->district_id==$login_user_district_id AND $employee->designation_id==4){
 
-				}
-				//check for state if spo
-				if($designation_login_user==2){
-					$token++;
-					$state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])
-											->first();
+                       if(!empty($employee)){
+                           $employees_po[$i] = $employee;
+                       }
 
-					$login_user_state_id = $state_login_user->state_id;
+                        $i++;
+                    }
 
-					$i=0;
-					 foreach($data as $employee){
-						 if($employee->state_id==$login_user_state_id AND ($employee->designation_id==3 OR $employee->designation_id==5)){
-							 if(!empty($employee)){
-								$employees_po[$i] = $employee;
-							}
+               } */
+            }
+            if($designation_login_user==4){
+                $token=4;
+                $employees_po=array();
+            }
+            if($designation_login_user==1){
+                $token++;
+                $employees_po=$data;
 
-						 }
-					$i++;
-					}
-				}
-				if((!isset($employees_po) OR empty($employees_po)) AND $token==0){
-					$employees_po=$data;
-				}
+            }
+            //check for state if spo
+            if($designation_login_user==2){
+                $token++;
+                $state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])
+                    ->first();
+
+                $login_user_state_id = $state_login_user->state_id;
+
+                $i=0;
+                foreach($data as $employee){
+                    if($employee->state_id==$login_user_state_id AND ($employee->designation_id==3 OR $employee->designation_id==5)){
+                        if(!empty($employee)){
+                            $employees_po[$i] = $employee;
+                        }
+
+                    }
+                    $i++;
+                }
+            }
+            if((!isset($employees_po) OR empty($employees_po)) AND $token==0){
+                $employees_po=$data;
+            }
 
         }
 
 
 
-    	$projects = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();
+        $projects = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();
         $departments = Department::where(['isactive'=>1])->select('id','name')->get();
 
-    	return view('employees.list')->with(['departments'=>$departments,'projects'=>$projects,'req'=>$req, 'data_emp'=>$employees_po]);
+        return view('employees.list')->with(['departments'=>$departments,'projects'=>$projects,'req'=>$req, 'data_emp'=>$employees_po]);
 
 
 
@@ -931,51 +931,51 @@ class UserController extends Controller
 
     {
 
-    	$employee = Employee::where(['user_id'=>$request->user_id])->first();
+        $employee = Employee::where(['user_id'=>$request->user_id])->first();
 
 
 
-	    if($request->action == "activate"){
+        if($request->action == "activate"){
 
 
 
-	        $data = [
+            $data = [
 
-	                    'isactive' => 1,
+                'isactive' => 1,
 
-	                    'rejoin_date' => date("Y-m-d",strtotime($request->action_date)),
+                'rejoin_date' => date("Y-m-d",strtotime($request->action_date)),
 
-	                    'rejoin_description' => $request->description
+                'rejoin_description' => $request->description
 
-	                ];
-
-
-
-	    }elseif($request->action == "deactivate"){
+            ];
 
 
 
-	        $data = [
-
-	                    'isactive' => 0,
-
-	                    'relieve_date' => date("Y-m-d",strtotime($request->action_date)),
-
-	                    'relieve_description' => $request->description
-
-	                ];
+        }elseif($request->action == "deactivate"){
 
 
 
-	    }
+            $data = [
+
+                'isactive' => 0,
+
+                'relieve_date' => date("Y-m-d",strtotime($request->action_date)),
+
+                'relieve_description' => $request->description
+
+            ];
 
 
 
-	    $employee->update($data);
+        }
 
 
 
-	    return redirect('employees/list');
+        $employee->update($data);
+
+
+
+        return redirect('employees/list');
 
 
 
@@ -993,13 +993,13 @@ class UserController extends Controller
 
         return Band::where('id', $request->band)
 
-                ->with(['city_class' => function($query) use ($request, $city){
+            ->with(['city_class' => function($query) use ($request, $city){
 
-                    $query->where('city_class_id',$city->city_class_id);
+                $query->where('city_class_id',$city->city_class_id);
 
-                }])
+            }])
 
-                ->first();
+            ->first();
 
 
 
@@ -1074,11 +1074,11 @@ class UserController extends Controller
 
 
         $data['next_available_uid'] = User::max('id') + 1;
-		$maxId = User::max('id');
-		$data['next_available_empCode'] = User::count();
-		//$next_available_empcode_data = User::where(['id'=>$maxId])->first();
-		//$data['next_available_empCode'] = $next_available_empcode_data->employee_code +1;
-		//exit;
+        $maxId = User::max('id');
+        $data['next_available_empCode'] = User::count();
+        //$next_available_empcode_data = User::where(['id'=>$maxId])->first();
+        //$data['next_available_empCode'] = $next_available_empcode_data->employee_code +1;
+        //exit;
 
         $data['salary_cycles'] = SalaryCycle::where(['isactive'=>1])->get();
 
@@ -1092,27 +1092,27 @@ class UserController extends Controller
 
         if(empty($last_inserted_employee)){
 
-          $last_inserted_employee = 0;
+            $last_inserted_employee = 0;
 
-          $data['employment_histories'] = collect();
+            $data['employment_histories'] = collect();
 
-          $data['qualification_documents'] = collect();
+            $data['qualification_documents'] = collect();
 
 
 
         }else{
 
-          $data['employment_histories'] = EmploymentHistory::where(['user_id'=>$last_inserted_employee,'isactive'=>1])->get();
+            $data['employment_histories'] = EmploymentHistory::where(['user_id'=>$last_inserted_employee,'isactive'=>1])->get();
 
-          $data['qualification_documents'] = DB::table('qualification_user as qu')
+            $data['qualification_documents'] = DB::table('qualification_user as qu')
 
-                                    ->join('qualifications as q','q.id','=','qu.qualification_id')
+                ->join('qualifications as q','q.id','=','qu.qualification_id')
 
-                                    ->where(['qu.user_id'=>$last_inserted_employee,'qu.isactive'=>1])
+                ->where(['qu.user_id'=>$last_inserted_employee,'qu.isactive'=>1])
 
-                                    ->select('qu.id','qu.qualification_id','qu.filename','q.name')
+                ->select('qu.id','qu.qualification_id','qu.filename','q.name')
 
-                                    ->get();
+                ->get();
 
         }
 
@@ -1120,7 +1120,7 @@ class UserController extends Controller
 
         $data['documents'] = Document::where(['document_category_id'=>1,'isactive'=>1])
 
-                                    ->get();
+            ->get();
 
 
 
@@ -1128,9 +1128,9 @@ class UserController extends Controller
 
             $value->filenames = DB::table('document_user')
 
-                                ->where(['document_id'=>$value->id,'user_id'=>$last_inserted_employee])
+                ->where(['document_id'=>$value->id,'user_id'=>$last_inserted_employee])
 
-                                ->pluck('name')->toArray();
+                ->pluck('name')->toArray();
 
         }
 
@@ -1220,19 +1220,19 @@ class UserController extends Controller
 
         $data['qualification_documents'] = DB::table('qualification_user as qu')
 
-                                    ->join('qualifications as q','q.id','=','qu.qualification_id')
+            ->join('qualifications as q','q.id','=','qu.qualification_id')
 
-                                    ->where(['qu.user_id'=>$user_id,'qu.isactive'=>1])
+            ->where(['qu.user_id'=>$user_id,'qu.isactive'=>1])
 
-                                    ->select('qu.id','qu.qualification_id','qu.filename','q.name')
+            ->select('qu.id','qu.qualification_id','qu.filename','q.name')
 
-                                    ->get();
+            ->get();
 
 
 
         $data['documents'] = Document::where(['document_category_id'=>1,'isactive'=>1])
 
-                                        ->get();
+            ->get();
 
 
 
@@ -1240,9 +1240,9 @@ class UserController extends Controller
 
             $value->filenames = DB::table('document_user')
 
-                                ->where(['document_id'=>$value->id,'user_id'=>$user_id])
+                ->where(['document_id'=>$value->id,'user_id'=>$user_id])
 
-                                ->pluck('name')->toArray();
+                ->pluck('name')->toArray();
 
         }
 
@@ -1250,40 +1250,40 @@ class UserController extends Controller
 
         $data['user'] = User::where(['id'=>$user_id])
 
-                            ->with('employee')
+            ->with('employee')
 
-                            ->with('employeeProfile')
+            ->with('employeeProfile')
 
-                            ->with('approval.approver.employee:id,user_id,fullname')
+            ->with('approval.approver.employee:id,user_id,fullname')
 
-                            ->with('roles:id,name')
+            ->with('roles:id,name')
 
-                            ->with('languages')
+            ->with('languages')
 
-                            ->with('locations')
+            ->with('locations')
 
-                            ->with('skills')
+            ->with('skills')
 
-                            ->with('qualifications')
+            ->with('qualifications')
 
-                            ->with('permissions:id,name')
+            ->with('permissions:id,name')
 
-                            ->with('perks')
+            ->with('perks')
 
-                            ->with('projects')
+            ->with('projects')
 
-                            ->with('userManager.manager.employee:id,user_id,fullname')
+            ->with('userManager.manager.employee:id,user_id,fullname')
 
-                            ->with('employeeAddresses')
+            ->with('employeeAddresses')
 
-                            ->with('employeeAccount')
+            ->with('employeeAccount')
 
-                            ->with('employeeReferences')
+            ->with('employeeReferences')
 
-                            //->with('employeeSecurity')
-							->with(['employeeSecurity', 'designation'])
+            //->with('employeeSecurity')
+            ->with(['employeeSecurity', 'designation'])
 
-                            ->first();
+            ->first();
 
 
 //return $data;
@@ -1305,21 +1305,21 @@ class UserController extends Controller
 
         $data['language_check_boxes'] = $data['user']->languages()
 
-                                        ->select('language_id','read_language','write_language','speak_language')
+            ->select('language_id','read_language','write_language','speak_language')
 
-                                        ->get()->toArray();
+            ->get()->toArray();
 
 
 
         $leave_authorities = $data['user']->leaveAuthorities()
 
-                            ->where('isactive',1)
+            ->where('isactive',1)
 
-                            ->orderBy('priority')
+            ->orderBy('priority')
 
-                            ->pluck('manager_id')
+            ->pluck('manager_id')
 
-                            ->toArray();
+            ->toArray();
 
 
 
@@ -1337,9 +1337,9 @@ class UserController extends Controller
 
             $so_departments = EmployeeProfile::whereIn('user_id',$distinct_leave_authorities)
 
-                                        ->pluck('department_id')
+                ->pluck('department_id')
 
-                                        ->toArray();
+                ->toArray();
 
 
 
@@ -1358,11 +1358,11 @@ class UserController extends Controller
         }
 
         $data['shift_exception_details'] = ShiftException::where(['user_id'=>$user_id])
-                                            ->with('Shift')
-                                            ->get();
+            ->with('Shift')
+            ->get();
 
-		$data['leave_details'] = LeaveDetail::where(['user_id'=>$user_id])
-                                            ->first();
+        $data['leave_details'] = LeaveDetail::where(['user_id'=>$user_id])
+            ->first();
 
         return view('employees.edit')->with(['data'=>$data]);
 
@@ -1431,21 +1431,21 @@ class UserController extends Controller
 
             'employeeName' => 'bail|required',
 
-			'joiningDate' => 'bail|required',
+            'joiningDate' => 'bail|required',
 
-            'employeeXeamCode' => 'bail|required|unique:users,employee_code'
+            'employeeXeamCode' => 'bail|required|unique:users,employee_code',
 
+            'projectId' => 'bail|required',
         ]);
-
 
 
         if($validator->fails()) {
 
             return redirect("employees/create")
 
-                        ->withErrors($validator,'basic')
+                ->withErrors($validator,'basic')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -1461,14 +1461,14 @@ class UserController extends Controller
 
         $user_data = [
 
-                        'email' => $request->email,
+            'email' => $request->email,
 
-                        'employee_code'  => $request->employeeXeamCode,
+            'employee_code'  => $request->employeeXeamCode,
 
-                        'password' => Hash::make($request->password),
+            'password' => Hash::make($request->password),
 
 
-                     ];
+        ];
 
 
 
@@ -1477,11 +1477,11 @@ class UserController extends Controller
 
         if(empty($request->employeeMiddleName)){
 
-          $employee_middle_name = "";
+            $employee_middle_name = "";
 
         }else{
 
-          $employee_middle_name = $request->employeeMiddleName;
+            $employee_middle_name = $request->employeeMiddleName;
 
         }
 
@@ -1509,75 +1509,75 @@ class UserController extends Controller
 
         $employee_data = [
 
-                            'employee_id' => $request->xeam_emp_code,
+            'employee_id' => $request->xeam_emp_code,
 
-                            'user_id' => $user->id,
+            'user_id' => $user->id,
 
-                            'creator_id' => Auth::id(),
+            'creator_id' => Auth::id(),
 
-                            'employee_id' => $request->employeeXeamCode,
+            'employee_id' => $request->employeeXeamCode,
 
-                            'salutation' => $request->salutation,
+            'salutation' => $request->salutation,
 
-                            'fullname' => $fullname,
+            'fullname' => $fullname,
 
-                            'first_name' => $request->employeeName,
+            'first_name' => $request->employeeName,
 
-                            'middle_name' => $employee_middle_name,
+            'middle_name' => $employee_middle_name,
 
-                            'last_name' => $request->employeeLastName,
+            'last_name' => $request->employeeLastName,
 
-                            'personal_email' => $request->personalEmail,
+            'personal_email' => $request->personalEmail,
 
-                            'attendance_type' => $request->attendanceType,
+            'attendance_type' => $request->attendanceType,
 
-                            'mobile_number' => $request->mobile,
+            'mobile_number' => $request->mobile,
 
-                            'country_id' => $request->mobileStdId,
+            'country_id' => $request->mobileStdId,
 
-                            'alternative_mobile_number' => $request->altMobile,
+            'alternative_mobile_number' => $request->altMobile,
 
-                            'alt_country_id' => $request->altMobileStdId,
+            'alt_country_id' => $request->altMobileStdId,
 
-                            'experience_year_month' => $experience,
+            'experience_year_month' => $experience,
 
-                            'experience_status' => $experience_status,
+            'experience_status' => $experience_status,
 
-                            'marital_status' => $request->maritalStatus,
+            'marital_status' => $request->maritalStatus,
 
-                            'gender' => $request->gender,
+            'gender' => $request->gender,
 
-                            'approval_status' => '0',
+            'approval_status' => '0',
 
-                            'father_name' => $request->fatherName,
+            'father_name' => $request->fatherName,
 
-                            'mother_name' => $request->motherName,
+            'mother_name' => $request->motherName,
 
-                            'spouse_name' => "",
+            'spouse_name' => "",
 
-                            'birth_date'  => date("Y-m-d",strtotime($request->birthDate)),
+            'birth_date'  => date("Y-m-d",strtotime($request->birthDate)),
 
-                            'joining_date' => date("Y-m-d",strtotime($request->joiningDate)),
+            'joining_date' => date("Y-m-d",strtotime($request->joiningDate)),
 
-                            'nominee_name'  => $request->nominee,
+            'nominee_name'  => $request->nominee,
 
-                            'relation'  => $request->relation,
+            'relation'  => $request->relation,
 
-                            'nominee_type' => $request->nomineeType,
+            'nominee_type' => $request->nomineeType,
 
-                            'registration_fees'=> $request->registrationFees,
+            'registration_fees'=> $request->registrationFees,
 
-                            'application_number' => $request->applicationNumber,
+            'application_number' => $request->applicationNumber,
 
-                            'spouse_working_status' => 'No',
+            'spouse_working_status' => 'No',
 
-                            'spouse_company_name' => '',
+            'spouse_company_name' => '',
 
-                            'spouse_designation' => '0',
+            'spouse_designation' => '0',
 
-                            'spouse_contact_number' => '',
+            'spouse_contact_number' => '',
 
-                        ];
+        ];
 
 
 
@@ -1595,13 +1595,13 @@ class UserController extends Controller
 
         if($request->nomineeType == 'Insurance'){
 
-          $employee_data['insurance_company_name'] = $request->insuranceCompanyName;
+            $employee_data['insurance_company_name'] = $request->insuranceCompanyName;
 
-          $employee_data['cover_amount'] = $request->coverAmount;
+            $employee_data['cover_amount'] = $request->coverAmount;
 
-          $employee_data['type_of_insurance'] = $request->typeOfInsurance;
+            $employee_data['type_of_insurance'] = $request->typeOfInsurance;
 
-          $employee_data['insurance_expiry_date'] = date("Y-m-d",strtotime($request->insuranceExpiryDate));
+            $employee_data['insurance_expiry_date'] = date("Y-m-d",strtotime($request->insuranceExpiryDate));
 
         }
 
@@ -1609,23 +1609,23 @@ class UserController extends Controller
 
         if($request->maritalStatus == "Married" || $request->maritalStatus == "Widowed"){
 
-          $employee_data['spouse_name'] = $request->spouseName;
+            $employee_data['spouse_name'] = $request->spouseName;
 
-          $employee_data['marriage_date'] = date("Y-m-d",strtotime($request->marriageDate));
+            $employee_data['marriage_date'] = date("Y-m-d",strtotime($request->marriageDate));
 
 
 
-          if($request->maritalStatus == "Married" && !empty($request->spouseWorkingStatus) && $request->spouseWorkingStatus == "Yes"){
+            if($request->maritalStatus == "Married" && !empty($request->spouseWorkingStatus) && $request->spouseWorkingStatus == "Yes"){
 
-            $employee_data['spouse_working_status'] = "Yes";
+                $employee_data['spouse_working_status'] = "Yes";
 
-            $employee_data['spouse_company_name'] = $request->spouseCompanyName;
+                $employee_data['spouse_company_name'] = $request->spouseCompanyName;
 
-            $employee_data['spouse_designation'] = $request->spouseDesignation;
+                $employee_data['spouse_designation'] = $request->spouseDesignation;
 
-            $employee_data['spouse_contact_number'] = $request->spouseContactNumber;
+                $employee_data['spouse_contact_number'] = $request->spouseContactNumber;
 
-          }
+            }
 
         }
 
@@ -1657,9 +1657,9 @@ class UserController extends Controller
 
             $referral_data = [
 
-                                'referrer_id' => $referrer->user_id
+                'referrer_id' => $referrer->user_id
 
-                             ];
+            ];
 
 
 
@@ -1698,109 +1698,291 @@ class UserController extends Controller
         $language_check_boxes = [];
 
 
-	if($request->languageIds){
-        foreach ($request->languageIds as $key => $value) {
+        if($request->languageIds){
+            foreach ($request->languageIds as $key => $value) {
 
-              $key2 = 'lang'.$value;
-
-
-
-              if(!empty($post_array[$key2])){
-
-                $language_check_boxes[$value] = $post_array[$key2];
-
-              }else{
-
-                $language_check_boxes[$value] = array();
-
-              }
+                $key2 = 'lang'.$value;
 
 
 
-              if(in_array('1',$language_check_boxes[$value])){
+                if(!empty($post_array[$key2])){
 
-                $check_box_data['read_language'] = true;
+                    $language_check_boxes[$value] = $post_array[$key2];
 
-              }else{
+                }else{
 
-                $check_box_data['read_language'] = false;
+                    $language_check_boxes[$value] = array();
 
-              }
-
-
-
-              if(in_array('2',$language_check_boxes[$value])){
-
-                $check_box_data['write_language'] = true;
-
-              }else{
-
-                $check_box_data['write_language'] = false;
-
-              }
+                }
 
 
 
-              if(in_array('3',$language_check_boxes[$value])){
+                if(in_array('1',$language_check_boxes[$value])){
 
-                $check_box_data['speak_language'] = true;
+                    $check_box_data['read_language'] = true;
 
-              }else{
+                }else{
 
-                $check_box_data['speak_language'] = false;
+                    $check_box_data['read_language'] = false;
 
-              }
-
-
-
-              $find_language = DB::table('language_user')
-
-                                ->where(['user_id'=>$user->id,'language_id'=>$value])
-
-                                ->update($check_box_data);
+                }
 
 
 
+                if(in_array('2',$language_check_boxes[$value])){
+
+                    $check_box_data['write_language'] = true;
+
+                }else{
+
+                    $check_box_data['write_language'] = false;
+
+                }
 
 
+
+                if(in_array('3',$language_check_boxes[$value])){
+
+                    $check_box_data['speak_language'] = true;
+
+                }else{
+
+                    $check_box_data['speak_language'] = false;
+
+                }
+
+
+
+                $find_language = DB::table('language_user')
+
+                    ->where(['user_id'=>$user->id,'language_id'=>$value])
+
+                    ->update($check_box_data);
+
+
+
+
+
+            }
         }
-	}
 
-         // Enter Data In leave Detailed Table By HK..
+        // Enter Data In leave Detailed Table By HK..
 
-        	$leavePool_casual = $request->leavePool_casual;
-        	$leavePool_sick = $request->leavePool_sick;
+        $leavePool_casual = $request->leavePool_casual;
+        $leavePool_sick = $request->leavePool_sick;
 
-			$approval_data =   [
-									'user_id' => $user->id,
-									'month_info' => date("Y-m-d",strtotime($request->joiningDate)),
-									'accumalated_casual_leave' => 0,
-									'accumalated_sick_leave' => 0,
-									'balance_casual_leave' => $leavePool_casual,
-									'balance_sick_leave' => $leavePool_sick,
-									'balance_maternity_leave' => 180,
-									'balance_paternity_leave' => 15,
-									'unpaid_casual' => 0,
-									'paid_casual' => 0,
-									'unpaid_sick' => 0,
-									'paid_sick' => 0,
-									'isactive' => 1
-									];
-		LeaveDetail::create($approval_data);
+        $approval_data =   [
+            'user_id' => $user->id,
+            'month_info' => date("Y-m-d",strtotime($request->joiningDate)),
+            'accumalated_casual_leave' => 0,
+            'accumalated_sick_leave' => 0,
+            'balance_casual_leave' => $leavePool_casual,
+            'balance_sick_leave' => $leavePool_sick,
+            'balance_maternity_leave' => 180,
+            'balance_paternity_leave' => 15,
+            'unpaid_casual' => 0,
+            'paid_casual' => 0,
+            'unpaid_sick' => 0,
+            'paid_sick' => 0,
+            'isactive' => 1
+        ];
+        LeaveDetail::create($approval_data);
         session(['last_inserted_employee' => $user->id]);
 
 
+        // Project Detail
+        if(!empty($request->locationId)) {
+            $locationId = $request->locationId;
+            $locationUser = \DB::select("SELECT * FROM `location_user`  WHERE `user_id` in (SELECT `user_id` FROM `designation_user` WHERE `designation_id` = 3) AND `location_id` = $locationId");
+            if (isset($locationUser->id)) {
+                $employee = Employee::where('user_id', $locationUser[0]->user_id)->first();
+                return redirect('employees/create/projectDetailsTab')->with('poError', $employee->fullname . ' Is already assigned as PO At Selected Location');
 
-        if($request->formSubmitButton == 'sc'){
+            }
+        }
 
-            return redirect("employees/create/projectDetailsTab")->with('profileSuccess',"Details saved successfully.");
+        $employee_profile_data =   [
+
+            //'shift_id'  => $request->shiftTimingId,
+            'department_id' => $request->departmentId,
+            'designation_id'=>$request->designation,
+            'state_id' => $request->stateId,
+            'probation_period_id' => 2,
+            'probation_approval_status' => '0',
+            'probation_hod_approval' => '0',
+            'probation_hr_approval' => '0'
+        ];
+
+        $last_inserted_employee = session('last_inserted_employee');
+
+        $check_unique = EmployeeProfile::where(['user_id'=>$last_inserted_employee])->first();
+
+        if(!empty($check_unique->user_id)){
+
+            return redirect('employees/create')->with('profileError',"Details of this employee have already been saved. Please create a new employee.");
+
+
 
         }else{
 
-            return redirect("employees/dashboard");
+
+            $user = User::find($last_inserted_employee);
+
+            /*  $role = Role::find($request->roleId);
+
+             $user->assignRole($role->name); */
+
+            // $user->syncPermissions($request->permissionIds);
+
+
+
+            $employee = $user->employee()->first();
+
+            $probation = ProbationPeriod::find($request->probationPeriodId);
+
+
+            if($probation)
+            {
+                $employee_profile_data['probation_end_date'] = Carbon::parse($employee->joining_date)->addDays($probation->no_of_days)->toDateString();
+            }
+
+
+
+            $user->employeeProfile()->create($employee_profile_data);
+
+            if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
+                for($i=0;$i<count($request->exceptionshiftTimingId); $i++){
+                    $ShiftExcept = new ShiftException;
+                    $ShiftExcept->user_id       = $last_inserted_employee;
+                    $ShiftExcept->shift_id      = $request->exceptionshiftTimingId[$i];
+                    $ShiftExcept->week_day = $request->exceptionshiftday[$i];;
+                    $ShiftExcept->save();
+
+                }
+            }
+
+            /*  $user->userManager()->create(['manager_id'=>$request->employeeIds]);
+
+
+             $manager = User::find($request->employeeIds);
+
+             if(!$manager->hasPermissionTo('approve-leave')){
+
+                 $manager->givePermissionTo(['approve-leave']);
+
+             }
+
+
+
+             if(!empty($request->hodId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->hodId,'priority'=>'2']);
+
+                 $manager = User::find($request->hodId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             }
+
+
+
+             if(!empty($request->hrId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->hrId,'priority'=>'3']);
+
+                 $manager = User::find($request->hrId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             }
+
+
+
+             if(!empty($request->mdId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->mdId,'priority'=>'4']);
+
+                 $manager = User::find($request->mdId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             } */
+
+
+
+            if(!empty($request->perkIds)){
+
+                $user->perks()->sync($request->perkIds);
+
+            }
+
+
+
+            if(!empty($request->locationId)){
+
+                $locations = [];
+
+                array_push($locations,$request->locationId);
+
+                $user->locations()->sync($locations);
+
+            }
+
+
+
+            $projects = [];
+
+            array_push($projects,$request->projectId);
+
+
+
+            if(!empty($request->projectId)){
+
+                $user->projects()->sync($projects);
+
+            }
+
+
+
+            if(!empty($request->designation)){
+
+                $designations = [];
+
+                array_push($designations,$request->designation);
+
+                $user->designation()->sync($designations);
+
+            }
+
+
+
+            if($request->formSubmitButton == 'sc'){
+
+                return redirect("employees/create/")->with('success','Details saved successfully.!');
+
+            }else{
+
+                return redirect("employees/dashboard");
+
+            }
+
+
 
         }
 
+            return redirect("employees/list");
     }//end of function
 
 
@@ -1812,6 +1994,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'employeeName' => 'bail|required',
+            'projectId' => 'bail|required',
 
         ]);
 
@@ -1819,9 +2002,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId")
 
-                        ->withErrors($validator,'basic')
+                ->withErrors($validator,'basic')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -1829,15 +2012,15 @@ class UserController extends Controller
 
         $user_data = Employee::where(['user_id'=>$request->employeeId])
 
-                    ->with('user')
+            ->with('user')
 
-                    ->with('user.languages')
+            ->with('user.languages')
 
-                    ->with('user.skills')
+            ->with('user.skills')
 
-                    ->with('user.qualifications')
+            ->with('user.qualifications')
 
-                    ->first();
+            ->first();
 
 
 
@@ -1845,11 +2028,11 @@ class UserController extends Controller
 
         $log_data = [
 
-                        'log_id' => $log->id,
+            'log_id' => $log->id,
 
-                        'data' => $user_data->toJson()
+            'data' => $user_data->toJson()
 
-                    ];
+        ];
 
 
 
@@ -1865,11 +2048,11 @@ class UserController extends Controller
 
         $user = User::find($request->employeeId);
 
-		$user_info_data = [
-                            'email' => $request->email,
-                            'employee_code' => $request->employeeXeamCode
-						];
-		 $user_info_update = User::where(['id'=>$user->id])->update($user_info_data);
+        $user_info_data = [
+            'email' => $request->email,
+            'employee_code' => $request->employeeXeamCode
+        ];
+        $user_info_update = User::where(['id'=>$user->id])->update($user_info_data);
 
 
         if(empty($request->employeeMiddleName)){
@@ -1906,65 +2089,65 @@ class UserController extends Controller
 
         $employee_data = [
 
-                            'employee_id' => $request->xeam_emp_code,
+            'employee_id' => $request->xeam_emp_code,
 
-                            'salutation' => $request->salutation,
+            'salutation' => $request->salutation,
 
-                            'fullname' => $fullname,
+            'fullname' => $fullname,
 
-                            'first_name' => $request->employeeName,
+            'first_name' => $request->employeeName,
 
-                            'middle_name' => $employee_middle_name,
+            'middle_name' => $employee_middle_name,
 
-                            'last_name' => $request->employeeLastName,
+            'last_name' => $request->employeeLastName,
 
-                            'personal_email' => $request->personalEmail,
+            'personal_email' => $request->personalEmail,
 
-                            'attendance_type' => $request->attendanceType,
+            'attendance_type' => $request->attendanceType,
 
-                            'alternative_mobile_number' => $request->altMobile,
+            'alternative_mobile_number' => $request->altMobile,
 
-							'mobile_number' => $request->mobile,
+            'mobile_number' => $request->mobile,
 
-                            'alt_country_id' => $request->altMobileStdId,
+            'alt_country_id' => $request->altMobileStdId,
 
-                            'experience_year_month' => $experience,
+            'experience_year_month' => $experience,
 
-                            'experience_status' => $experience_status,
+            'experience_status' => $experience_status,
 
-                            'marital_status' => $request->maritalStatus,
+            'marital_status' => $request->maritalStatus,
 
-                            'gender' => $request->gender,
+            'gender' => $request->gender,
 
-                            'father_name' => $request->fatherName,
+            'father_name' => $request->fatherName,
 
-                            'mother_name' => $request->motherName,
+            'mother_name' => $request->motherName,
 
-                            'spouse_name' => "",
+            'spouse_name' => "",
 
-                            'birth_date'  => date("Y-m-d",strtotime($request->birthDate)),
+            'birth_date'  => date("Y-m-d",strtotime($request->birthDate)),
 
-                            'joining_date' => date("Y-m-d",strtotime($request->joiningDate)),
+            'joining_date' => date("Y-m-d",strtotime($request->joiningDate)),
 
-                            'nominee_name'  => $request->nominee,
+            'nominee_name'  => $request->nominee,
 
-                            'relation'  => $request->relation,
+            'relation'  => $request->relation,
 
-                            'nominee_type' => $request->nomineeType,
+            'nominee_type' => $request->nomineeType,
 
-                            'registration_fees'=> $request->registrationFees,
+            'registration_fees'=> $request->registrationFees,
 
-                            'application_number' => $request->applicationNumber,
+            'application_number' => $request->applicationNumber,
 
-                            'spouse_working_status' => 'No',
+            'spouse_working_status' => 'No',
 
-                            'spouse_company_name' => '',
+            'spouse_company_name' => '',
 
-                            'spouse_designation' => '0',
+            'spouse_designation' => '0',
 
-                            'spouse_contact_number' => '',
+            'spouse_contact_number' => '',
 
-                        ];
+        ];
 
 
 
@@ -2053,391 +2236,108 @@ class UserController extends Controller
         $language_check_boxes = [];
 
 
-	if($request->languageIds){
-        foreach ($request->languageIds as $key => $value) {
+        if($request->languageIds){
+            foreach ($request->languageIds as $key => $value) {
 
-              $key2 = 'lang'.$value;
+                $key2 = 'lang'.$value;
 
 
 
-              if(!empty($post_array[$key2])){
+                if(!empty($post_array[$key2])){
 
-                $language_check_boxes[$value] = $post_array[$key2];
+                    $language_check_boxes[$value] = $post_array[$key2];
 
-              }else{
+                }else{
 
-                $language_check_boxes[$value] = array();
-
-              }
-
-
-
-              if(in_array('1',$language_check_boxes[$value])){
-
-                $check_box_data['read_language'] = true;
-
-              }else{
-
-                $check_box_data['read_language'] = false;
-
-              }
-
-
-
-              if(in_array('2',$language_check_boxes[$value])){
-
-                $check_box_data['write_language'] = true;
-
-              }else{
-
-                $check_box_data['write_language'] = false;
-
-              }
-
-
-
-              if(in_array('3',$language_check_boxes[$value])){
-
-                $check_box_data['speak_language'] = true;
-
-              }else{
-
-                $check_box_data['speak_language'] = false;
-
-              }
-
-
-
-              $find_language = DB::table('language_user')
-
-                                ->where(['user_id'=>$user->id,'language_id'=>$value])
-
-                                ->update($check_box_data);
-
-        }
-	}
-
-				$approval_data =   [
-
-									'month_info' => date("Y-m-d",strtotime($request->joiningDate)),
-									'accumalated_casual_leave' => 0,
-									'accumalated_sick_leave' => 0,
-									'balance_casual_leave' => $request->leavePool_casual,
-									'balance_sick_leave' => $request->leavePool_sick,
-									'balance_maternity_leave' => 90,
-									'balance_paternity_leave' => 14,
-									'unpaid_casual' => 0,
-									'paid_casual' => 0,
-									'unpaid_sick' => 0,
-									'paid_sick' => 0,
-									'isactive' => 1
-									];
-			//LeaveDetail::create($approval_data);
-			LeaveDetail::updateOrCreate(['user_id'=>$user->id],$approval_data);
-			//$LeavePool_update = LeaveDetail::where(['user_id'=>$user->id])->update($employee_data);
-
-        if($request->formSubmitButton == 'sc'){
-
-            return redirect("/employees/edit/$request->employeeId/projectDetailsTab")->with('profileSuccess',"Details updated successfully.");
-
-        }else{
-
-            return redirect("/employees/dashboard");
-
-        }
-
-
-
-    }//end of function
-
-
-    /*
-        Save the details of profile details tab of create employee form
-    */
-    function createProfileDetails(Request $request)
-    {
-
-      // dd($request->all());
-
-        $validator = Validator::make($request->all(), [
-
-            'projectId' => 'bail|required',
-
-            //'permissionIds' => 'bail|required',
-
-            //'employeeIds' => 'bail|required'
-
-            //'designation' => 'bail|required'
-
-        ]);
-
-
-
-        if($validator->fails()) {
-
-            return redirect('/employees/create/projectDetailsTab')
-
-                        ->withErrors($validator,'profile')
-
-                        ->withInput();
-
-        }
-
-        if(!empty($request->locationId)) {
-            $locationId = $request->locationId;
-            $locationUser = \DB::select("SELECT * FROM `location_user`  WHERE `user_id` in (SELECT `user_id` FROM `designation_user` WHERE `designation_id` = 3) AND `location_id` = $locationId");
-            if (isset($locationUser->id)) {
-                $employee = Employee::where('user_id', $locationUser[0]->user_id)->first();
-                return redirect('employees/create/projectDetailsTab')->with('poError', $employee->fullname . ' Is already assigned as PO At Selected Location');
-
-            }
-        }
-
-//$request->probationPeriodId;
-//2 for 1 month
-        $employee_profile_data =   [
-
-                                   //'shift_id'  => $request->shiftTimingId,
-
-                                   'department_id' => $request->departmentId,
-                                   'designation_id'=>$request->designation,
-                                   'state_id' => $request->stateId,
-                                   'probation_period_id' => 2,
-                                   'probation_approval_status' => '0',
-                                   'probation_hod_approval' => '0',
-                                   'probation_hr_approval' => '0'
-                                ];
-
-
-
-        $last_inserted_employee = session('last_inserted_employee');
-
-        $check_unique = EmployeeProfile::where(['user_id'=>$last_inserted_employee])->first();
-
-
-
-        if(!empty($check_unique->user_id)){
-
-          return redirect('employees/create')->with('profileError',"Details of this employee have already been saved. Please create a new employee.");
-
-
-
-        }else{
-
-
-            $user = User::find($last_inserted_employee);
-
-           /*  $role = Role::find($request->roleId);
-
-            $user->assignRole($role->name); */
-
-           // $user->syncPermissions($request->permissionIds);
-
-
-
-            $employee = $user->employee()->first();
-
-            $probation = ProbationPeriod::find($request->probationPeriodId);
-
-
-			if($probation)
-			{
-				$employee_profile_data['probation_end_date'] = Carbon::parse($employee->joining_date)->addDays($probation->no_of_days)->toDateString();
-			}
-
-
-
-            $user->employeeProfile()->create($employee_profile_data);
-
-            if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
-                for($i=0;$i<count($request->exceptionshiftTimingId); $i++){
-                    $ShiftExcept = new ShiftException;
-                    $ShiftExcept->user_id       = $last_inserted_employee;
-                    $ShiftExcept->shift_id      = $request->exceptionshiftTimingId[$i];
-                    $ShiftExcept->week_day = $request->exceptionshiftday[$i];;
-                    $ShiftExcept->save();
-
-                }
-            }
-
-           /*  $user->userManager()->create(['manager_id'=>$request->employeeIds]);
-
-
-            $manager = User::find($request->employeeIds);
-
-            if(!$manager->hasPermissionTo('approve-leave')){
-
-                $manager->givePermissionTo(['approve-leave']);
-
-            }
-
-
-
-            if(!empty($request->hodId)){
-
-                $user->leaveAuthorities()->create(['manager_id'=>$request->hodId,'priority'=>'2']);
-
-                $manager = User::find($request->hodId);
-
-                if(!$manager->hasPermissionTo('approve-leave')){
-
-                    $manager->givePermissionTo(['approve-leave']);
+                    $language_check_boxes[$value] = array();
 
                 }
 
-            }
 
 
+                if(in_array('1',$language_check_boxes[$value])){
 
-            if(!empty($request->hrId)){
+                    $check_box_data['read_language'] = true;
 
-                $user->leaveAuthorities()->create(['manager_id'=>$request->hrId,'priority'=>'3']);
+                }else{
 
-                $manager = User::find($request->hrId);
-
-                if(!$manager->hasPermissionTo('approve-leave')){
-
-                    $manager->givePermissionTo(['approve-leave']);
+                    $check_box_data['read_language'] = false;
 
                 }
 
-            }
 
 
+                if(in_array('2',$language_check_boxes[$value])){
 
-            if(!empty($request->mdId)){
+                    $check_box_data['write_language'] = true;
 
-                $user->leaveAuthorities()->create(['manager_id'=>$request->mdId,'priority'=>'4']);
+                }else{
 
-                $manager = User::find($request->mdId);
-
-                if(!$manager->hasPermissionTo('approve-leave')){
-
-                    $manager->givePermissionTo(['approve-leave']);
+                    $check_box_data['write_language'] = false;
 
                 }
 
-            } */
+
+
+                if(in_array('3',$language_check_boxes[$value])){
+
+                    $check_box_data['speak_language'] = true;
+
+                }else{
+
+                    $check_box_data['speak_language'] = false;
+
+                }
 
 
 
-            if(!empty($request->perkIds)){
+                $find_language = DB::table('language_user')
 
-                $user->perks()->sync($request->perkIds);
+                    ->where(['user_id'=>$user->id,'language_id'=>$value])
 
-            }
-
-
-
-            if(!empty($request->locationId)){
-
-                $locations = [];
-
-                array_push($locations,$request->locationId);
-
-                $user->locations()->sync($locations);
-
-            }
-
-
-
-            $projects = [];
-
-            array_push($projects,$request->projectId);
-
-
-
-            if(!empty($request->projectId)){
-
-                $user->projects()->sync($projects);
+                    ->update($check_box_data);
 
             }
-
-
-
-            if(!empty($request->designation)){
-
-                $designations = [];
-
-                array_push($designations,$request->designation);
-
-                $user->designation()->sync($designations);
-
-            }
-
-
-
-            if($request->formSubmitButton == 'sc'){
-
-               return redirect("employees/create/")->with('success','Details saved successfully.!');
-
-            }else{
-
-              return redirect("employees/dashboard");
-
-            }
-
-
-
         }
 
+        $approval_data =   [
 
-
-    }//end of function
-
-
-    /*
-        Save the details of profile details tab of edit employee form
-    */
-    function editProfileDetails(Request $request)
-
-    {
-
-        $validator = Validator::make($request->all(), [
-
-            'projectId' => 'bail|required',
-
-            //'probationPeriodId' => 'bail|required',
-
-            //'permissionIds' => 'bail|required',
-
-            //'employeeIds' => 'bail|required',
-
-            //'designation' => 'bail|required'
-
-        ]);
-
-        if($validator->fails()) {
-
-            return redirect("/employees/edit/$request->employeeId/projectDetailsTab")
-
-                        ->withErrors($validator,'profile')
-
-                        ->withInput();
-
-        }
-
-
+            'month_info' => date("Y-m-d",strtotime($request->joiningDate)),
+            'accumalated_casual_leave' => 0,
+            'accumalated_sick_leave' => 0,
+            'balance_casual_leave' => $request->leavePool_casual,
+            'balance_sick_leave' => $request->leavePool_sick,
+            'balance_maternity_leave' => 90,
+            'balance_paternity_leave' => 14,
+            'unpaid_casual' => 0,
+            'paid_casual' => 0,
+            'unpaid_sick' => 0,
+            'paid_sick' => 0,
+            'isactive' => 1
+        ];
+        //LeaveDetail::create($approval_data);
+        LeaveDetail::updateOrCreate(['user_id'=>$user->id],$approval_data);
+        //$LeavePool_update = LeaveDetail::where(['user_id'=>$user->id])->update($employee_data);
 
         $user_data = User::where(['id'=>$request->employeeId])
 
-                    ->with('roles:id,name')
+            ->with('roles:id,name')
 
-                    ->with('locations')
+            ->with('locations')
 
-                    ->with('permissions:id,name')
+            ->with('permissions:id,name')
 
-                    ->with('perks')
+            ->with('perks')
 
-                    ->with('projects')
+            ->with('projects')
 
-                    ->with('userManager')
+            ->with('userManager')
 
-                    ->with('leaveAuthorities')
+            ->with('leaveAuthorities')
 
-                    ->with('designation')
+            ->with('designation')
 
-                    ->first();
+            ->first();
 
 
 
@@ -2451,11 +2351,11 @@ class UserController extends Controller
 
             $log_data = [
 
-                            'log_id' => $log->id,
+                'log_id' => $log->id,
 
-                            'data' => $user_data->toJson()
+                'data' => $user_data->toJson()
 
-                        ];
+            ];
 
 
 
@@ -2509,9 +2409,9 @@ class UserController extends Controller
         if(empty($check_unique)){
 
             //$employee_profile_data['probation_period_id'] = $request->probationPeriodId;
-			$employee_profile_data['probation_period_id'] = 2;
+            $employee_profile_data['probation_period_id'] = 2;
 
-			$request->probationPeriodId = 2;
+            $request->probationPeriodId = 2;
 
             $employee_profile_data['probation_approval_status'] = '0';
 
@@ -2537,18 +2437,18 @@ class UserController extends Controller
 
             $user->employeeProfile()->update($employee_profile_data);
 
-           /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
+            /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
 
-                for($i=0;$i<count($request->shiftexcept); $i++){
-                    ShiftException::where('id', $request->shiftexcept[$i])
-                        ->update([
-                            'user_id'=> $request->employeeId,
-                            'shift_id'=>$request->exceptionshiftTimingId[$i],
-                            'week_day'=> $request->exceptionshiftday[$i]
-                            ]);
-                    }
+                 for($i=0;$i<count($request->shiftexcept); $i++){
+                     ShiftException::where('id', $request->shiftexcept[$i])
+                         ->update([
+                             'user_id'=> $request->employeeId,
+                             'shift_id'=>$request->exceptionshiftTimingId[$i],
+                             'week_day'=> $request->exceptionshiftday[$i]
+                             ]);
+                     }
 
-            } */
+             } */
 
             /* if(!empty($request->exceptionshiftTimingId_new) && !empty($request->exceptionshiftday_new)){
                         for($j=0;$j<count($request->exceptionshiftTimingId_new); $j++){
@@ -2637,8 +2537,533 @@ class UserController extends Controller
 
             //$locations = [];
 
-           //array_push($locations,$request->locationId);
-			$locations=$request->locationId;
+            //array_push($locations,$request->locationId);
+            $locations=$request->locationId;
+
+            $user->locations()->sync($locations);
+
+        }
+
+
+
+        $projects = [];
+
+        array_push($projects,$request->projectId);
+
+
+
+        if(!empty($request->projectId)){
+
+            $user->projects()->sync($projects);
+
+        }
+
+
+
+        if(!empty($request->designation)){
+
+            $designations = [];
+
+            array_push($designations,$request->designation);
+
+            $user->designation()->sync($designations);
+
+        }
+
+            return redirect("/employees/edit/$request->employeeId/projectDetailsTab")->with('profileSuccess',"Details updated successfully.");
+
+
+
+
+    }//end of function
+
+
+    /*
+        Save the details of profile details tab of create employee form
+    */
+    function createProfileDetails(Request $request)
+    {
+
+        // dd($request->all());
+
+        $validator = Validator::make($request->all(), [
+
+            'projectId' => 'bail|required',
+
+            //'permissionIds' => 'bail|required',
+
+            //'employeeIds' => 'bail|required'
+
+            //'designation' => 'bail|required'
+
+        ]);
+
+
+
+        if($validator->fails()) {
+
+            return redirect('/employees/create/projectDetailsTab')
+
+                ->withErrors($validator,'profile')
+
+                ->withInput();
+
+        }
+
+        if(!empty($request->locationId)) {
+            $locationId = $request->locationId;
+            $locationUser = \DB::select("SELECT * FROM `location_user`  WHERE `user_id` in (SELECT `user_id` FROM `designation_user` WHERE `designation_id` = 3) AND `location_id` = $locationId");
+            if (isset($locationUser->id)) {
+                $employee = Employee::where('user_id', $locationUser[0]->user_id)->first();
+                return redirect('employees/create/projectDetailsTab')->with('poError', $employee->fullname . ' Is already assigned as PO At Selected Location');
+
+            }
+        }
+
+
+        $employee_profile_data =   [
+
+            //'shift_id'  => $request->shiftTimingId,
+            'department_id' => $request->departmentId,
+            'designation_id'=>$request->designation,
+            'state_id' => $request->stateId,
+            'probation_period_id' => 2,
+            'probation_approval_status' => '0',
+            'probation_hod_approval' => '0',
+            'probation_hr_approval' => '0'
+        ];
+
+
+
+        $last_inserted_employee = session('last_inserted_employee');
+
+        $check_unique = EmployeeProfile::where(['user_id'=>$last_inserted_employee])->first();
+
+
+
+        if(!empty($check_unique->user_id)){
+
+            return redirect('employees/create')->with('profileError',"Details of this employee have already been saved. Please create a new employee.");
+
+
+
+        }else{
+
+
+            $user = User::find($last_inserted_employee);
+
+            /*  $role = Role::find($request->roleId);
+
+             $user->assignRole($role->name); */
+
+            // $user->syncPermissions($request->permissionIds);
+
+
+
+            $employee = $user->employee()->first();
+
+            $probation = ProbationPeriod::find($request->probationPeriodId);
+
+
+            if($probation)
+            {
+                $employee_profile_data['probation_end_date'] = Carbon::parse($employee->joining_date)->addDays($probation->no_of_days)->toDateString();
+            }
+
+
+
+            $user->employeeProfile()->create($employee_profile_data);
+
+            if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
+                for($i=0;$i<count($request->exceptionshiftTimingId); $i++){
+                    $ShiftExcept = new ShiftException;
+                    $ShiftExcept->user_id       = $last_inserted_employee;
+                    $ShiftExcept->shift_id      = $request->exceptionshiftTimingId[$i];
+                    $ShiftExcept->week_day = $request->exceptionshiftday[$i];;
+                    $ShiftExcept->save();
+
+                }
+            }
+
+            /*  $user->userManager()->create(['manager_id'=>$request->employeeIds]);
+
+
+             $manager = User::find($request->employeeIds);
+
+             if(!$manager->hasPermissionTo('approve-leave')){
+
+                 $manager->givePermissionTo(['approve-leave']);
+
+             }
+
+
+
+             if(!empty($request->hodId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->hodId,'priority'=>'2']);
+
+                 $manager = User::find($request->hodId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             }
+
+
+
+             if(!empty($request->hrId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->hrId,'priority'=>'3']);
+
+                 $manager = User::find($request->hrId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             }
+
+
+
+             if(!empty($request->mdId)){
+
+                 $user->leaveAuthorities()->create(['manager_id'=>$request->mdId,'priority'=>'4']);
+
+                 $manager = User::find($request->mdId);
+
+                 if(!$manager->hasPermissionTo('approve-leave')){
+
+                     $manager->givePermissionTo(['approve-leave']);
+
+                 }
+
+             } */
+
+
+
+            if(!empty($request->perkIds)){
+
+                $user->perks()->sync($request->perkIds);
+
+            }
+
+
+
+            if(!empty($request->locationId)){
+
+                $locations = [];
+
+                array_push($locations,$request->locationId);
+
+                $user->locations()->sync($locations);
+
+            }
+
+
+
+            $projects = [];
+
+            array_push($projects,$request->projectId);
+
+
+
+            if(!empty($request->projectId)){
+
+                $user->projects()->sync($projects);
+
+            }
+
+
+
+            if(!empty($request->designation)){
+
+                $designations = [];
+
+                array_push($designations,$request->designation);
+
+                $user->designation()->sync($designations);
+
+            }
+
+
+
+            if($request->formSubmitButton == 'sc'){
+
+                return redirect("employees/create/")->with('success','Details saved successfully.!');
+
+            }else{
+
+                return redirect("employees/dashboard");
+
+            }
+
+
+
+        }
+
+
+
+    }//end of function
+
+
+    /*
+        Save the details of profile details tab of edit employee form
+    */
+    function editProfileDetails(Request $request)
+
+    {
+
+        $validator = Validator::make($request->all(), [
+
+            'projectId' => 'bail|required',
+
+            //'probationPeriodId' => 'bail|required',
+
+            //'permissionIds' => 'bail|required',
+
+            //'employeeIds' => 'bail|required',
+
+            //'designation' => 'bail|required'
+
+        ]);
+
+        if($validator->fails()) {
+
+            return redirect("/employees/edit/$request->employeeId/projectDetailsTab")
+
+                ->withErrors($validator,'profile')
+
+                ->withInput();
+
+        }
+
+
+
+        $user_data = User::where(['id'=>$request->employeeId])
+
+            ->with('roles:id,name')
+
+            ->with('locations')
+
+            ->with('permissions:id,name')
+
+            ->with('perks')
+
+            ->with('projects')
+
+            ->with('userManager')
+
+            ->with('leaveAuthorities')
+
+            ->with('designation')
+
+            ->first();
+
+
+
+        if(!empty($user_data)){
+
+            $employeeProfile = $user_data->employeeProfile()->first();
+
+
+
+            $log = Log::where(['name'=>'User-Updated'])->first();
+
+            $log_data = [
+
+                'log_id' => $log->id,
+
+                'data' => $user_data->toJson()
+
+            ];
+
+
+
+            $updated_by = Auth::user();
+
+            $username = $updated_by->employee->fullname;
+
+            $log_data['message'] = $log->name. " by ".$username."(".$updated_by->id.").";
+
+            if(!empty($employeeProfile)){
+                $employeeProfile->logDetails()->create($log_data);
+            }
+
+
+        }
+
+
+
+        $employee_profile_data = [
+
+            'shift_id'  => $request->shiftTimingId,
+
+            'department_id' => $request->departmentId,
+
+            'state_id' => $request->stateId
+
+        ];
+
+
+
+        $user = User::find($request->employeeId);
+
+        $role = Role::find($request->roleId);
+
+        $roles = [];
+
+        //$roles[0] = $role->name;
+
+        $user->syncRoles($roles);
+
+        $user->syncPermissions($request->permissionIds);
+
+        $employee = $user->employee()->first();
+
+
+
+        $check_unique = EmployeeProfile::where(['user_id'=>$request->employeeId])->first();
+
+
+
+        if(empty($check_unique)){
+
+            //$employee_profile_data['probation_period_id'] = $request->probationPeriodId;
+            $employee_profile_data['probation_period_id'] = 2;
+
+            $request->probationPeriodId = 2;
+
+            $employee_profile_data['probation_approval_status'] = '0';
+
+            $employee_profile_data['probation_hod_approval'] = '0';
+
+            $employee_profile_data['probation_hr_approval'] = '0';
+
+
+
+            $probation = ProbationPeriod::find($request->probationPeriodId);
+
+            $employee_profile_data['probation_end_date'] = Carbon::parse($employee->joining_date)->addDays($probation->no_of_days)->toDateString();
+
+
+
+            $user->employeeProfile()->create($employee_profile_data);
+
+            //$user->userManager()->create(['manager_id'=>$request->employeeIds]);
+
+
+
+        }else{
+
+            $user->employeeProfile()->update($employee_profile_data);
+
+            /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
+
+                 for($i=0;$i<count($request->shiftexcept); $i++){
+                     ShiftException::where('id', $request->shiftexcept[$i])
+                         ->update([
+                             'user_id'=> $request->employeeId,
+                             'shift_id'=>$request->exceptionshiftTimingId[$i],
+                             'week_day'=> $request->exceptionshiftday[$i]
+                             ]);
+                     }
+
+             } */
+
+            /* if(!empty($request->exceptionshiftTimingId_new) && !empty($request->exceptionshiftday_new)){
+                        for($j=0;$j<count($request->exceptionshiftTimingId_new); $j++){
+                            $Shift_Except = new ShiftException;
+                            $Shift_Except->user_id       = $request->employeeId;
+                            $Shift_Except->shift_id      = $request->exceptionshiftTimingId_new[$j];
+                            $Shift_Except->week_day = $request->exceptionshiftday_new[$j];
+                            $Shift_Except->save();
+
+                        }
+                    } */
+
+            //$user->userManager()->update(['manager_id'=>$request->employeeIds]);
+
+        }
+
+
+
+        $manager = User::find($request->employeeIds);
+
+        /* if(!$manager->hasPermissionTo('approve-leave')){
+
+            $manager->givePermissionTo(['approve-leave']);
+
+        } */
+
+
+
+        if(!empty($request->hodId)){
+
+            LeaveAuthority::updateOrCreate(['user_id'=>$user->id,'priority'=>'2'],['manager_id'=>$request->hodId]);
+
+            $manager = User::find($request->hodId);
+
+            if(!$manager->hasPermissionTo('approve-leave')){
+
+                $manager->givePermissionTo(['approve-leave']);
+
+            }
+
+        }
+
+
+
+        if(!empty($request->hrId)){
+
+            LeaveAuthority::updateOrCreate(['user_id'=>$user->id,'priority'=>'3'],['manager_id'=>$request->hrId]);
+
+            $manager = User::find($request->hrId);
+
+            if(!$manager->hasPermissionTo('approve-leave')){
+
+                $manager->givePermissionTo(['approve-leave']);
+
+            }
+
+        }
+
+
+
+        if(!empty($request->mdId)){
+
+            LeaveAuthority::updateOrCreate(['user_id'=>$user->id,'priority'=>'4'],['manager_id'=>$request->mdId]);
+
+            $manager = User::find($request->mdId);
+
+            if(!$manager->hasPermissionTo('approve-leave')){
+
+                $manager->givePermissionTo(['approve-leave']);
+
+            }
+
+        }
+
+
+
+        if(!empty($request->perkIds)){
+
+            $user->perks()->sync($request->perkIds);
+
+        }
+
+
+
+        if(!empty($request->locationId)){
+
+            //$locations = [];
+
+            //array_push($locations,$request->locationId);
+            $locations=$request->locationId;
 
             $user->locations()->sync($locations);
 
@@ -2672,15 +3097,8 @@ class UserController extends Controller
 
 
 
-        if($request->formSubmitButton == 'sc'){
+            return redirect("/employees/edit/$request->employeeId")->with('documentSuccess',"Details updated successfully.");
 
-            return redirect("/employees/edit/$request->employeeId/documentDetailsTab")->with('documentSuccess',"Details updated successfully.");
-
-        }else{
-
-            return redirect("/employees/dashboard");
-
-        }
 
     }//end of function
 
@@ -2706,9 +3124,9 @@ class UserController extends Controller
 
             return redirect('/employees/create/documentDetailsTab')
 
-                        ->withErrors($validator,'document')
+                ->withErrors($validator,'document')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -2774,9 +3192,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/documentDetailsTab")
 
-                        ->withErrors($validator,'document')
+                ->withErrors($validator,'document')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -2840,9 +3258,9 @@ class UserController extends Controller
 
             return redirect("/employees/create/documentDetailsTab")
 
-                        ->withErrors($validator,'document')
+                ->withErrors($validator,'document')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -2872,9 +3290,9 @@ class UserController extends Controller
 
                 DB::table('qualification_user')
 
-                ->where($where)
+                    ->where($where)
 
-                ->update($document_data);
+                    ->update($document_data);
 
             }
 
@@ -2910,9 +3328,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/documentDetailsTab")
 
-                        ->withErrors($validator,'document')
+                ->withErrors($validator,'document')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -2942,9 +3360,9 @@ class UserController extends Controller
 
                 DB::table('qualification_user')
 
-                ->where($where)
+                    ->where($where)
 
-                ->update($document_data);
+                    ->update($document_data);
 
             }
 
@@ -2986,9 +3404,9 @@ class UserController extends Controller
 
             return redirect('/employees/create/accountDetailsTab')
 
-                        ->withErrors($validator,'account')
+                ->withErrors($validator,'account')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3014,31 +3432,31 @@ class UserController extends Controller
 
             $data = [
 
-                        'adhaar'  => $request->adhaar,
+                'adhaar'  => $request->adhaar,
 
-                        'pan_number'        => $request->panNo,
+                'pan_number'        => $request->panNo,
 
-                        'uan_number'   => $request->uanNo,
+                'uan_number'   => $request->uanNo,
 
-                        'account_holder_name'   => $request->accHolderName,
+                'account_holder_name'   => $request->accHolderName,
 
-                        'bank_account_number'   => $request->bankAccNo,
+                'bank_account_number'   => $request->bankAccNo,
 
-                        'ifsc_code'   => $request->ifsc,
+                'ifsc_code'   => $request->ifsc,
 
-                        'pf_number_department'   => $request->pfNoDepartment,
+                'pf_number_department'   => $request->pfNoDepartment,
 
-                        'bank_id'   => $request->financialInstitutionId,
+                'bank_id'   => $request->financialInstitutionId,
 
-                        'esi_number' => $request->empEsiNo,
+                'esi_number' => $request->empEsiNo,
 
-                        'dispensary' => $request->empDispensary,
+                'dispensary' => $request->empDispensary,
 
-                        'remarks' => $request->remarks,
+                'remarks' => $request->remarks,
 
-                        'contract_signed' => $request->contractSigned
+                'contract_signed' => $request->contractSigned
 
-                    ];
+            ];
 
             if(!$request->has('contractSigned')){
                 $data['contract_signed'] = '0';
@@ -3136,9 +3554,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/accountDetailsTab")
 
-                        ->withErrors($validator,'account')
+                ->withErrors($validator,'account')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3146,9 +3564,9 @@ class UserController extends Controller
 
         $user_data = EmployeeAccount::where(['user_id'=>$request->employeeId])
 
-                                    ->with('user')
+            ->with('user')
 
-                                    ->first();
+            ->first();
 
 
 
@@ -3158,11 +3576,11 @@ class UserController extends Controller
 
             $log_data = [
 
-                            'log_id' => $log->id,
+                'log_id' => $log->id,
 
-                            'data' => $user_data->toJson()
+                'data' => $user_data->toJson()
 
-                        ];
+            ];
 
 
 
@@ -3182,31 +3600,31 @@ class UserController extends Controller
 
         $data = [
 
-                    'adhaar'  => $request->adhaar,
+            'adhaar'  => $request->adhaar,
 
-                    'pan_number'        => $request->panNo,
+            'pan_number'        => $request->panNo,
 
-                    'uan_number'   => $request->uanNo,
+            'uan_number'   => $request->uanNo,
 
-                    'account_holder_name'   => $request->accHolderName,
+            'account_holder_name'   => $request->accHolderName,
 
-                    'bank_account_number'   => $request->bankAccNo,
+            'bank_account_number'   => $request->bankAccNo,
 
-                    'ifsc_code'   => $request->ifsc,
+            'ifsc_code'   => $request->ifsc,
 
-                    'pf_number_department'   => $request->pfNoDepartment,
+            'pf_number_department'   => $request->pfNoDepartment,
 
-                    'bank_id'   => $request->financialInstitutionId,
+            'bank_id'   => $request->financialInstitutionId,
 
-                    'esi_number' => $request->empEsiNo,
+            'esi_number' => $request->empEsiNo,
 
-                    'dispensary' => $request->empDispensary,
+            'dispensary' => $request->empDispensary,
 
-                    'remarks' => $request->remarks,
+            'remarks' => $request->remarks,
 
-                    'contract_signed' => $request->contractSigned
+            'contract_signed' => $request->contractSigned
 
-                ];
+        ];
 
         if(!$request->has('contractSigned')){
             $data['contract_signed'] = '0';
@@ -3320,9 +3738,9 @@ class UserController extends Controller
 
             return redirect('employees/create/addressDetailsTab')
 
-                        ->withErrors($validator,'address')
+                ->withErrors($validator,'address')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3346,53 +3764,53 @@ class UserController extends Controller
 
             $permanent_data =  [
 
-                            'type'  => '2',
+                'type'  => '2',
 
-                            'house_number' => $request->perHouseNo,
+                'house_number' => $request->perHouseNo,
 
-                            'road_street'   => $request->perRoadStreet,
+                'road_street'   => $request->perRoadStreet,
 
-                            'locality_area'   => $request->perLocalityArea,
+                'locality_area'   => $request->perLocalityArea,
 
-                            'emergency_number'   => $request->perEmergencyNumber,
+                'emergency_number'   => $request->perEmergencyNumber,
 
-                            'emergency_number_country_id'   => $request->perEmergencyNumberStdId,
+                'emergency_number_country_id'   => $request->perEmergencyNumberStdId,
 
-                            'pincode'   => $request->perPinCode,
+                'pincode'   => $request->perPinCode,
 
-                            'country_id'   => $request->perCountryId,
+                'country_id'   => $request->perCountryId,
 
-                            'state_id'   => $request->perStateId,
+                'state_id'   => $request->perStateId,
 
-                            'city_id'   => $request->perCityId
+                'city_id'   => $request->perCityId
 
-                        ];
+            ];
 
 
 
             $present_data =  [
 
-                            'type'  => '1',
+                'type'  => '1',
 
-                            'house_number' => $request->preHouseNo,
+                'house_number' => $request->preHouseNo,
 
-                            'road_street'   => $request->preRoadStreet,
+                'road_street'   => $request->preRoadStreet,
 
-                            'locality_area'   => $request->preLocalityArea,
+                'locality_area'   => $request->preLocalityArea,
 
-                            'emergency_number'   => $request->preEmergencyNumber,
+                'emergency_number'   => $request->preEmergencyNumber,
 
-                            'emergency_number_country_id'   => $request->preEmergencyNumberStdId,
+                'emergency_number_country_id'   => $request->preEmergencyNumberStdId,
 
-                            'pincode'   => $request->prePinCode,
+                'pincode'   => $request->prePinCode,
 
-                            'country_id'   => $request->preCountryId,
+                'country_id'   => $request->preCountryId,
 
-                            'state_id'   => $request->preStateId,
+                'state_id'   => $request->preStateId,
 
-                            'city_id'   => $request->preCityId
+                'city_id'   => $request->preCityId
 
-                        ];
+            ];
 
 
 
@@ -3464,9 +3882,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/addressDetailsTab")
 
-                        ->withErrors($validator,'address')
+                ->withErrors($validator,'address')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3474,9 +3892,9 @@ class UserController extends Controller
 
         $user_data = EmployeeAddress::where(['user_id'=>$request->employeeId])
 
-                                    ->with('user')
+            ->with('user')
 
-                                    ->get();
+            ->get();
 
 
 
@@ -3486,11 +3904,11 @@ class UserController extends Controller
 
             $log_data = [
 
-                            'log_id' => $log->id,
+                'log_id' => $log->id,
 
-                            'data' => $user_data->toJson()
+                'data' => $user_data->toJson()
 
-                        ];
+            ];
 
 
 
@@ -3510,53 +3928,53 @@ class UserController extends Controller
 
         $permanent_data =   [
 
-                                'type'  => '2',
+            'type'  => '2',
 
-                                'house_number' => $request->perHouseNo,
+            'house_number' => $request->perHouseNo,
 
-                                'road_street'   => $request->perRoadStreet,
+            'road_street'   => $request->perRoadStreet,
 
-                                'locality_area'   => $request->perLocalityArea,
+            'locality_area'   => $request->perLocalityArea,
 
-                                'emergency_number'   => $request->perEmergencyNumber,
+            'emergency_number'   => $request->perEmergencyNumber,
 
-                                'emergency_number_country_id'   => $request->perEmergencyNumberStdId,
+            'emergency_number_country_id'   => $request->perEmergencyNumberStdId,
 
-                                'pincode'   => $request->perPinCode,
+            'pincode'   => $request->perPinCode,
 
-                                'country_id'   => $request->perCountryId,
+            'country_id'   => $request->perCountryId,
 
-                                'state_id'   => $request->perStateId,
+            'state_id'   => $request->perStateId,
 
-                                'city_id'   => $request->perCityId
+            'city_id'   => $request->perCityId
 
-                            ];
+        ];
 
 
 
         $present_data = [
 
-                            'type'  => '1',
+            'type'  => '1',
 
-                            'house_number' => $request->preHouseNo,
+            'house_number' => $request->preHouseNo,
 
-                            'road_street'   => $request->preRoadStreet,
+            'road_street'   => $request->preRoadStreet,
 
-                            'locality_area'   => $request->preLocalityArea,
+            'locality_area'   => $request->preLocalityArea,
 
-                            'emergency_number'   => $request->preEmergencyNumber,
+            'emergency_number'   => $request->preEmergencyNumber,
 
-                            'emergency_number_country_id'   => $request->preEmergencyNumberStdId,
+            'emergency_number_country_id'   => $request->preEmergencyNumberStdId,
 
-                            'pincode'   => $request->prePinCode,
+            'pincode'   => $request->prePinCode,
 
-                            'country_id'   => $request->preCountryId,
+            'country_id'   => $request->preCountryId,
 
-                            'state_id'   => $request->preStateId,
+            'state_id'   => $request->preStateId,
 
-                            'city_id'   => $request->preCityId
+            'city_id'   => $request->preCityId
 
-                        ];
+        ];
 
 
 
@@ -3612,9 +4030,9 @@ class UserController extends Controller
 
             return redirect('employees/create/historyDetailsTab')
 
-                        ->withErrors($validator,'history')
+                ->withErrors($validator,'history')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3628,33 +4046,33 @@ class UserController extends Controller
 
         $data = [
 
-                   'employment_from'  => date("Y-m-d",strtotime($request->fromDate)),
+            'employment_from'  => date("Y-m-d",strtotime($request->fromDate)),
 
-                   'employment_to'  => date("Y-m-d",strtotime($request->toDate)),
+            'employment_to'  => date("Y-m-d",strtotime($request->toDate)),
 
-                   'organization_name' => $request->orgName,
+            'organization_name' => $request->orgName,
 
-                   'organization_email' => $request->orgEmail,
+            'organization_email' => $request->orgEmail,
 
-                   'organization_phone' => $request->orgPhone,
+            'organization_phone' => $request->orgPhone,
 
-                   'country_id' => $request->orgPhoneStdId,
+            'country_id' => $request->orgPhoneStdId,
 
-                   'organization_phone_stdcode' => $request->orgPhoneStdCode,
+            'organization_phone_stdcode' => $request->orgPhoneStdCode,
 
-                   'organization_website' => $request->orgWebsite,
+            'organization_website' => $request->orgWebsite,
 
-                   'responsibilities' => $request->responsibilities,
+            'responsibilities' => $request->responsibilities,
 
-                   'report_to_position' => $request->reportTo,
+            'report_to_position' => $request->reportTo,
 
-                   'salary_per_month' => $request->salaryPerMonth,
+            'salary_per_month' => $request->salaryPerMonth,
 
-                   'perks' => $request->perks,
+            'perks' => $request->perks,
 
-                   'reason_for_leaving' => $request->leavingReason,
+            'reason_for_leaving' => $request->leavingReason,
 
-                ];
+        ];
 
 
 
@@ -3664,11 +4082,11 @@ class UserController extends Controller
 
         if($request->formSubmitButton == 's'){
 
-          return redirect("employees/create/historyDetailsTab")->with('historySuccess',"Details saved successfully.");
+            return redirect("employees/create/historyDetailsTab")->with('historySuccess',"Details saved successfully.");
 
         }else{
 
-          return redirect("employees/dashboard");
+            return redirect("employees/dashboard");
 
         }
 
@@ -3708,9 +4126,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/historyDetailsTab")
 
-                        ->withErrors($validator,'history')
+                ->withErrors($validator,'history')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3722,33 +4140,33 @@ class UserController extends Controller
 
         $data = [
 
-                    'employment_from'  => date("Y-m-d",strtotime($request->fromDate)),
+            'employment_from'  => date("Y-m-d",strtotime($request->fromDate)),
 
-                    'employment_to'  => date("Y-m-d",strtotime($request->toDate)),
+            'employment_to'  => date("Y-m-d",strtotime($request->toDate)),
 
-                    'organization_name' => $request->orgName,
+            'organization_name' => $request->orgName,
 
-                    'organization_email' => $request->orgEmail,
+            'organization_email' => $request->orgEmail,
 
-                    'organization_phone' => $request->orgPhone,
+            'organization_phone' => $request->orgPhone,
 
-                    'country_id' => $request->orgPhoneStdId,
+            'country_id' => $request->orgPhoneStdId,
 
-                    'organization_phone_stdcode' => $request->orgPhoneStdCode,
+            'organization_phone_stdcode' => $request->orgPhoneStdCode,
 
-                    'organization_website' => $request->orgWebsite,
+            'organization_website' => $request->orgWebsite,
 
-                    'responsibilities' => $request->responsibilities,
+            'responsibilities' => $request->responsibilities,
 
-                    'report_to_position' => $request->reportTo,
+            'report_to_position' => $request->reportTo,
 
-                    'salary_per_month' => $request->salaryPerMonth,
+            'salary_per_month' => $request->salaryPerMonth,
 
-                    'perks' => $request->perks,
+            'perks' => $request->perks,
 
-                    'reason_for_leaving' => $request->leavingReason,
+            'reason_for_leaving' => $request->leavingReason,
 
-                ];
+        ];
 
 
 
@@ -3804,9 +4222,9 @@ class UserController extends Controller
 
             return redirect('/employees/create/referenceDetailsTab')
 
-                        ->withErrors($validator,'reference')
+                ->withErrors($validator,'reference')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3830,37 +4248,37 @@ class UserController extends Controller
 
             $data1 = [
 
-                       'type' => '1',
+                'type' => '1',
 
-                       'name'  => $request->ref1Name,
+                'name'  => $request->ref1Name,
 
-                       'phone'  => $request->ref1Phone,
+                'phone'  => $request->ref1Phone,
 
-                       'country_id'  => $request->ref1PhoneStdId,
+                'country_id'  => $request->ref1PhoneStdId,
 
-                       'email' => $request->ref1Email,
+                'email' => $request->ref1Email,
 
-                       'address' => $request->ref1Address,
+                'address' => $request->ref1Address,
 
-                    ];
+            ];
 
 
 
             $data2 = [
 
-                       'type' => '2',
+                'type' => '2',
 
-                       'name'  => $request->ref2Name,
+                'name'  => $request->ref2Name,
 
-                       'phone'  => $request->ref2Phone,
+                'phone'  => $request->ref2Phone,
 
-                       'country_id'  => $request->ref2PhoneStdId,
+                'country_id'  => $request->ref2PhoneStdId,
 
-                       'email' => $request->ref2Email,
+                'email' => $request->ref2Email,
 
-                       'address' => $request->ref2Address,
+                'address' => $request->ref2Address,
 
-                    ];
+            ];
 
 
 
@@ -3872,11 +4290,11 @@ class UserController extends Controller
 
             if($request->formSubmitButton == 'sc'){
 
-              return redirect("employees/create/securityDetailsTab")->with('securitySuccess',"Details saved successfully.");
+                return redirect("employees/create/securityDetailsTab")->with('securitySuccess',"Details saved successfully.");
 
             }else{
 
-              return redirect("employees/dashboard");
+                return redirect("employees/dashboard");
 
             }
 
@@ -3918,9 +4336,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/referenceDetailsTab")
 
-                        ->withErrors($validator,'reference')
+                ->withErrors($validator,'reference')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -3928,9 +4346,9 @@ class UserController extends Controller
 
         $user_data = EmployeeReference::where(['user_id'=>$request->employeeId])
 
-                                    ->with('user')
+            ->with('user')
 
-                                    ->get();
+            ->get();
 
 
 
@@ -3940,11 +4358,11 @@ class UserController extends Controller
 
             $log_data = [
 
-                        'log_id' => $log->id,
+                'log_id' => $log->id,
 
-                        'data' => $user_data->toJson()
+                'data' => $user_data->toJson()
 
-                    ];
+            ];
 
 
 
@@ -3964,37 +4382,37 @@ class UserController extends Controller
 
         $data1 = [
 
-                    'type' => '1',
+            'type' => '1',
 
-                    'name'  => $request->ref1Name,
+            'name'  => $request->ref1Name,
 
-                    'phone'  => $request->ref1Phone,
+            'phone'  => $request->ref1Phone,
 
-                    'country_id'  => $request->ref1PhoneStdId,
+            'country_id'  => $request->ref1PhoneStdId,
 
-                    'email' => $request->ref1Email,
+            'email' => $request->ref1Email,
 
-                    'address' => $request->ref1Address,
+            'address' => $request->ref1Address,
 
-                ];
+        ];
 
 
 
         $data2 = [
 
-                    'type' => '2',
+            'type' => '2',
 
-                    'name'  => $request->ref2Name,
+            'name'  => $request->ref2Name,
 
-                    'phone'  => $request->ref2Phone,
+            'phone'  => $request->ref2Phone,
 
-                    'country_id'  => $request->ref2PhoneStdId,
+            'country_id'  => $request->ref2PhoneStdId,
 
-                    'email' => $request->ref2Email,
+            'email' => $request->ref2Email,
 
-                    'address' => $request->ref2Address,
+            'address' => $request->ref2Address,
 
-                ];
+        ];
 
 
 
@@ -4046,9 +4464,9 @@ class UserController extends Controller
 
             return redirect('/employees/create/securityDetailsTab')
 
-                        ->withErrors($validator,'security')
+                ->withErrors($validator,'security')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -4070,19 +4488,19 @@ class UserController extends Controller
 
             $data = [
 
-                        'dd_number' => $request->ddNo,
+                'dd_number' => $request->ddNo,
 
-                        'account_number'  => $request->accNo,
+                'account_number'  => $request->accNo,
 
-                        'bank_name'  => $request->bankName,
+                'bank_name'  => $request->bankName,
 
-                        'receipt_number' => $request->receiptNo,
+                'receipt_number' => $request->receiptNo,
 
-                        'dd_date' => date("Y-m-d",strtotime($request->ddDate)),
+                'dd_date' => date("Y-m-d",strtotime($request->ddDate)),
 
-                        'amount' => $request->amount,
+                'amount' => $request->amount,
 
-                    ];
+            ];
 
 
 
@@ -4124,9 +4542,9 @@ class UserController extends Controller
 
             return redirect("/employees/edit/$request->employeeId/securityDetailsTab")
 
-                        ->withErrors($validator,'security')
+                ->withErrors($validator,'security')
 
-                        ->withInput();
+                ->withInput();
 
         }
 
@@ -4134,9 +4552,9 @@ class UserController extends Controller
 
         $user_data = EmployeeSecurity::where(['user_id'=>$request->employeeId])
 
-                                    ->with('user')
+            ->with('user')
 
-                                    ->first();
+            ->first();
 
 
 
@@ -4146,11 +4564,11 @@ class UserController extends Controller
 
             $log_data = [
 
-                            'log_id' => $log->id,
+                'log_id' => $log->id,
 
-                            'data' => $user_data->toJson()
+                'data' => $user_data->toJson()
 
-                        ];
+            ];
 
 
 
@@ -4170,19 +4588,19 @@ class UserController extends Controller
 
         $data = [
 
-                    'dd_number' => $request->ddNo,
+            'dd_number' => $request->ddNo,
 
-                    'account_number'  => $request->accNo,
+            'account_number'  => $request->accNo,
 
-                    'bank_name'  => $request->bankName,
+            'bank_name'  => $request->bankName,
 
-                    'receipt_number' => $request->receiptNo,
+            'receipt_number' => $request->receiptNo,
 
-                    'dd_date' => date("Y-m-d",strtotime($request->ddDate)),
+            'dd_date' => date("Y-m-d",strtotime($request->ddDate)),
 
-                    'amount' => $request->amount,
+            'amount' => $request->amount,
 
-                ];
+        ];
 
 
 
@@ -4210,17 +4628,17 @@ class UserController extends Controller
 
         $data = DB::table('employees as e')
 
-                ->join('employee_profiles as ep','e.user_id','=','ep.user_id')
+            ->join('employee_profiles as ep','e.user_id','=','ep.user_id')
 
-                ->join('users as u','e.user_id','=','u.id')
+            ->join('users as u','e.user_id','=','u.id')
 
-                ->whereIn('ep.department_id',$department_ids)
+            ->whereIn('ep.department_id',$department_ids)
 
-                ->where(['e.approval_status'=>'1','e.isactive'=>1,'ep.isactive'=>1])
+            ->where(['e.approval_status'=>'1','e.isactive'=>1,'ep.isactive'=>1])
 
-                ->select('e.user_id','e.fullname','u.employee_code')
+            ->select('e.user_id','e.fullname','u.employee_code')
 
-                ->get();
+            ->get();
 
 
 
@@ -4244,11 +4662,11 @@ class UserController extends Controller
 
         $cities = City::where(['isactive'=>1])
 
-                        ->whereIn('state_id',$state_ids)
+            ->whereIn('state_id',$state_ids)
 
-                        ->select('id','name')
+            ->select('id','name')
 
-                        ->get();
+            ->get();
 
 
 
@@ -4306,17 +4724,17 @@ class UserController extends Controller
 
         $result = [
 
-                     'referralMatch' => "no",
+            'referralMatch' => "no",
 
-                     'emailUnique'   => "yes",
+            'emailUnique'   => "yes",
 
-                     'mobileUnique'  => "yes",
+            'mobileUnique'  => "yes",
 
-                     'employeeXeamCodeUnique' => "yes",
+            'employeeXeamCodeUnique' => "yes",
 
-                     'oldXeamCodeUnique' => "yes"
+            'oldXeamCodeUnique' => "yes"
 
-                  ];
+        ];
 
 
 
@@ -4402,7 +4820,7 @@ class UserController extends Controller
 
         if(!empty($request->mobile)){
 
-             $employee = Employee::where(['mobile_number' => $request->mobile])->first();
+            $employee = Employee::where(['mobile_number' => $request->mobile])->first();
 
 
 
@@ -4436,55 +4854,55 @@ class UserController extends Controller
 
         $user = User::where(['id'=>Auth::id()])
 
-                    ->with('employee')
+            ->with('employee')
 
-                    ->with('employeeProfile')
+            ->with('employeeProfile')
 
-                    ->with('roles:id,name')
+            ->with('roles:id,name')
 
-                    ->with('languages')
+            ->with('languages')
 
-                    ->with('skills')
+            ->with('skills')
 
-                    ->with('qualifications')
+            ->with('qualifications')
 
-                    ->with('permissions:id,name')
+            ->with('permissions:id,name')
 
-                    ->with('perks')
+            ->with('perks')
 
-                    ->with('projects')
+            ->with('projects')
 
-                    ->with('userManager.manager.employee:id,user_id,fullname')
+            ->with('userManager.manager.employee:id,user_id,fullname')
 
-                    ->with('employeeAddresses')
+            ->with('employeeAddresses')
 
-                    ->with('employeeAccount')
+            ->with('employeeAccount')
 
-                    ->with('employeeReferences')
+            ->with('employeeReferences')
 
-                    ->first();
+            ->first();
 
 
 
         $leave_authorities = $user->leaveAuthorities()
 
-                                  ->where(['isactive'=>1])
+            ->where(['isactive'=>1])
 
-                                  ->with('manager.employee:id,user_id,fullname')
+            ->with('manager.employee:id,user_id,fullname')
 
-                                  ->orderBy('priority')
+            ->orderBy('priority')
 
-                                  ->get();
+            ->get();
 
 
 
         $documents = DB::table('documents as d')
 
-                    ->where(['d.document_category_id'=>1,'d.isactive'=>1])
+            ->where(['d.document_category_id'=>1,'d.isactive'=>1])
 
-                    ->select('d.id','d.name as document_name')
+            ->select('d.id','d.name as document_name')
 
-                    ->get();
+            ->get();
 
 
 
@@ -4492,9 +4910,9 @@ class UserController extends Controller
 
             $value->name = DB::table('document_user')
 
-                           ->where(['document_id'=>$value->id,'user_id'=>$user->id])
+                ->where(['document_id'=>$value->id,'user_id'=>$user->id])
 
-                           ->value('name');
+                ->value('name');
 
         }
 
@@ -4513,39 +4931,39 @@ class UserController extends Controller
     function otherUserProfile($user_id){
 
         $user = User::where(['id'=>$user_id])
-                    ->with('employee')
-                    ->with('employeeProfile')
-                    ->with('roles:id,name')
-                    ->with('languages')
-                    ->with('skills')
-                    ->with('qualifications')
-                    ->with('permissions:id,name')
-                    ->with('perks')
-                    ->with('projects')
-                    ->with('userManager.manager.employee:id,user_id,fullname')
-                    ->with('employeeAddresses')
-                    ->with('employeeAccount')
-                    ->with('employeeReferences')
-                    ->with('printDocument')
-                    ->first();
+            ->with('employee')
+            ->with('employeeProfile')
+            ->with('roles:id,name')
+            ->with('languages')
+            ->with('skills')
+            ->with('qualifications')
+            ->with('permissions:id,name')
+            ->with('perks')
+            ->with('projects')
+            ->with('userManager.manager.employee:id,user_id,fullname')
+            ->with('employeeAddresses')
+            ->with('employeeAccount')
+            ->with('employeeReferences')
+            ->with('printDocument')
+            ->first();
 
         //dd($user);
 
         $leave_authorities = $user->leaveAuthorities()
-                      ->where(['isactive'=>1])
-                      ->with('manager.employee:id,user_id,fullname')
-                      ->orderBy('priority')
-                      ->get();
+            ->where(['isactive'=>1])
+            ->with('manager.employee:id,user_id,fullname')
+            ->orderBy('priority')
+            ->get();
 
         $documents = DB::table('documents as d')
-                    ->where(['d.document_category_id'=>1,'d.isactive'=>1])
-                    ->select('d.id','d.name as document_name')
-                    ->get();
+            ->where(['d.document_category_id'=>1,'d.isactive'=>1])
+            ->select('d.id','d.name as document_name')
+            ->get();
 
         foreach($documents as $key => $value) {
-                $value->name = DB::table('document_user')
-                    ->where(['document_id'=>$value->id,'user_id'=>$user->id])
-                    ->value('name');
+            $value->name = DB::table('document_user')
+                ->where(['document_id'=>$value->id,'user_id'=>$user->id])
+                ->value('name');
         }
 
         session()->put('employeeId',$user_id);
@@ -4655,11 +5073,11 @@ class UserController extends Controller
 
         $user = User::where(['id'=>Auth::id()])
 
-                      ->whereHas('employeeProfile')
+            ->whereHas('employeeProfile')
 
-                      ->with('employeeProfile')
+            ->with('employeeProfile')
 
-                      ->first();
+            ->first();
 
 
 
@@ -4677,11 +5095,11 @@ class UserController extends Controller
 
         $leave_authorities = LeaveAuthority::where(['manager_id'=>$user_id])
 
-                                            ->whereIn('priority',['2','3'])
+            ->whereIn('priority',['2','3'])
 
-                                            ->select('user_id','manager_id','priority')
+            ->select('user_id','manager_id','priority')
 
-                                            ->get();
+            ->get();
 
 
 
@@ -4715,15 +5133,15 @@ class UserController extends Controller
 
                             $update_data =  [
 
-                                                'probation_hod_approval' => '1',
+                                'probation_hod_approval' => '1',
 
-                                                'probation_hr_approval' => '1',
+                                'probation_hr_approval' => '1',
 
-                                                'probation_approval_status' => '1',
+                                'probation_approval_status' => '1',
 
-                                                'probation_end_date' => date("Y-m-d",strtotime($end_date))
+                                'probation_end_date' => date("Y-m-d",strtotime($end_date))
 
-                                            ];
+                            ];
 
 
 
@@ -4844,9 +5262,9 @@ class UserController extends Controller
 
         $user_id = Auth::id();
         $messages = Message::where(['isactive'=>1,'receiver_id'=>$user_id])
-                                     ->with(['sender.employee:id,user_id,fullname'])
-                                     ->orderBy('created_at','DESC')
-                                     ->paginate(15);
+            ->with(['sender.employee:id,user_id,fullname'])
+            ->orderBy('created_at','DESC')
+            ->paginate(15);
         return view('employees.all_messages')->with(['messages'=>$messages]);
 
     }//end of function
@@ -4859,9 +5277,9 @@ class UserController extends Controller
 
         $user_id = Auth::id();
         $notifications = Notification::where(['isactive'=>1,'receiver_id'=>$user_id])
-                                     ->with(['sender.employee:id,user_id,fullname'])
-                                     ->orderBy('created_at','DESC')
-                                     ->paginate(15);
+            ->with(['sender.employee:id,user_id,fullname'])
+            ->orderBy('created_at','DESC')
+            ->paginate(15);
         return view('employees.all_notifications')->with(['notifications'=>$notifications]);
 
     }//end of function
@@ -4906,12 +5324,12 @@ class UserController extends Controller
 
         $employeeId = session('employeeId');
         $user = User::where(['id'=>$employeeId])
-                    ->with('employee')
-                    ->with('employeeProfile')
-                    ->with('employeeAddresses')
-                    ->with('roles:id,name')
-                    ->with('printDocument')
-                    ->first();
+            ->with('employee')
+            ->with('employeeProfile')
+            ->with('employeeAddresses')
+            ->with('roles:id,name')
+            ->with('printDocument')
+            ->first();
         return view('employees.offer_letter')->with(['user'=>$user]);
     }
 
@@ -4919,22 +5337,22 @@ class UserController extends Controller
 
         $todays_date = date("Y-m-d");
         $data['attendances_info'] = DB::table("employees")->select('id', 'user_id', 'fullname', 'mobile_number')->whereNotIn('user_id',function($query)  {
-                            $query->select('user_id')->where('on_date', date("Y-m-d"))->from('attendances');
+            $query->select('user_id')->where('on_date', date("Y-m-d"))->from('attendances');
 
-                            })
-                        ->where('isactive', 1)
-                        ->get();
+        })
+            ->where('isactive', 1)
+            ->get();
         $employee_arr=[];
 
         foreach($data['attendances_info'] as $attendance_info){
 
             $dep = EmployeeProfile::where(['user_id' => $attendance_info->user_id])
-                                    ->with('department')
-                                    ->first();
+                ->with('department')
+                ->first();
 
-           $designation = User::where(['id' => $attendance_info->user_id])
-                            ->with('designation')
-                            ->first();
+            $designation = User::where(['id' => $attendance_info->user_id])
+                ->with('designation')
+                ->first();
 
             $employee_arr[]=[
 
@@ -4954,24 +5372,24 @@ class UserController extends Controller
         $punch_date = $request->miss_punch_date;
 
         $data['attendances_info'] = DB::table("employees")->select('id', 'user_id', 'fullname', 'mobile_number')->whereNotIn('user_id',function($query) use($punch_date) {
-        $query->select('user_id')->where('on_date', $punch_date)->from('attendances');
+            $query->select('user_id')->where('on_date', $punch_date)->from('attendances');
         })
 
-        ->where('isactive', 1)
-        ->get();
+            ->where('isactive', 1)
+            ->get();
 
         $employee_arr=[];
         foreach($data['attendances_info'] as $attendance_info){
 
-        $dep = EmployeeProfile::where(['user_id' => $attendance_info->user_id])
-                                ->with('department')
-                                ->first();
+            $dep = EmployeeProfile::where(['user_id' => $attendance_info->user_id])
+                ->with('department')
+                ->first();
 
-        $designation = User::where(['id' => $attendance_info->user_id])
-                            ->with('designation')
-                            ->first();
+            $designation = User::where(['id' => $attendance_info->user_id])
+                ->with('designation')
+                ->first();
 
-        $employee_arr[]=[
+            $employee_arr[]=[
 
                 "attendance_info"=>$attendance_info,
                 "dep"=>$dep,
@@ -4983,10 +5401,10 @@ class UserController extends Controller
         return view('employees.missed_punch')->with(['data'=>$employee_arr, 'punch_date'=>$punch_date]);
 
     }
-	public function editLocation(Request $request){
+    public function editLocation(Request $request){
         /* return $request->all();
 		exit;  */
-		if(!$request->designation_id)
+        if(!$request->designation_id)
             exit;
         if($request->designation_id==4 || $request->designation_id==5 || $request->designation_id==3){
             $validator = Validator::make($request->all(), [
@@ -4998,13 +5416,13 @@ class UserController extends Controller
                 'stateId' => 'required',
             ]);
         }
-		if($request->designation_id!=1){
-			if($validator->fails()) {
-				return redirect()->back()
-							->withErrors($validator,'basic')
-							->withInput();
-			}
-		}
+        if($request->designation_id!=1){
+            if($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator,'basic')
+                    ->withInput();
+            }
+        }
         $userObj=User::find($request->employeeId);
 
         if($request->designation_id==4 || $request->designation_id==5 || $request->designation_id==3){
@@ -5015,11 +5433,11 @@ class UserController extends Controller
                 $locations=[$request->locationId];
             }
             else{
-				 print_r($locations=$request->locationId);
-				//exit;
+                print_r($locations=$request->locationId);
+                //exit;
 
-			}
-			$userObj->locations()->sync($locations);
+            }
+            $userObj->locations()->sync($locations);
 
 
         }
@@ -5039,105 +5457,105 @@ class UserController extends Controller
 
     function profile_detail_submit(Request $request)
     {
-     /*  echo"<PRE>";
-       print_r($request->all());
-       exit;*/
+        /*  echo"<PRE>";
+          print_r($request->all());
+          exit;*/
 
-            $user = Auth::user();
-            $user_data = [
+        $user = Auth::user();
+        $user_data = [
 
-                            'email' => $request->official_email,
-                        ];
-            $user_update = User::where(['id'=>$user->id])->update($user_data);
+            'email' => $request->official_email,
+        ];
+        $user_update = User::where(['id'=>$user->id])->update($user_data);
 
-            $name_arr = explode(" ",$request->name);
+        $name_arr = explode(" ",$request->name);
 
-            $firstname = $name_arr[0];
+        $firstname = $name_arr[0];
 
-            if( sizeof($name_arr)>1){
-                $lastname = $name_arr[1];
-            }
-            else
-                $lastname=null;
-
-            $emp_data = [
-
-                            'first_name' => $firstname,
-                            'last_name' => $lastname,
-                            'personal_email' => $request->personal_email,
-                            'fullname' => $request->name,
-                            'birth_date' => $request->date_of_birth,
-                            'gender' => $request->gender,
-                            'father_name' => $request->father_name,
-                            'mobile_number' => $request->official_mobile_number,
-                            'alternative_mobile_number' => $request->personal_mobile_number
-                        ];
-            $emp_update = Employee::where(['user_id'=>$user->id])->update($emp_data);
-
-            /*
-            $emp_profile_data = [
-
-                                    'state_id' => $request->state
-
-                                  ];
-
-            $emp_profile_update = EmployeeProfile::where(['user_id'=>$user->id])->update($emp_profile_data);
-
-
-         DB::table('location_user')->where('user_id', $user->id)->delete();
-
-            foreach($request->work_location as $location){
-
-
-
-
-                 $location_data = [
-
-                                    'user_id' => $user->id,
-                                    'location_id' => $location,
-                                    'isactive' => 1
-
-                                ];
-
-
-                $location_data_create = DB::table('location_user')->insert($location_data);
-
-
+        if( sizeof($name_arr)>1){
+            $lastname = $name_arr[1];
         }
+        else
+            $lastname=null;
+
+        $emp_data = [
+
+            'first_name' => $firstname,
+            'last_name' => $lastname,
+            'personal_email' => $request->personal_email,
+            'fullname' => $request->name,
+            'birth_date' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'father_name' => $request->father_name,
+            'mobile_number' => $request->official_mobile_number,
+            'alternative_mobile_number' => $request->personal_mobile_number
+        ];
+        $emp_update = Employee::where(['user_id'=>$user->id])->update($emp_data);
+
+        /*
+        $emp_profile_data = [
+
+                                'state_id' => $request->state
+
+                              ];
+
+        $emp_profile_update = EmployeeProfile::where(['user_id'=>$user->id])->update($emp_profile_data);
+
+
+     DB::table('location_user')->where('user_id', $user->id)->delete();
+
+        foreach($request->work_location as $location){
 
 
 
-             $designation_data = [
 
-                                    'designation_id' => $request->designation
+             $location_data = [
 
-                                ];
-            $designation_data_update = DB::table('designation_user')->where('user_id', $user->id)->update($designation_data);
-             */
+                                'user_id' => $user->id,
+                                'location_id' => $location,
+                                'isactive' => 1
 
-             $emp_data = [
+                            ];
 
-                            'is_complete' => 1
 
-                        ];
-            $emp_update = Employee::where(['user_id'=>$user->id])->update($emp_data);
+            $location_data_create = DB::table('location_user')->insert($location_data);
 
-             //return redirect()->back()->with('profileSuccess',"Details saved successfully.");
-             return redirect("employees/dashboard")->with('profileSuccess',"Details saved successfully.");
 
-     }
+    }
 
-      /*
-        Ajax request to get states wise locations
-    */
+
+
+         $designation_data = [
+
+                                'designation_id' => $request->designation
+
+                            ];
+        $designation_data_update = DB::table('designation_user')->where('user_id', $user->id)->update($designation_data);
+         */
+
+        $emp_data = [
+
+            'is_complete' => 1
+
+        ];
+        $emp_update = Employee::where(['user_id'=>$user->id])->update($emp_data);
+
+        //return redirect()->back()->with('profileSuccess',"Details saved successfully.");
+        return redirect("employees/dashboard")->with('profileSuccess',"Details saved successfully.");
+
+    }
+
+    /*
+      Ajax request to get states wise locations
+  */
     function stateWiseLocations(Request $request)
     {
         $state_id = $request->state_id;
 
         $result['locations'] = Location::where('state_id',$state_id)
-                                        ->where('isactive',1)
-                                        ->orderBy('name')
-                                        ->get();
+            ->where('isactive',1)
+            ->orderBy('name')
+            ->get();
 
         return $result;
 
@@ -5156,31 +5574,31 @@ class UserController extends Controller
     }
 
 
- function saveuserdata_final_bkp(Request $request){
+    function saveuserdata_final_bkp(Request $request){
 
-         $users_data = DB::table('TABLE_153')->get();
+        $users_data = DB::table('TABLE_153')->get();
 
         /* echo"<PRE>";
         print_r($users_data);
         exit;   */
 
-         $i=2075;
-         $j=100036;
-          $c=0;
-          $k=0;
-          $phone = 9876543210;
-         foreach($users_data as $user){
+        $i=2075;
+        $j=100036;
+        $c=0;
+        $k=0;
+        $phone = 9876543210;
+        foreach($users_data as $user){
             //$SNo = $user->SNo;
             $State = $user->State;
             $Region = $user->REGION;
             //$phone = $user->Mobile;
             $phone = $phone + 1;
 
-           $bal_cas_leave = $user->Total_Casual_Leave;
+            $bal_cas_leave = $user->Total_Casual_Leave;
             $bal_sick_leave = $user->Sick_leave;
 
 
-           // $Designation = $user->Designation;
+            // $Designation = $user->Designation;
 
             //$Email = $user->Email;
             $Email = "vccm_@gmail.com";
@@ -5201,13 +5619,13 @@ class UserController extends Controller
 
             $user_data = [
 
-                        'email' => $Email,
+                'email' => $Email,
 
-                        'employee_code'  => $emp_code,
+                'employee_code'  => $emp_code,
 
-                        'password' => Hash::make($password),
+                'password' => Hash::make($password),
 
-                     ];
+            ];
 
             $user = User::create($user_data);
             echo "   Name: ".$Name;
@@ -5228,175 +5646,175 @@ class UserController extends Controller
             }
 
 
-             $employee_data = [
+            $employee_data = [
 
-                            'user_id' => $user_id,
+                'user_id' => $user_id,
 
-                            'creator_id' => Auth::id(),
+                'creator_id' => Auth::id(),
 
-                            'employee_id' => $emp_code,
+                'employee_id' => $emp_code,
 
-                            'salutation' => $Prefix,
+                'salutation' => $Prefix,
 
-                            'fullname' => $Name,
+                'fullname' => $Name,
 
-                            'first_name' => $firstname,
+                'first_name' => $firstname,
 
-                            'middle_name' => "",
+                'middle_name' => "",
 
-                            'last_name' => $lastname,
+                'last_name' => $lastname,
 
-                            'personal_email' => "",
+                'personal_email' => "",
 
-                            'attendance_type' => "",
+                'attendance_type' => "",
 
-                            'mobile_number' => $phone,
+                'mobile_number' => $phone,
 
-                            'country_id' => 1,
+                'country_id' => 1,
 
-                            'alternative_mobile_number' =>"",
+                'alternative_mobile_number' =>"",
 
-                            'alt_country_id' => 1,
+                'alt_country_id' => 1,
 
-                            'experience_year_month' => "",
+                'experience_year_month' => "",
 
-                            'experience_status' => "",
+                'experience_status' => "",
 
-                            'marital_status' => "",
+                'marital_status' => "",
 
-                            'gender' => $gender,
+                'gender' => $gender,
 
-                            'approval_status' => '1',
+                'approval_status' => '1',
 
-                            'father_name' => "",
+                'father_name' => "",
 
-                            'mother_name' => "",
+                'mother_name' => "",
 
-                            'spouse_name' => "",
+                'spouse_name' => "",
 
-                            'birth_date'  => "",
+                'birth_date'  => "",
 
-                            'joining_date' => "2020-04-01",
+                'joining_date' => "2020-04-01",
 
-                            'nominee_name'  => "",
+                'nominee_name'  => "",
 
-                            'relation'  => "",
+                'relation'  => "",
 
-                            'nominee_type' => "",
+                'nominee_type' => "",
 
-                            'registration_fees'=> "",
+                'registration_fees'=> "",
 
-                            'application_number' => "",
+                'application_number' => "",
 
-                            'spouse_working_status' => 'No',
+                'spouse_working_status' => 'No',
 
-                            'spouse_company_name' => '',
+                'spouse_company_name' => '',
 
-                            'spouse_designation' => '0',
+                'spouse_designation' => '0',
 
-                            'spouse_contact_number' => '',
+                'spouse_contact_number' => '',
 
-                        ];
+            ];
             $employee = Employee::create($employee_data);
             $approve_data =   [
-                                    'approvalable_id' => $user_id,
-                                    'approvalable_type' => "App\User",
-                                    'approver_id'=>1
-                                    ];
+                'approvalable_id' => $user_id,
+                'approvalable_type' => "App\User",
+                'approver_id'=>1
+            ];
 
             $employee_data_inserted = DB::table('approvals')->insert($approve_data);
 
-             $state_data = DB::table('states')->where('name', $State)->first();
-             if($state_data){
-                 $state_id = $state_data->id;
-             }else{
+            $state_data = DB::table('states')->where('name', $State)->first();
+            if($state_data){
+                $state_id = $state_data->id;
+            }else{
 
-                  $states_data =   [
+                $states_data =   [
 
-                                   'country_id' => 1,
+                    'country_id' => 1,
 
-                                   "name" => $State,
+                    "name" => $State,
 
-                                   "has_pt" => 1,
+                    "has_pt" => 1,
 
-                                   "isactive" => 1,
-                                    ];
-                 $state_data = DB::table('states')->insert($states_data);
-                 $inserted_state_data = DB::table('states')->where('name', $State)->first();
-                 $state_id = $inserted_state_data->id;
+                    "isactive" => 1,
+                ];
+                $state_data = DB::table('states')->insert($states_data);
+                $inserted_state_data = DB::table('states')->where('name', $State)->first();
+                $state_id = $inserted_state_data->id;
 
-             }
+            }
             if($employee){
                 $userid = $employee->user_id;
             }
             $employee_profile_data =   [
 
-                                   'user_id'  => $userid,
+                'user_id'  => $userid,
 
-                                   'shift_id'  => 1,
+                'shift_id'  => 1,
 
-                                   'department_id' => 6,
+                'department_id' => 6,
 
-                                   "probation_period_id" => 1,
+                "probation_period_id" => 1,
 
-                                   'state_id' => $state_id,
+                'state_id' => $state_id,
 
-                                   'probation_approval_status' => '0',
+                'probation_approval_status' => '0',
 
-                                   'probation_hod_approval' => '0',
+                'probation_hod_approval' => '0',
 
-                                   'probation_hr_approval' => '0'
+                'probation_hr_approval' => '0'
 
-                                ];
+            ];
             $employee_profile = EmployeeProfile::create($employee_profile_data);
 
             $location_data = DB::table('locations')->where('name', $Region)->first();
 
-             if($location_data){
-                 $location_id = $location_data->id;
-             }else{
+            if($location_data){
+                $location_id = $location_data->id;
+            }else{
 
-                 $region_data =   [
+                $region_data =   [
 
-                                   'name' => $Region,
+                    'name' => $Region,
 
-                                   "state_id" => $state_id,
+                    "state_id" => $state_id,
 
-                                   "has_esi" => 1,
+                    "has_esi" => 1,
 
-                                   "isactive" => 1,
-                                    ];
-                 $location_data = DB::table('locations')->insert($region_data);
-                 $inserted_location_data = DB::table('locations')->where('name', $Region)->first();
-                 $location_id = $inserted_location_data->id;
-             }
+                    "isactive" => 1,
+                ];
+                $location_data = DB::table('locations')->insert($region_data);
+                $inserted_location_data = DB::table('locations')->where('name', $Region)->first();
+                $location_id = $inserted_location_data->id;
+            }
 
             $employee_location_data =   [
 
-                                   'user_id'  => $userid,
+                'user_id'  => $userid,
 
-                                   'location_id' => $location_id,
+                'location_id' => $location_id,
 
-                                   "isactive" => 1
-                                    ];
-             //$loc_profile = LocationUser::create($employee_location_data);
-             $loc_profile = DB::table('location_user')->insert($employee_location_data);
+                "isactive" => 1
+            ];
+            //$loc_profile = LocationUser::create($employee_location_data);
+            $loc_profile = DB::table('location_user')->insert($employee_location_data);
 
 
 
 
             $employee_designation_data =   [
 
-                                   'user_id'  => $userid,
+                'user_id'  => $userid,
 
-                                   'designation_id' => 4,
+                'designation_id' => 4,
 
-                                   'remarks' => "",
+                'remarks' => "",
 
-                                   "isactive" => 1
-                                    ];
-             //$loc_profile = LocationUser::create($employee_location_data);
-             $designation_data = DB::table('designation_user')->insert($employee_designation_data);
+                "isactive" => 1
+            ];
+            //$loc_profile = LocationUser::create($employee_location_data);
+            $designation_data = DB::table('designation_user')->insert($employee_designation_data);
 
             /* if(!empty($Designation)){
 
@@ -5411,14 +5829,14 @@ class UserController extends Controller
 
             $employee_project_data =   [
 
-                                   'project_id'  => 4,
+                'project_id'  => 4,
 
-                                   'user_id' => $userid,
+                'user_id' => $userid,
 
-                                   'isactive' => 1,
+                'isactive' => 1,
 
-                                   "isactive" => 1
-                                    ];
+                "isactive" => 1
+            ];
 
             $project_data = DB::table('project_user')->insert($employee_project_data);
 
@@ -5429,38 +5847,38 @@ class UserController extends Controller
 
 
             $approval_data =   [
-                                    'user_id' => $user_id,
-                                    'month_info' => "2020-04-01",
-                                    'accumalated_casual_leave' => 0,
-                                    'accumalated_sick_leave' => 0,
-                                    'balance_casual_leave' => $bal_cas_leave,
-                                    'balance_sick_leave' => $bal_sick_leave,
-                                    'balance_maternity_leave' => 90,
-                                    'balance_paternity_leave' => 14,
-                                    'unpaid_casual' => 0,
-                                    'paid_casual' => 0,
-                                    'unpaid_sick' => 0,
-                                    'paid_sick' => 0,
-                                    'isactive' => 1
-                                    ];
+                'user_id' => $user_id,
+                'month_info' => "2020-04-01",
+                'accumalated_casual_leave' => 0,
+                'accumalated_sick_leave' => 0,
+                'balance_casual_leave' => $bal_cas_leave,
+                'balance_sick_leave' => $bal_sick_leave,
+                'balance_maternity_leave' => 90,
+                'balance_paternity_leave' => 14,
+                'unpaid_casual' => 0,
+                'paid_casual' => 0,
+                'unpaid_sick' => 0,
+                'paid_sick' => 0,
+                'isactive' => 1
+            ];
             $leave_inserted = LeaveDetail::create($approval_data);
-                if($leave_inserted){
-                    echo " AND ". $Name." with user id".$user_id."inserted in leave detail table";
-                    echo"<br/>";
-                }else{
-                    echo " AND ". $Name."with user id".$user_id."not inserted in leave detail table";
-                    echo"<br/>";
-                }
+            if($leave_inserted){
+                echo " AND ". $Name." with user id".$user_id."inserted in leave detail table";
+                echo"<br/>";
+            }else{
+                echo " AND ". $Name."with user id".$user_id."not inserted in leave detail table";
+                echo"<br/>";
+            }
 
             $i++;
             $j++;
-         }
+        }
 
     }
-      function saveuserdata(Request $request){
+    function saveuserdata(Request $request){
 
         return $users_data = DB::table('TABLE_156')->get();
-		exit;
+        exit;
         $i=0;
         foreach($users_data as $data){
 
@@ -5471,7 +5889,7 @@ class UserController extends Controller
             $user_data = User::where(['employee_code'=>$emp_code])->first();
             if($user_data){
                 echo "user id: ".$user_id = $user_data->id;
-				echo "    emp code : ". $emp_code;
+                echo "    emp code : ". $emp_code;
                 echo"<br/>";
             }else{
                 echo $emp_code."<br/>";
@@ -5482,8 +5900,8 @@ class UserController extends Controller
 
 
             $emp_data = [
-                            'father_name' => $data->father_name,
-                        ];
+                'father_name' => $data->father_name,
+            ];
             $emp_update = Employee::where(['user_id'=>$user_id])->update($emp_data);
 
             if($emp_update){
@@ -5497,10 +5915,10 @@ class UserController extends Controller
             if($emp_account_exist){
 
                 $emp_account_data = [
-                            'bank_account_number' => $data->bank_account,
-                            'ifsc_code' => $data->ifsc_code,
-                            'isactive' => 1,
-                        ];
+                    'bank_account_number' => $data->bank_account,
+                    'ifsc_code' => $data->ifsc_code,
+                    'isactive' => 1,
+                ];
                 $emp_account_update = EmployeeAccount::where(['user_id'=>$user_id])->update($emp_account_data);
                 if( $emp_account_update){
 
@@ -5508,12 +5926,12 @@ class UserController extends Controller
                 }
             }else{
 
-                 $emp_account_data = [
-                            'user_id' => $user_id,
-                            'bank_account_number' => $data->bank_account,
-                            'ifsc_code' => $data->ifsc_code,
-                            'isactive' => 1,
-                        ];
+                $emp_account_data = [
+                    'user_id' => $user_id,
+                    'bank_account_number' => $data->bank_account,
+                    'ifsc_code' => $data->ifsc_code,
+                    'isactive' => 1,
+                ];
                 $emp_account_create = EmployeeAccount::create($emp_account_data);
                 if( $emp_account_create){
 
