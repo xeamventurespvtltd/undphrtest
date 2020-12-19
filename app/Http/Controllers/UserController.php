@@ -1423,19 +1423,19 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
 
-            'email' => 'bail|required|unique:users,email',
+//            'email' => 'bail|required|unique:users,email',
 
-            'mobile' => 'bail|required|unique:employees,mobile_number',
+//            'mobile' => 'bail|required|unique:employees,mobile_number',
 
             //'password' => 'bail|required',
 
-            'employeeName' => 'bail|required',
+//            'employeeName' => 'bail|required',
 
-            'joiningDate' => 'bail|required',
+//            'joiningDate' => 'bail|required',
 
-            'employeeXeamCode' => 'bail|required|unique:users,employee_code',
+//            'employeeXeamCode' => 'bail|required|unique:users,employee_code',
 
-            'projectId' => 'bail|required',
+//            'projectId' => 'bail|required',
         ]);
 
 
@@ -1791,19 +1791,15 @@ class UserController extends Controller
 
 
         // Project Detail
-        if(!empty($request->locationId)) {
-            $locationId = $request->locationId;
-            $locationUser = \DB::select("SELECT * FROM `location_user`  WHERE `user_id` in (SELECT `user_id` FROM `designation_user` WHERE `designation_id` = 3) AND `location_id` = $locationId");
-            if (isset($locationUser->id)) {
-                $employee = Employee::where('user_id', $locationUser[0]->user_id)->first();
-                return redirect('employees/create/projectDetailsTab')->with('poError', $employee->fullname . ' Is already assigned as PO At Selected Location');
+        if(!empty($request->locationId)){
 
-            }
+            $locations=$request->locationId;
+
+            $user->locations()->sync($locations);
         }
 
         $employee_profile_data =   [
 
-            //'shift_id'  => $request->shiftTimingId,
             'department_id' => $request->departmentId,
             'designation_id'=>$request->designation,
             'state_id' => $request->stateId,
@@ -1820,106 +1816,14 @@ class UserController extends Controller
         if(!empty($check_unique->user_id)){
 
             return redirect('employees/create')->with('profileError',"Details of this employee have already been saved. Please create a new employee.");
-
-
-
-        }else{
+        }
+        else{
 
 
             $user = User::find($last_inserted_employee);
 
-            /*  $role = Role::find($request->roleId);
-
-             $user->assignRole($role->name); */
-
-            // $user->syncPermissions($request->permissionIds);
-
-
-
             $employee = $user->employee()->first();
-
-            $probation = ProbationPeriod::find($request->probationPeriodId);
-
-
-            if($probation)
-            {
-                $employee_profile_data['probation_end_date'] = Carbon::parse($employee->joining_date)->addDays($probation->no_of_days)->toDateString();
-            }
-
-
-
             $user->employeeProfile()->create($employee_profile_data);
-
-            if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
-                for($i=0;$i<count($request->exceptionshiftTimingId); $i++){
-                    $ShiftExcept = new ShiftException;
-                    $ShiftExcept->user_id       = $last_inserted_employee;
-                    $ShiftExcept->shift_id      = $request->exceptionshiftTimingId[$i];
-                    $ShiftExcept->week_day = $request->exceptionshiftday[$i];;
-                    $ShiftExcept->save();
-
-                }
-            }
-
-            /*  $user->userManager()->create(['manager_id'=>$request->employeeIds]);
-
-
-             $manager = User::find($request->employeeIds);
-
-             if(!$manager->hasPermissionTo('approve-leave')){
-
-                 $manager->givePermissionTo(['approve-leave']);
-
-             }
-
-
-
-             if(!empty($request->hodId)){
-
-                 $user->leaveAuthorities()->create(['manager_id'=>$request->hodId,'priority'=>'2']);
-
-                 $manager = User::find($request->hodId);
-
-                 if(!$manager->hasPermissionTo('approve-leave')){
-
-                     $manager->givePermissionTo(['approve-leave']);
-
-                 }
-
-             }
-
-
-
-             if(!empty($request->hrId)){
-
-                 $user->leaveAuthorities()->create(['manager_id'=>$request->hrId,'priority'=>'3']);
-
-                 $manager = User::find($request->hrId);
-
-                 if(!$manager->hasPermissionTo('approve-leave')){
-
-                     $manager->givePermissionTo(['approve-leave']);
-
-                 }
-
-             }
-
-
-
-             if(!empty($request->mdId)){
-
-                 $user->leaveAuthorities()->create(['manager_id'=>$request->mdId,'priority'=>'4']);
-
-                 $manager = User::find($request->mdId);
-
-                 if(!$manager->hasPermissionTo('approve-leave')){
-
-                     $manager->givePermissionTo(['approve-leave']);
-
-                 }
-
-             } */
-
 
 
             if(!empty($request->perkIds)){
@@ -1932,12 +1836,9 @@ class UserController extends Controller
 
             if(!empty($request->locationId)){
 
-                $locations = [];
-
-                array_push($locations,$request->locationId);
+                $locations=$request->locationId;
 
                 $user->locations()->sync($locations);
-
             }
 
 
@@ -1968,15 +1869,9 @@ class UserController extends Controller
 
 
 
-            if($request->formSubmitButton == 'sc'){
+                return redirect("employees/list/")->with('success','Details saved successfully.!');
 
-                return redirect("employees/create/")->with('success','Details saved successfully.!');
 
-            }else{
-
-                return redirect("employees/dashboard");
-
-            }
 
 
 

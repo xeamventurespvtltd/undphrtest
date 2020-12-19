@@ -300,14 +300,6 @@
                                                 @endforeach
                                             @endif
                                         </select>
-                                    <!--<select class="form-control input-sm basic-detail-input-style" name="locationId">
-					                              <option value="" selected disabled>Please Select Employee's Location.</option>
-					                          @if(!$data['locations']->isEmpty())
-                                        @foreach($data['locations'] as $location)
-                                            <option value="{{$location->id}}" @if(@$data['user']->locations->contains('id',$location->id)){{'selected'}}@endif>{{$location->name}}</option>
-					                            @endforeach
-                                    @endif
-                                        </select>-->
                                     </div>
                                 </div>
                                 <input type="hidden" name="employeeId" value="{{$data['user']->id}}">
