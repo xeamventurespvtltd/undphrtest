@@ -118,7 +118,7 @@ class LeaveController extends Controller
 
         $data['taken_monthLeave'] = $this->calculateMonthLeave($from_date,$to_date);
 
-       $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
+        $leaveDetail = LeaveDetail::where('user_id', Auth::user()->id)->whereYear('month_info', '2020')
             ->whereMonth
             ('month_info', date('m'))->first();
 
@@ -490,6 +490,7 @@ class LeaveController extends Controller
             $chk_existing_date = DB::table('applied_leaves')
                 ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
                 ->first();
+
             if(!empty($chk_existing_date)){
                 $unique_error = "You have already applied for leave on given date.";
                 return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
@@ -574,7 +575,7 @@ class LeaveController extends Controller
 
             if(date("d",strtotime($request->toDate)) > 25 || date("m",strtotime($request->toDate)) > date("m",strtotime($request->fromDate)))
             {
-                 $date = explode('/',$request->fromDate);
+                $date = explode('/',$request->fromDate);
                 $year = $date[2];
                 $month = $date[0];
                 $firstEndDate = $year.'-'.$month.'-25';
@@ -606,7 +607,7 @@ class LeaveController extends Controller
                 $applied_leave->appliedLeaveSegregations()->create($segregation_data);
 
                 $secondFromDate = $year.'-'.$month.'-26';
-                  $secondSegregation = $secondFromDate.' - '. $request->toDate;
+                $secondSegregation = $secondFromDate.' - '. $request->toDate;
                 $date3 = Carbon::createFromDate($secondFromDate);
                 $date4 = Carbon::createFromDate($request->toDate);
 
@@ -1169,7 +1170,7 @@ class LeaveController extends Controller
 
                             }elseif ($designation==2){    // for SPO
                                 $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-                                 $balance_sick_leave = $accumulatedSl;
+                                $balance_sick_leave = $accumulatedSl;
                             }
                             if ($designation != 6 ) {    // for TO
 
