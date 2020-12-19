@@ -1423,19 +1423,17 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
 
-//            'email' => 'bail|required|unique:users,email',
+            'email' => 'bail|required|unique:users,email',
 
-//            'mobile' => 'bail|required|unique:employees,mobile_number',
+            'mobile' => 'bail|required|unique:employees,mobile_number',
 
-            //'password' => 'bail|required',
+            'employeeName' => 'bail|required',
 
-//            'employeeName' => 'bail|required',
+            'joiningDate' => 'bail|required',
 
-//            'joiningDate' => 'bail|required',
+            'employeeXeamCode' => 'bail|required|unique:users,employee_code',
 
-//            'employeeXeamCode' => 'bail|required|unique:users,employee_code',
-
-//            'projectId' => 'bail|required',
+            'projectId' => 'bail|required',
         ]);
 
 
