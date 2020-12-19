@@ -300,8 +300,8 @@
                                                     <div class="row field-changes-below">
                                                         <label class="col-md-4 control-label basic-detail-label">City</label>
                                                         <div class="col-md-8 basic-input-right">
-                                                            <select class="form-control input-sm basic-detail-input-style" name="locationId" id="city_field">
-                                                                <option value="" selected disabled>Please Select Employee's Location.</option>
+                                                            <select required="" class="form-control input-sm basic-detail-input-style select2" multiple="" name="locationId[]" style="width: 300px; height: 200px;" id="city_field">
+                                                                <option value=""  disabled>Please Select Employee's Location.</option>
                                                                 @if(!$data['locations']->isEmpty())
                                                                     @foreach($data['locations'] as $location)
                                                                         <option value="{{$location->id}}">{{$location->name}}</option>
