@@ -96,10 +96,6 @@
                             </ul>
                         </div>
                     @endif
-                    <div id="noEmployeeProfile" class="alert alert-danger alert-dismissible">
-                        <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
-                        {{"Please fill the basic details form for a new employee, or you can edit the profile of an existing user later."}}
-                    </div>
 
             <button class="btn btn-primary">UID {{$data['user']->id}}</button>
                     <!-- form start -->
