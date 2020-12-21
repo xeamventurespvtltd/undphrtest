@@ -212,7 +212,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
             $approval_data = [
                 'user_id' => $userId,
-                'month_info' => $current_month,
+                'month_info' => $current_year.'-'.$current_month.'-26',
                 'accumalated_casual_leave' => $accumlated_casual,
                 'accumalated_sick_leave' => $accumlated_sick,
                 'balance_casual_leave' => $balance_casual_leave,
