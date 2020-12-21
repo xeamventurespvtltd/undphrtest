@@ -212,7 +212,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
             $approval_data = [
                 'user_id' => $userId,
-                'month_info' => $applied_leave->from_date,
+                'month_info' => $current_year.'-'.$current_month.'-26',
                 'accumalated_casual_leave' => $accumlated_casual,
                 'accumalated_sick_leave' => $accumlated_sick,
                 'balance_casual_leave' => $balance_casual_leave,
@@ -230,7 +230,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
             // update
             $leave_status_after = LeaveDetail::where('user_id', $userId)
-                ->whereMonth('month_info',$applied_leave->from_date)  //works with to_date as well
+                ->whereMonth('month_info', $current_month)  //works with to_date as well
                 ->first();
 
             $id_to_update = $leave_status_after->id;
