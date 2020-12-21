@@ -139,7 +139,6 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
     $leave_status_prev = LeaveDetail::where('user_id', $userId)
         ->whereMonth('month_info',$prev_month)
         ->first();
-    //dd($leave_status_prev);
 
     // chk Previous month leave detailed set and not empty...
 
@@ -231,7 +230,7 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
 
             // update
             $leave_status_after = LeaveDetail::where('user_id', $userId)
-                ->whereMonth('month_info',$current_month)  //works with to_date as well
+                ->whereMonth('month_info',$applied_leave->from_date)  //works with to_date as well
                 ->first();
 
             $id_to_update = $leave_status_after->id;
