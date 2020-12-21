@@ -38,7 +38,7 @@
 
                 </div>
 
-            @endif
+        @endif
 
         <!-- Small boxes (Stat box) -->
 
@@ -591,17 +591,23 @@
                                             <input type="radio" name="secondaryLeaveType" value="Full" checked>Full
                                             <input type="radio" name="secondaryLeaveType" value="Half">Half
                                         </div>
+
+                                        <div class="form-group" id="totalDays">
+                                            <label for="noDays" class="apply-leave-label">Days <span id="errorNumberOfDays"></span></label>
+                                            <input autocomplete="off" type="text" class="form-control basic-detail-input-style apply-leave-input" id="numberOfDays" name="noDays" placeholder="Number Of Days" value="" readonly>
+
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6 attendance-column4" style="padding-left: 5px;">
                                         <div class="form-group">
                                             <label>On-Date</label>
-                                            <input type="text" class="form-control input-sm basic-detail-input-style" name="on_date" id="leave_date" readonly>
+                                            <input type="text" class="form-control input-sm basic-detail-input-style paternity-leave" name="on_date" id="leave_date" readonly>
                                         </div>
 
                                         <div class="form-group" id="pat_mat" style="display: none;">
                                             <label>To-Date</label>
-                                            <input type="text" class="form-control datepicker" name="to_date" id="leave_date" autocomplete="off">
+                                            <input type="text" class="form-control datepicker paternity-leave" name="to_date" id="paternity-to-date" autocomplete="off">
                                         </div>
                                     </div>
 
@@ -625,7 +631,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer in-out-footer">
-                                <button type="submit" id="saveStatus" class="btn btn-primary" name="saveStatus" value="Save">Save</button>
+                                <button type="submit" id="addLeaveButton" class="btn btn-primary" name="saveStatus" value="Save">Save</button>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </form>
@@ -651,6 +657,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+            $('#totalDays').hide();
 
             //Date picker
             $('.datepicker').datepicker({
@@ -738,6 +745,7 @@
     </script>
 
     <script type="text/javascript">
+        var allowFormSubmit = {time: 1, date: 1, maternity: 1, tasks: 1, paternity:1};
 
         $(".leave-tooltip").on('click',function(){
 
@@ -914,15 +922,70 @@
             if(selectedValue == 1 ||  selectedValue == 2){
                 $('#cas_sick').show();
                 $('#pat_mat').hide();
-
+                $('#totalDays').hide();
             }
 
             if(selectedValue == 7 || selectedValue == 4){
                 $('#cas_sick').hide();
                 $('#pat_mat').show();
+                $('#totalDays').show();
             }
 
         }
+
+
+
+        $('.paternity-leave').on('change', function(){
+
+            allowFormSubmit.paternity = 1;
+
+            var fromDate = $("#leave_date").val();
+            var toDate = $("#paternity-to-date").val();
+
+            var date1 = fromDate;
+            var date2 = new Date(toDate);
+
+            var d = new Date(date2);
+            date2 = [
+                d.getFullYear(),
+                ('0' + (d.getMonth() + 1)).slice(-2),
+                ('0' + d.getDate()).slice(-2)
+            ].join('-');
+
+            var date1 = new Date(date1);
+            var date2 = new Date(date2);
+            var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+            var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+            var dayMilliseconds = 1000 * 60 * 60 * 24;
+            var weekendDays = 0;
+            while (date1 <= date2) {
+                var day = date1.getDay()
+                if (day == 0) {
+                    weekendDays++;
+                }
+                date1 = new Date(+date1 + dayMilliseconds);
+            }
+
+            var totalDays = diffDays + 1 - weekendDays;
+            $('#numberOfDays').val(totalDays);
+
+            if(totalDays != 15) {
+                allowFormSubmit.paternity = 0;
+                // document.getElementById("addLeaveButton").disabled = true;
+                alert("You cannot take paternity leave for more or less than 15 days.");
+            }else{
+
+            }
+
+        });
+
+        $("#addLeaveButton").click(function() {
+            if(allowFormSubmit.paternity == 0 ){
+                return false;
+            }
+        });
+
 
     </script>
 
