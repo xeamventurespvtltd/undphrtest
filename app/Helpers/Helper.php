@@ -304,9 +304,10 @@ function leaveRelatedCalculations($probation_data,$applied_leave){
                 $paidCount = 0;
                 $unpaidCount = 0;
             }
+
             elseif($applied_leave->leave_type_id==7){ //Paternity leave
                 $balance_paternity = 0;
-                $paidCount = 0;
+                $paidCount = $applied_leave->number_of_days;
                 $unpaidCount = 0;
             }
             elseif($applied_leave->leave_type_id==5){ //compensatory

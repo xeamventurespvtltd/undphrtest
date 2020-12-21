@@ -2920,54 +2920,54 @@ class AttendanceController extends Controller
         ];
         $applied_leave->appliedLeaveApprovals()->create($approval_data);
 
-//        if($applied_leave->final_status == '1'){
-//
-//            //Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
-//
-//            // comment by hitesh...
-//
-//            $excluded_dates = $applied_leave->excluded_dates;
-//            $excluded_date = explode(",",$excluded_dates);
-//
-//            $i=0;
-//
-//            if(!empty($request->to_date)){
-//
-//                while (strtotime($request->on_date) <= strtotime($t_date)) {
-//
-//                    Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
-//
-//                    $request->on_date = date ("Y-m-d", strtotime("+1 days", strtotime($request->on_date)));
-//                    $i++;
-//                }
-//            }else{
-//
-//                //  when po add casual or sick leave..
-//                $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-//            }
-//
-//            //$Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-//
-//            // When po add paternity leave condition
-//
-//            /* if(!empty($request->to_date)){
-//                // dd("if");
-//                 $i=0;
-//                 while ($request->on_date <= $t_date) {
-//
-//                     $rr  = Attendance::create(['user_id'=>$user_id,'on_date'=>$request->on_date,'status'=>"Leave"]);
-//
-//                     $from_date = date ("Y-m-d", strtotime("+1 days",$request->on_date));
-//
-//                     $i++;
-//                 }
-//             }else{
-//
-//                 //  when po add casual or sick leave..
-//                 $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-//             }*/
-//
-//        }
+        if($applied_leave->final_status == '1'){
+
+            //Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
+
+            // comment by hitesh...
+
+            $excluded_dates = $applied_leave->excluded_dates;
+            $excluded_date = explode(",",$excluded_dates);
+
+            $i=0;
+
+            if(!empty($request->to_date)){
+
+                while (strtotime($request->on_date) <= strtotime($t_date)) {
+
+                    Attendance::create(['user_id'=>$userid,'on_date'=>$request->on_date,'status'=>"Leave"]);
+
+                    $request->on_date = date ("Y-m-d", strtotime("+1 days", strtotime($request->on_date)));
+                    $i++;
+                }
+            }else{
+
+                //  when po add casual or sick leave..
+                $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
+            }
+
+            //$Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
+
+            // When po add paternity leave condition
+
+            /* if(!empty($request->to_date)){
+                // dd("if");
+                 $i=0;
+                 while ($request->on_date <= $t_date) {
+
+                     $rr  = Attendance::create(['user_id'=>$user_id,'on_date'=>$request->on_date,'status'=>"Leave"]);
+
+                     $from_date = date ("Y-m-d", strtotime("+1 days",$request->on_date));
+
+                     $i++;
+                 }
+             }else{
+
+                 //  when po add casual or sick leave..
+                 $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
+             }*/
+
+        }
 
         $probation_data = array();
 
