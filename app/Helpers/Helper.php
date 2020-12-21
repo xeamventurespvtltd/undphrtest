@@ -929,12 +929,11 @@ function amountInWords(float $number)
 function getAttendanceInfo($date,$user_id)
 {
 
-    $user = User::where(['id'=>$user_id])->with('employee')
+   $user = User::where(['id'=>$user_id])->with('employee')
         ->with('employeeProfile')
         ->with('employee')
         ->first();
 
-    //dd($user);
     $dayofweek = date('w', strtotime($date));
 
     $exception_shift_info = ShiftException::where(['user_id'=>$user_id, 'week_day'=>$dayofweek])
@@ -959,7 +958,7 @@ function getAttendanceInfo($date,$user_id)
 
     $date = date("Y-m-d",strtotime($date));
     $attendance = Attendance::where(['on_date'=>$date,'user_id'=>$user_id])
-        ->first();
+        ->latest()->first();
 
     $data['late'] = 0;
     $data['status'] = "";
@@ -969,22 +968,12 @@ function getAttendanceInfo($date,$user_id)
     $data['last_punch_type'] = 'NA';
     $data['secondary_leave_type'] = "";
     $data['description'] = "";
-    $data['remarks'] = AttendanceRemark::where(['on_date'=>$date,'user_id'=>$user_id])
+   $data['remarks'] = AttendanceRemark::where(['on_date'=>$date,'user_id'=>$user_id])
         ->value('remarks');
 
     if(!empty($attendance)){
         $data['status'] = $attendance->status;
 
-
-        /*    if($attendance->status == 'Holiday'){
-               $holiday = Holiday::where('holiday_from','<=',$date)
-                              ->where('holiday_to','>=',$date)
-                              ->where('isactive',1)
-                              ->first();
-
-               $data['description'] = $holiday->name;
-
-           }else */
         if($attendance->status == 'Leave'){
             $leave = DB::table('applied_leaves as al')
                 ->where('al.from_date','<=',$date)

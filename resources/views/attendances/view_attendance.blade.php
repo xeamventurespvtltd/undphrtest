@@ -259,26 +259,9 @@
                                                                             <?php
 
                                                                             $timestamp = mktime(0,0,0,$cMonth,1,$cYear);
-                                                                            //$maxday = date("t",$timestamp);
                                                                             $thismonth = getdate ($timestamp);
 
                                                                             $startday = $thismonth['wday'];
-
-
-
-                                                                            /*   $startDate = "2020-03-25";
-                                                                                $endDate = "2020-04-26";
-                                                                                $dateYear = ($year != '')?$year:date("Y");
-                                                                            $dateMonth = ($month != '')?$month:date("m");
-                                                                            $date = $dateYear.'-'.$dateMonth.'-01';
-                                                                            $currentMonthFirstDay = date("N",strtotime($date));
-
-                                                                            $date1 = createDateRangeArray($startDate,$endDate);
-                                                                            $startDateFrom = date("N",strtotime($startDate));
-                                                                            $endDateFrom = date("N",strtotime($endDate));
-                                                                             $date=array();
-                                                                            array_push($date,$date1); */
-
 
                                                                             $timestamp = strtotime($date1);
                                                                             $thismonth = getdate ($timestamp);
@@ -293,21 +276,12 @@
                                                                             $day = $i - $startday + 1;
                                                                             $cDayTime = $cYear.'-'.$cMonth.'-'.$day;
 
-                                                                            //if(strtotime(date("Y-m-d")) >= mktime(0,0,0,$cMonth,$day,$cYear)){
                                                                             $attendanceArray = getAttendanceInfo($date1, $user->id);
 
-                                                                            //}
 
                                                                             $status = $attendanceArray['status'];
 
                                                                             $mapUrl = url('attendances/view-map').'?id='.$user->id.'&date='.$date1;
-
-                                                                            /* if($user->user_designation!=4){
-                                                                                if(($i % 7) == 0 OR $i == 6 OR $i==13 OR $i==20 OR $i==27 ){
-                                                                                    $status = "Week-Off";
-                                                                                    $attendanceArray['secondary_leave_type'] = "";
-                                                                                }
-                                                                            } */
 
 
                                                                             if(($i % 7) == 0 ){

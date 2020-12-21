@@ -310,8 +310,6 @@ class AttendanceController extends Controller
     function changeAttendanceStatus(Request $request)
     {
 
-        // dd($request->all());
-
         $date = date("Y-m-d",strtotime($request->on_date));
         $attendance = Attendance::where(['user_id'=>$request->user_id,'on_date'=>$date])->first();
 
@@ -2861,8 +2859,7 @@ class AttendanceController extends Controller
         }
 
 
-        if($request->leaveTypeId == '1' || $request->leaveTypeId == '2' || $request->leaveTypeId == '7'){
-
+        if($request->leaveTypeId == '1' || $request->leaveTypeId == '2' || $request->leaveTypeId == '5'){
             $leave_data = [
                 'leave_type_id' => $request->leaveTypeId,
                 'reason' => $request->reasonLeave,
@@ -2872,32 +2869,43 @@ class AttendanceController extends Controller
                 'to_date' => $request->on_date,
                 'final_status' => '1'
             ];
+
+            $segregation_data = [
+                'from_date' => $request->on_date,
+                'to_date' => $request->on_date,
+                'number_of_days' => $days,
+                'paid_count' => '0',
+                'unpaid_count' => '0',
+                'compensatory_count' => '0'
+            ];
         }
 
-        if($request->leaveTypeId == '5' || $request->leaveTypeId == '4' ){
+        if($request->leaveTypeId == '7' || $request->leaveTypeId == '4' ){
 
             $leave_data = [
                 'leave_type_id' => $request->leaveTypeId,
                 'reason' => $request->reasonLeave,
-                'number_of_days' => $days,
+                'number_of_days' => $request->noDays,
                 "secondary_leave_type" => $request->secondaryLeaveType,
                 'from_date' => $request->on_date,
                 'to_date' => $t_date,
                 'final_status' => '1'
             ];
 
+            $segregation_data = [
+                'from_date' => $request->on_date,
+                'to_date' => $t_date,
+                'number_of_days' =>  $request->noDays,
+                'paid_count' => '0',
+                'unpaid_count' => '0',
+                'compensatory_count' => '0'
+            ];
+
         }
 
         $applied_leave = $user->appliedLeaves()->create($leave_data);
 
-        $segregation_data = [
-            'from_date' => $request->on_date,
-            'to_date' => $request->on_date,
-            'number_of_days' => $days,
-            'paid_count' => '0',
-            'unpaid_count' => '0',
-            'compensatory_count' => '0'
-        ];
+
 
         // comment by hitesh...
         $applied_leave->appliedLeaveSegregations()->create($segregation_data);
