@@ -593,9 +593,9 @@
                                         </div>
 
                                         <div class="form-group" id="totalDays">
-                                            <label for="noDays" class="apply-leave-label">Days <span id="errorNumberOfDays"></span></label>
+                                            <label for="noDays" class="apply-leave-label">Days </label>
                                             <input autocomplete="off" type="text" class="form-control basic-detail-input-style apply-leave-input" id="numberOfDays" name="noDays" placeholder="Number Of Days" value="" readonly>
-
+                                            <p id="errorNumberOfDays" class="text-red"></p>
                                         </div>
                                     </div>
 
@@ -933,8 +933,6 @@
 
         }
 
-
-
         $('.paternity-leave').on('change', function(){
 
             allowFormSubmit.paternity = 1;
@@ -972,16 +970,20 @@
 
             if(totalDays != 15) {
                 allowFormSubmit.paternity = 0;
-                // document.getElementById("addLeaveButton").disabled = true;
-                alert("You cannot take paternity leave for more or less than 15 days.");
+                document.getElementById("addLeaveButton").disabled = true;
+                // alert("You cannot take paternity leave for more or less than 15 days.");
+                document.getElementById("errorNumberOfDays").innerHTML
+                    = "You cannot take paternity leave for more or less than 15 days.";
             }else{
-
+                document.getElementById("errorNumberOfDays").innerHTML = '';
+                document.getElementById("addLeaveButton").disabled = false;
             }
-
         });
 
         $("#addLeaveButton").click(function() {
             if(allowFormSubmit.paternity == 0 ){
+                document.getElementById("errorNumberOfDays").innerHTML
+                    = "You cannot take paternity leave for more or less than 15 days.";
                 return false;
             }
         });
