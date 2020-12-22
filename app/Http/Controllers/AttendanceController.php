@@ -1440,7 +1440,6 @@ class AttendanceController extends Controller
                             }
                             $j++;
                         }
-
                     }
                     if (!$presentstatus) {
                         if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
