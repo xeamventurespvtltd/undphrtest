@@ -926,7 +926,7 @@ class AttendanceController extends Controller
                     })
                     ->select('als.unpaid_count')
                     ->orderBy('als.applied_leave_id', 'DESC')->sum('unpaid_count');
-                     $value->verification = "No";
+                $value->verification = "No";
 
                 $verification = AttendanceVerification::where(['on_date' => date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-' . '25')), 'user_id' => $value->user_id])->first();
 
@@ -1291,161 +1291,178 @@ class AttendanceController extends Controller
 
 
                 $user = $emp->user_id;
-                    $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
-                    $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
+                $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
+                $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
 
-                    $punches = Attendance::where('user_id', $user)
-                        ->where('on_date', '>=', $start_month)
-                        ->where('on_date', '<=', $end_month)
-                        ->with('user')
-                        ->with('user.employee')
-                        ->with('user.designation')
-                        ->orderBy('on_date', 'ASC')
-                        ->get();
+                $punches = Attendance::where('user_id', $user)
+                    ->where('on_date', '>=', $start_month)
+                    ->where('on_date', '<=', $end_month)
+                    ->with('user')
+                    ->with('user.employee')
+                    ->with('user.designation')
+                    ->orderBy('id', 'DESC')
+                    ->get()->toArray();
 
-                    $data[$key]['#'] = $key + 1;
-
-
-                    // echo "<br/> key  $key";
-                    $emp_data = Employee::where(['user_id' => $user])->first();
-                    $emp_profile_data = EmployeeProfile::where(['user_id' => $user])->with('state')->first();
-                    if (isset($emp_profile_data->state)) {
-                        $emp_state = $emp_profile_data->state->name;
-                    } else {
-                        $emp_state = "NULL";
+                $new_array = array();
+                foreach($punches as $key=>$value){
+                    if(!isset($new_array[$value['on_date']])){
+                        $new_array[$value['on_date']] = $value;
                     }
+                }
+                $new_array = array_values($new_array);
+
+                $punches = array_reverse($new_array);
+
+                $column = array_column($punches, 'on_date');
+
+                array_multisort($column, SORT_ASC, $punches);
+
+                $data[$key]['#'] = $key + 1;
 
 
-                    $prev_month = date("F", strtotime("-1 month", strtotime($end_month)));
+                // echo "<br/> key  $key";
+                $emp_data = Employee::where(['user_id' => $user])->first();
+                $emp_profile_data = EmployeeProfile::where(['user_id' => $user])->with('state')->first();
+                if (isset($emp_profile_data->state)) {
+                    $emp_state = $emp_profile_data->state->name;
+                } else {
+                    $emp_state = "NULL";
+                }
 
-                    $month = date('F', strtotime($end_month));
+
+                $prev_month = date("F", strtotime("-1 month", strtotime($end_month)));
+
+                $month = date('F', strtotime($end_month));
 
 
-                    $verified_data = AttendanceVerification::where(['user_id' => $user])
-                        ->whereYear('on_date', $req['year'])
-                        ->whereMonth('on_date', $req['month'])
-                        ->first();
-                    if ($verified_data) {
-                        $verified = $verified_data->isverified;
-                        if ($verified == 1) {
-                            $verify_status = "Yes";
-                        } else {
-                            $verify_status = "No";
-                        }
+                $verified_data = AttendanceVerification::where(['user_id' => $user])
+                    ->whereYear('on_date', $req['year'])
+                    ->whereMonth('on_date', $req['month'])
+                    ->first();
+                if ($verified_data) {
+                    $verified = $verified_data->isverified;
+                    if ($verified == 1) {
+                        $verify_status = "Yes";
                     } else {
                         $verify_status = "No";
                     }
+                } else {
+                    $verify_status = "No";
+                }
 
-                    // Get LoggedIn User Detailed...
+                // Get LoggedIn User Detailed...
 
-                    $logged_in_user = User::where(['id' => Auth::id()])
-                        ->with('employee')
-                        ->first();
+                $logged_in_user = User::where(['id' => Auth::id()])
+                    ->with('employee')
+                    ->first();
 
-                    $user_data = User::where(['id' => $user])->with('designation')->first();
+                $user_data = User::where(['id' => $user])->with('designation')->first();
 
-                    $data[$key]['fullname'] = $emp_data->fullname;
-                    $data[$key]['employee_code'] = $user_data->employee_code;
-                    $data[$key]['designation'] = $user_data->designation[0]->name;
-                    $data[$key]['State'] = $emp_state;
+                $data[$key]['fullname'] = $emp_data->fullname;
+                $data[$key]['employee_code'] = $user_data->employee_code;
+                $data[$key]['designation'] = $user_data->designation[0]->name;
+                $data[$key]['State'] = $emp_state;
 
-                    $data[$key]['Reporting head'] = $logged_in_user->employee->fullname;
-                    $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
+                $data[$key]['Reporting head'] = $logged_in_user->employee->fullname;
+                $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
 
-                    $data[$key]['Verified'] = $verify_status;
-                    $data[$key]['Month'] = $prev_month . "-" . $month;
+                $data[$key]['Verified'] = $verify_status;
+                $data[$key]['Month'] = $prev_month . "-" . $month;
 
 
-                    while (strtotime($start_date) <= strtotime($end_month)) {
-                        $j = 1;
+                while (strtotime($start_date) <= strtotime($end_month)) {
+                    $j = 1;
 
-                        $presentstatus = false;
+                    $presentstatus = false;
 
-                        if (!$punches->isEmpty()) {
+                    if (count($punches) != 0) {
+                        $allPunches = $punches;
+                        foreach ($allPunches as $punch) {
+                            $punch = (object)$punch;
+                            if(isset($punch->on_date)) {
+                                if ($start_date == date("Y-m-d", strtotime($punch->on_date))) {
 
-                            foreach ($punches as $punch) {
-                                if ($punch->on_date) {
-                                    if ($start_date == date("Y-m-d", strtotime($punch->on_date))) {
+                                    if ($punch->status == "Present") {
 
-                                        if ($punch->status == "Present") {
+                                        $data[$key][$start_date] = "P";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($punch->status == "Holiday") {
+                                        $data[$key][$start_date] = "H";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($punch->status == "Week-Off") {
+                                        $data[$key][$start_date] = "WO";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($punch->status == "Leave") {
+                                        $punch_date = $punch->on_date;
+                                        $leaves = DB::table('applied_leaves as al')
+                                            ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
+                                            ->where('al.user_id', $user)
+                                            ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
+                                            ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
+                                            ->where(function ($query) use ($punch_date) {
+                                                $query->where('al.from_date', '<=', $punch_date)
+                                                    ->Where('al.to_date', '>=', $punch_date);
+                                            })->orderBY('al.id', 'DESC')->first();
 
-                                            $data[$key][$start_date] = "P";
-                                            $presentstatus = true;
-                                            break;
-                                        } elseif ($punch->status == "Holiday") {
-                                            $data[$key][$start_date] = "H";
-                                            $presentstatus = true;
-                                            break;
-                                        } elseif ($punch->status == "Week-Off") {
-                                            $data[$key][$start_date] = "WO";
-                                            $presentstatus = true;
-                                            break;
-                                        } elseif ($punch->status == "Leave") {
-                                            $punch_date = $punch->on_date;
-                                            $leaves = DB::table('applied_leaves as al')
-                                                ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
-                                                ->where('al.user_id', $user)
-                                                ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
-                                            ->where(function($query)use($punch_date){
-                                                $query->where('al.from_date','<=',$punch_date)
-                                                    ->Where('al.to_date','>=',$punch_date);
-                                            })->first();
 
-                                            if ($leaves) {
-                                                if ($leaves->name == "Sick Leave") {
-                                                    $data[$key][$start_date] = "SL";
-                                                    $presentstatus = true;
-                                                    break;
-                                                } elseif ($leaves->name == "Casual Leave") {
-                                                    $data[$key][$start_date] = "CL";
-                                                    $presentstatus = true;
-                                                    break;
-                                                } elseif ($leaves->name == "Maternity Leave") {
-                                                    $data[$key][$start_date] = "ML";
-                                                    $presentstatus = true;
-                                                    break;
-                                                } elseif ($leaves->name == "Paternity Leave") {
-                                                    $data[$key][$start_date] = "PL";
-                                                    $presentstatus = true;
-                                                    break;
-                                                } elseif ($leaves->name == "Half Leave") {
-                                                    $data[$key][$start_date] = "HL";
-                                                    $presentstatus = true;
-                                                    break;
-                                                } elseif ($leaves->name == "Compensatory Leave") {
-                                                    $data[$key][$start_date] = "CompL";
-                                                    $presentstatus = true;
-                                                    break;
-                                                }
+                                        if ($leaves) {
+                                            if ($leaves->name == "Sick Leave") {
+                                                $data[$key][$start_date] = "SL";
+                                                $presentstatus = true;
+                                                break;
+                                            } elseif ($leaves->name == "Casual Leave") {
+                                                $data[$key][$start_date] = "CL";
+                                                $presentstatus = true;
+                                                break;
+                                            } elseif ($leaves->name == "Maternity Leave") {
+                                                $data[$key][$start_date] = "ML";
+                                                $presentstatus = true;
+                                                break;
+                                            } elseif ($leaves->name == "Paternity Leave") {
+                                                $data[$key][$start_date] = "PL";
+                                                $presentstatus = true;
+                                                break;
+                                            } elseif ($leaves->name == "Half Leave") {
+                                                $data[$key][$start_date] = "HL";
+                                                $presentstatus = true;
+                                                break;
+                                            } elseif ($leaves->name == "Compensatory Leave") {
+                                                $data[$key][$start_date] = "CompL";
+                                                $presentstatus = true;
+                                                break;
                                             }
                                         }
                                     }
                                 }
-                                $j++;
                             }
-
+                            $j++;
                         }
-                        if (!$presentstatus) {
-                            if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
-                                $data[$key][$start_date] = "NA";
-                            } else {
-                                $data[$key][$start_date] = "A";
-                            }
-
-                        }
-                        if ($key == 0) {
-                            $start_date = date("d-m-Y", strtotime($start_date));
-                            $start_date_heading = date("d", strtotime($start_date));
-                            $heading_array[] = $start_date_heading;
-                        }
-
-                        $start_date = date("Y-m-d", strtotime("+1 day", strtotime($start_date)));
 
                     }
+                    if (!$presentstatus) {
+                        if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
+                            $data[$key][$start_date] = "NA";
+                        } else {
+                            $data[$key][$start_date] = "A";
+                        }
 
-                    $key = $key + 1;
+                    }
+                    if ($key == 0) {
+                        $start_date = date("d-m-Y", strtotime($start_date));
+                        $start_date_heading = date("d", strtotime($start_date));
+                        $heading_array[] = $start_date_heading;
+                    }
+
+                    $start_date = date("Y-m-d", strtotime("+1 day", strtotime($start_date)));
 
                 }
+
+                $key = $key + 1;
+
+            }
 //            }
 
             $data = collect($data);
@@ -2689,7 +2706,6 @@ class AttendanceController extends Controller
 
     /**********add leave and approve from calander by reporting manager***********/
 
-
     function addLeave(Request $request){
 
         $t_date = date("Y-m-d",strtotime($request->to_date));
@@ -2941,32 +2957,9 @@ class AttendanceController extends Controller
                     $i++;
                 }
             }else{
-
                 //  when po add casual or sick leave..
                 $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
             }
-
-            //$Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-
-            // When po add paternity leave condition
-
-            /* if(!empty($request->to_date)){
-                // dd("if");
-                 $i=0;
-                 while ($request->on_date <= $t_date) {
-
-                     $rr  = Attendance::create(['user_id'=>$user_id,'on_date'=>$request->on_date,'status'=>"Leave"]);
-
-                     $from_date = date ("Y-m-d", strtotime("+1 days",$request->on_date));
-
-                     $i++;
-                 }
-             }else{
-
-                 //  when po add casual or sick leave..
-                 $Attendance_entry = Attendance::updateOrCreate(['user_id' =>  $userid, 'on_date'=>$request->on_date], ['status' => "Leave"] );
-             }*/
-
         }
 
         $probation_data = array();
@@ -2987,8 +2980,6 @@ class AttendanceController extends Controller
         $mail_data['message'] = $message;
         $this->sendGeneralMail($mail_data);
 
-        //pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
-
         //to manager
 
         $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
@@ -2998,11 +2989,6 @@ class AttendanceController extends Controller
         $mail_data['subject'] = "Leave Application Approval";
         $mail_data['message'] = $user->employee->fullname." has applied for a leave. Please took for an approval.";
         $mail_data['fullname'] = $reporting_manager_data->fullname;
-
-        //$this->sendGeneralMail($mail_data);
-
-
-        //return redirect('attendances/view?id='.$userid)->with('leave_success','Leave has been added successfully.');
 
         return redirect($request->url)->with('leave_success','Leave has been added successfully.');
 
