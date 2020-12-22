@@ -713,6 +713,14 @@ class LeaveController extends Controller
 
         $applied_leave = $leave_approval->appliedLeave;
 
+        if($request->leaveStatus == $leave_approval->leave_status){
+            if($leave_approval->leave_status == 1){
+                return back()->with('error', 'You Already Approved the leave');
+            }elseif($leave_approval->leave_status == 2){
+                return back()->with('error', 'You Already Reject the leave');
+            }
+        }
+
         $approver = User::where(['id'=>Auth::id()])->first();
 
         $leave_approval->leave_status = $request->leaveStatus;
@@ -743,6 +751,7 @@ class LeaveController extends Controller
         ];
 
         $applied_leave->messages()->create($message_data);
+
         if($leave_approval->leave_status==1){
             $applied_leave->final_status = '1';
         }else{
