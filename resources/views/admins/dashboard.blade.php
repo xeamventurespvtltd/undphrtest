@@ -777,22 +777,41 @@
         @if($status != 'Leave')
             <section>
                 <!-- Leave detail starts here -->
-                <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
-                        <div class="outer-border text-center">
-                            <h3>Attendance</h3>
-                            <button class="btn btn-danger" onclick="window.location.href='/employees/dashboard?type=checkin';" title="Click to checkin" style="cursor: pointer;" style="padding: 20px 50px;">Check In</button>
-                            <button class="btn btn-info hide" onclick="window.location.href='/employees/dashboard?type=checkout';" title="Click to checkout" style="cursor: pointer;" style="padding: 20px 50px;">Check Out</button>
+                <form method="post" action="{{ route('mark.attendance') }}">
+                    @csrf
+                    <div class="text-center">
+                        <h4>Mark Attendance Of</h4>
+                        <select name="on_date" class="form-group">
+                            <option value="2020-12-23">2020-12-23</option>
+                            <option value="2020-12-24">2020-12-24</option>
+                            <option value="2020-12-25">2020-12-25</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
+                            <div class="outer-border text-center">
+                                <h3>Attendance</h3>
+                                <button class="btn btn-danger" type="submit" name="type" value="checkin" style="cursor: pointer;">
+
+                                    Check In
+                                </button>
+
+                                {{--                            <button class="btn btn-danger" onclick="window.location.href='/employees/dashboard?type=checkin';" title="Click to checkin" style="cursor: pointer;" style="padding: 20px 50px;">Check In</button>--}}
+                                <button class="btn btn-info hide" onclick="window.location.href='/employees/dashboard?type=checkout';" title="Click to checkout" style="cursor: pointer;" style="padding: 20px 50px;">Check Out</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
+                            <div class="outer-border text-center">
+                                <h3 class="text-center">Mark Your Days Off</h3>
+                                <button class="btn btn-danger" type="submit" name="status" value="Holiday" style="cursor: pointer;">Holiday</button>
+                                <button class="btn btn-info" type="submit" name="status" value="Week-Off" style="cursor: pointer;">Week-off</button>
+
+                                {{--                            <button class="btn btn-danger" onclick="window.location.href='/attendances/change-offs-status?status=Holiday';" title="Click to add Holiday" style="cursor: pointer;" style="padding: 20px 50px;">Holiday</button>--}}
+                                {{--                            <button class="btn btn-info" onclick="window.location.href='/attendances/change-offs-status?status=Week-Off';" title="Click to add Week-Off" style="cursor: pointer;" style="padding: 20px 50px;">Week-off</button>--}}
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
-                        <div class="outer-border text-center">
-                            <h3 class="text-center">Mark Your Days Off</h3>
-                            <button class="btn btn-danger" onclick="window.location.href='/attendances/change-offs-status?status=Holiday';" title="Click to add Holiday" style="cursor: pointer;" style="padding: 20px 50px;">Holiday</button>
-                            <button class="btn btn-info" onclick="window.location.href='/attendances/change-offs-status?status=Week-Off';" title="Click to add Week-Off" style="cursor: pointer;" style="padding: 20px 50px;">Week-off</button>
-                        </div>
-                    </div>
-                </div>
+                </form>
                 <!-- Leave detail ends here -->
             </section>
         @else
@@ -812,7 +831,6 @@
 
                                 <div class="info-box-content">
                                     <span class="info-box-text">Total Leaves</span>
-
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>

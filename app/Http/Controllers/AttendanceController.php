@@ -3060,5 +3060,74 @@ class AttendanceController extends Controller
 
     }
 
+    function markAttendance(Request $request){
+
+//        return $request->on_date.'/'.date("Y-m-d");
+        $on_date = $request->on_date;
+
+        if($request->type){
+            $attendance=Attendance::where('user_id',Auth::id())
+                ->where('on_date', $on_date)
+                ->first();
+            $attendance_id=0;
+            if(isset($attendance->id)){
+                $attendance_id=$attendance->id;
+            }
+            else{
+                $obj= new Attendance;
+                $obj->on_date=$on_date;
+                $obj->user_id=Auth::id();
+                $obj->status='Present';
+                $obj->save();
+
+                $attendance_id=$obj->id;
+            }
+
+            if($request->type=='checkin'){
+                $type='Check-In';
+            }
+            elseif($request->type=='checkout'){
+                $type='Check-Out';
+            }
+            else
+                exit;
+
+
+            $obj=new AttendancePunch;
+            $obj->attendance_id=$attendance_id;
+            $obj->on_time=date('H:i:s');
+            $obj->punched_by=Auth::id();
+            $obj->type=$type;
+            $obj->save();
+
+            return redirect()->back()->withSuccess('Attendance marked successfully.');
+        }
+
+        $user_id = Auth::id();
+
+        if($request->status=='Holiday'){
+            $status='Holiday';
+            $attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
+
+            if(!empty($attendance)){
+                $attendance->update(['status'=>$status]);
+
+            }else{
+                $attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
+            }
+            return redirect()->back()->withSuccess('Holiday added successfully.');
+        }
+
+        elseif($request->status=='Week-Off'){
+            $status='Week-Off';
+            $attendance = Attendance::where(['user_id'=>$user_id,'on_date'=>$on_date])->first();
+            if(!empty($attendance)){
+                $attendance->update(['status'=>$status]);
+            }else{
+                $attendance = Attendance::create(['user_id'=>$user_id,'on_date'=>$on_date,'status'=>$status]);
+            }
+            return redirect()->back()->withSuccess('Week-Off added successfully.');
+        }
+    }
 
 }//end of class
