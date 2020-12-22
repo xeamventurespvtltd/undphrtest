@@ -781,10 +781,18 @@
                     @csrf
                     <div class="text-center">
                         <h4>Mark Attendance Of</h4>
+
+
                         <select name="on_date" class="form-group">
-                            <option value="2020-12-23">2020-12-23</option>
-                            <option value="2020-12-24">2020-12-24</option>
-                            <option value="2020-12-25">2020-12-25</option>
+                            <?php
+                            if(date('d') == 22){
+                                $todayDate = date('d') + 1;}
+                            else{
+                                $todayDate = date('d'); }
+                            for($date = $todayDate; $date <= 25; $date++){
+                                ?>
+                            <option value="2020-12-".$date>2020-12-{{ $date }}</option>
+                            @php } @endphp
                         </select>
                     </div>
                     <div class="row">
