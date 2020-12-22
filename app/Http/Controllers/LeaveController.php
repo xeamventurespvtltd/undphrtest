@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AppliedLeaveSegregation;
 use App\AttendanceVerification;
 use App\Exports\LeavePoolExport;
 use App\Imports\LeaveDetailImport;
@@ -793,6 +794,23 @@ class LeaveController extends Controller
                 Attendance::where('user_id', $applier->id)->where('status', 'Leave')
                     ->where('on_date', '>=', $applied_leave->from_date)->where('on_date', '<=', $applied_leave->to_date)->delete();
 
+                $appliedLeaveSegregation = AppliedLeaveSegregation::where('applied_leave_id', $applied_leave->id)->first();
+                $userLeavePool = LeaveDetail::where('user_id', $applier->id)->latest()->first();
+
+                if($applied_leave->leave_type_id == 1) {
+                    LeaveDetail::where('id', $userLeavePool->id)->update([
+                        'accumalated_casual_leave' => $userLeavePool->accumalated_casual_leave + $appliedLeaveSegregation->paid_count,
+                        'paid_casual' => $userLeavePool->paid_casual - $appliedLeaveSegregation->paid_count
+                    ]);
+                }
+
+                if($applied_leave->leave_type_id == 2) {
+                    LeaveDetail::where('id', $userLeavePool->id)->update([
+                        'accumalated_sick_leave' => $userLeavePool->accumalated_sick_leave + $appliedLeaveSegregation->paid_count,
+                        'paid_sick' => $userLeavePool->paid_sick - $appliedLeaveSegregation->paid_count
+
+                    ]);
+                }
 
                 $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been rejected.';
 
