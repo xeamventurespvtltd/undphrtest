@@ -790,6 +790,10 @@ class LeaveController extends Controller
             pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
         }else{
             if($leave_approval->leave_status == '2'){
+                Attendance::where('user_id', $applier->id)->where('status', 'Leave')
+                    ->where('on_date', '>=', $applied_leave->from_date)->where('on_date', '<=', $applied_leave->to_date)->delete();
+
+
                 $message = "Your applied leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).' has been rejected.';
 
                 $mail_data['subject'] = "Leave Rejected";
