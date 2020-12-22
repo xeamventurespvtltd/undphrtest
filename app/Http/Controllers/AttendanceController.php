@@ -1377,6 +1377,7 @@ class AttendanceController extends Controller
 
                     if (count($punches) != 0) {
                         $allPunches = $punches;
+
                         foreach ($allPunches as $punch) {
                             $punch = (object)$punch;
                             if(isset($punch->on_date)) {
@@ -1440,7 +1441,9 @@ class AttendanceController extends Controller
                             }
                             $j++;
                         }
+
                     }
+
                     if (!$presentstatus) {
                         if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
                             $data[$key][$start_date] = "NA";
@@ -1454,7 +1457,6 @@ class AttendanceController extends Controller
                         $start_date_heading = date("d", strtotime($start_date));
                         $heading_array[] = $start_date_heading;
                     }
-
                     $start_date = date("Y-m-d", strtotime("+1 day", strtotime($start_date)));
 
                 }
@@ -1462,8 +1464,14 @@ class AttendanceController extends Controller
                 $key = $key + 1;
 
             }
-//            }
 
+            for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
+                $heading_array[] = $i;
+            }
+
+            for($i = 1; $i < 26; $i++){
+                $heading_array[] = $i;
+            }
             $data = collect($data);
             $export = new AttendanceExport($data, $heading_array);
             return Excel::download($export, 'attendance-punch.xlsx');
