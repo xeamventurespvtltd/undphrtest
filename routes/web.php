@@ -334,6 +334,9 @@ Route::group(['prefix'=>'attendances', 'middleware'=>'App\Http\Middleware\Restri
         Route::post('change-attendance', 'AttendanceController@changeAttendance');
     });
 
+
+    Route::post('mark-attendance', 'AttendanceController@markAttendance')->name('mark.attendance');
+
     Route::get('change-offs-status', 'AttendanceController@changeAttendancOffeStatus');
     Route::post('change-status', 'AttendanceController@changeAttendanceStatus');
     Route::get('consolidated-attendance-sheets', 'AttendanceController@consolidatedAttendanceSheets');

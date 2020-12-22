@@ -523,7 +523,6 @@ class UserController extends Controller
     */
 
     function dashboard(Request $request)
-
     {
         $user_info = User::where(['id'=>Auth::id()])->first();
 
