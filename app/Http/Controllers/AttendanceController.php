@@ -1465,13 +1465,13 @@ class AttendanceController extends Controller
 
             }
 
-            for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
-                $heading_array[] = $i;
-            }
-
-            for($i = 1; $i < 26; $i++){
-                $heading_array[] = $i;
-            }
+//            for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
+//                $heading_array[] = $i;
+//            }
+//
+//            for($i = 1; $i < 26; $i++){
+//                $heading_array[] = $i;
+//            }
             $data = collect($data);
             $export = new AttendanceExport($data, $heading_array);
             return Excel::download($export, 'attendance-punch.xlsx');
