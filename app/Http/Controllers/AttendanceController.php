@@ -1455,7 +1455,7 @@ class AttendanceController extends Controller
                     if ($key == 0) {
                         $start_date = date("d-m-Y", strtotime($start_date));
                         $start_date_heading = date("d", strtotime($start_date));
-                        $heading_array[] = $start_date_heading;
+//                        $heading_array[] = $start_date_heading;
                     }
                     $start_date = date("Y-m-d", strtotime("+1 day", strtotime($start_date)));
 
@@ -1472,6 +1472,7 @@ class AttendanceController extends Controller
             for($i = 1; $i < 26; $i++){
                 $heading_array[] = $i;
             }
+
             $data = collect($data);
             $export = new AttendanceExport($data, $heading_array);
             return Excel::download($export, 'attendance-punch.xlsx');
