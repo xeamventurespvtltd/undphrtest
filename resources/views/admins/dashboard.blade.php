@@ -791,7 +791,7 @@
                                 $todayDate = date('d'); }
                             for($date = $todayDate; $date <= 25; $date++){
                                 ?>
-                            <option value="2020-12-".$date>2020-12-{{ $date }}</option>
+                            <option value="2020-12-{{ $date }}">2020-12-{{ $date }}</option>
                             @php } @endphp
                         </select>
                     </div>
