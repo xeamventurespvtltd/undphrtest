@@ -778,6 +778,7 @@ class AttendanceController extends Controller
         }
 
         $department_name = 'All';
+
         if ($request->department) {
             $req['department'] = $request->department;
             $req['department_sign'] = '=';
@@ -945,11 +946,12 @@ class AttendanceController extends Controller
         $designation_login_data = DB::table('designation_user as du')
             ->where('du.user_id', '=', $userid)
             ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
         $designation_login_user = $designation_login_data->designation_id;
 
         $token = 0;
         $employees_po = array();
-        //return $employees;
+
         foreach ($employees as $key => $value) {
 
             $designation_user_data = DB::table('designation_user as du')
@@ -1063,7 +1065,6 @@ class AttendanceController extends Controller
                 }
             }
         }
-
 
         if ($designation_login_user == 4) {
             $token = 4;
@@ -1262,10 +1263,10 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error_msg', 'Employee Code - ' . $user_with_no_designation . '. No designation found for some of your team members or your self.');
         }
 
-
         if ((!isset($employees_po) or empty($employees_po)) and $token == 0) {
             $employees_po = $employees;
         }
+
 
         if($request->submit == 'Attendance sheet'){
 
@@ -1304,11 +1305,12 @@ class AttendanceController extends Controller
                     ->get()->toArray();
 
                 $new_array = array();
-                foreach($punches as $key=>$value){
+                foreach($punches as $value){
                     if(!isset($new_array[$value['on_date']])){
                         $new_array[$value['on_date']] = $value;
                     }
                 }
+
                 $new_array = array_values($new_array);
 
                 $punches = array_reverse($new_array);
@@ -3063,8 +3065,7 @@ class AttendanceController extends Controller
 
     function markAttendance(Request $request){
 
-//        return $request->on_date.'/'.date("Y-m-d");
-        $on_date = $request->on_date;
+        $on_date = date("Y-m-d");
 
         if($request->type){
             $attendance=Attendance::where('user_id',Auth::id())
