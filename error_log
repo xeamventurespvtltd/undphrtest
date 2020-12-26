@@ -1,5 +1,12 @@
 [30-Sep-2020 06:42:43 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
 [30-Sep-2020 06:48:11 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+<<<<<<< HEAD
+[06-Nov-2020 10:10:05 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+[06-Nov-2020 10:13:13 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+[06-Nov-2020 10:13:23 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+[06-Nov-2020 10:13:24 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+[06-Nov-2020 10:13:40 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
+=======
 [07-Nov-2020 05:27:14 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
 [07-Nov-2020 05:31:17 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
 [07-Nov-2020 05:31:35 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0
@@ -10,3 +17,5 @@
 [09-Nov-2020 17:28:30 Asia/Kolkata] PHP Fatal error:  Allowed memory size of 2147483648 bytes exhausted (tried to allocate 4096 bytes) in /home/xeamventures/public_html/undphr/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Worksheet/Worksheet.php on line 1262
 [09-Nov-2020 17:35:13 Asia/Kolkata] PHP Fatal error:  Allowed memory size of 2147483648 bytes exhausted (tried to allocate 4096 bytes) in /home/xeamventures/public_html/undphr/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Worksheet/Worksheet.php on line 1262
 [09-Nov-2020 17:36:52 Asia/Kolkata] PHP Fatal error:  Allowed memory size of 2147483648 bytes exhausted (tried to allocate 4096 bytes) in /home/xeamventures/public_html/undphr/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Worksheet/Worksheet.php on line 1262
+>>>>>>> 22320bb2233cad11f0a250fe2c4994f19572de76
+[26-Dec-2020 08:46:36 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0

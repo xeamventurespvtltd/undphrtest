@@ -308,7 +308,7 @@ class LeaveController extends Controller
         $user = Auth::user();
         $userid = $user->id;
 
-         $user = User::where(['id'=>$userid])
+        $user = User::where(['id'=>$userid])
             ->with('employee')
             ->with('userManager')
             ->first();
@@ -479,15 +479,14 @@ class LeaveController extends Controller
         ];
 
 
+        // $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
 
-//         $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
-//
-//        if(!empty($already_applied_leave)){
-//            $unique_error = "You have already applied for leave on the given dates.";
-//            return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
-//        }
+        // if(!empty($already_applied_leave)){
+        //     $unique_error = "You have already applied for leave on the given dates.";
+        //     return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
+        // }
 
-        if(!empty($last_applied_leave)){
+         if(!empty($last_applied_leave)){
              $chk_existing_date = DB::table('applied_leaves')
                 ->where('from_date', '<=', $from_date)->where('to_date', '>=', $from_date)
                 ->where('user_id', $last_applied_leave->user_id)->where('final_status', '1')
@@ -498,6 +497,7 @@ class LeaveController extends Controller
                 return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
             }
         }
+
 
         if($request->leaveTypeId == '4'){  //check for maternity leave
             if($request->noDays != 180){
@@ -688,6 +688,7 @@ class LeaveController extends Controller
         $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
             ->with('user')->first();
         $mail_data['to_email'] = $reporting_manager_data->user->email;
+        //$mail_data['to_email'] = "xeam.richa@gmail.com";
         $mail_data['subject'] = "Leave Application";
         $mail_data['message'] = $user->employee->fullname." has applied for a leave. Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
         $mail_data['fullname'] = $reporting_manager_data->fullname;

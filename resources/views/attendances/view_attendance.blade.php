@@ -93,8 +93,8 @@
                         </form>
 
                         <?php
-                        $monthNames = Array("January", "February", "March", "April", "May", "June", "July",
-                            "August", "September", "October", "November", "December");
+                        $monthNames = Array('1' => "January", '2' => "February", '3' => "March", '4' => "April", '5' => "May", '6' => "June", '7' => "July",
+                            '8' => "August", '9' => "September", '10' => "October", '11' => "November", '12' => "December");
 
                         if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
                         if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
@@ -115,6 +115,9 @@
                             $next_month = 1;
                             $next_year = $cYear + 1;
                         }
+
+                        $date1 = $prev_year.'-'.$prev_month.'-'.'26';
+                        $date2 = $cYear.'-'.$cMonth.'-'.'25';
 
                         ?>
                         <hr class="attendance-hr">
@@ -158,39 +161,11 @@
 
 
                                         <div class="fc-center">
-                                            @php
-                                                $current_date = date('Y-m-d');
-
-
-
-                                                //$today_date = date('d');
-
-                                                if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
-                                                if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
-
-                                                $curr_month = $_REQUEST["month"];
-
-                                                if(date("d", strtotime($current_date))>25){
-                                                  $curr_month = $curr_month+1;
-                                                 }
-
-                                                $curr_year = $_REQUEST["year"];
-
-                                                if($curr_month==1){
-                                                $start_year= $curr_year-1;
-                                                $startmonth = 12;
-                                                }else{
-                                                $start_year= $curr_year;
-                                                $startmonth = $curr_month-1;
-                                                }
-                                                  $date1 = $start_year.'-'.$startmonth.'-'.'26';
-                                                  $date2 = $curr_year.'-'.$curr_month.'-'.'25';
-
-                                            @endphp
                                             <h2>
-                                                <?php echo $monthNames[$startmonth - 1];
+                                                <?php
+                                                echo $monthNames[$prev_month];
                                                 echo "-";
-                                                echo $monthNames[$curr_month - 1];
+                                                echo $monthNames[$cMonth];
                                                 echo " ".$cYear;
                                                 ?>
                                             </h2>
@@ -343,10 +318,10 @@
                                                                                                 @if($attendanceArray['status'] == 'Leave')
 
                                                                                                 @else
-{{--                                                                                                    @if(strtotime($date1) <= strtotime(date("Y-m-d")))--}}
-                                                                                                            @if(strtotime($date1) <= strtotime('2020-12-25'))
+                                                                                                    {{--                                                                                                    @if(strtotime($date1) <= strtotime(date("Y-m-d")))--}}
+                                                                                                    @if(strtotime($date1) <= strtotime('2020-12-25'))
 
-                                                                                                            <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
+                                                                                                        <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
                                                                                                             <!--<i class="fa fa-clock-o a-icon5"></i>-->
                                                                                                             <i class="fa fa-user-times" aria-hidden="true"></i>
                                                                                                             <span class="status-tooltiptext">Change Status</span>
