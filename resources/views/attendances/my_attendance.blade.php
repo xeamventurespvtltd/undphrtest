@@ -40,12 +40,12 @@
                         <label>Year<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                             <option value="" selected disabled>Please select Year</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                            <option value="2019">2019</option>
-                            <option value="2018">2018</option>
-                            <option value="2017">2017</option>
-                            <option value="2016">2016</option>
+                            <option value="2021" {{ $_REQUEST["year"] == 2021 ? 'selected' : ''}}>2021</option>
+                            <option value="2020" {{ $_REQUEST["year"] == 2020 ? 'selected' : ''}}>2020</option>
+                            <option value="2019" {{ $_REQUEST["year"] == 2019 ? 'selected' : ''}}>2019</option>
+                            <option value="2018" {{ $_REQUEST["year"] == 2018 ? 'selected' : ''}}>2018</option>
+                            <option value="2017" {{ $_REQUEST["year"] == 2017 ? 'selected' : ''}}>2017</option>
+                            <option value="2016" {{ $_REQUEST["year"] == 2016 ? 'selected' : ''}}>2016</option>
                         </select>
                       </div>
 
@@ -53,18 +53,18 @@
                         <label>Month<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="month" name="month">
                             <option value="" selected disabled>Please select Month</option>
-							<option value="1">Dec-Jan</option>
-                            <option value="2">Jan-Feb</option>
-                            <option value="3">Feb-March</option>
-                            <option value="4">Mar-Apr</option>
-                            <option value="5">Apr-May</option>
-                            <option value="6">May-June</option>
-                            <option value="7">June-Jul</option>
-                            <option value="8">Jul-Aug</option>
-                            <option value="9">aug-Sep</option>
-                            <option value="10">sep-Oct</option>
-                            <option value="11">Oct-Nov</option>
-                            <option value="12">Nov-Dec</option>
+							<option value="1" {{ $_REQUEST["month"] == 1 ? 'selected' : ''}}>Dec-Jan</option>
+                            <option value="2" {{ $_REQUEST["month"] == 2 ? 'selected' : ''}}>Jan-Feb</option>
+                            <option value="3" {{ $_REQUEST["month"] == 3 ? 'selected' : ''}}>Feb-March</option>
+                            <option value="4" {{ $_REQUEST["month"] == 4 ? 'selected' : ''}}>Mar-Apr</option>
+                            <option value="5" {{ $_REQUEST["month"] == 5 ? 'selected' : ''}}>Apr-May</option>
+                            <option value="6" {{ $_REQUEST["month"] == 6 ? 'selected' : ''}}>May-June</option>
+                            <option value="7" {{ $_REQUEST["month"] == 7 ? 'selected' : ''}}>June-Jul</option>
+                            <option value="8" {{ $_REQUEST["month"] == 8 ? 'selected' : ''}}>Jul-Aug</option>
+                            <option value="9" {{ $_REQUEST["month"] == 9 ? 'selected' : ''}}>aug-Sep</option>
+                            <option value="10" {{ $_REQUEST["month"] == 10 ? 'selected' : ''}}>sep-Oct</option>
+                            <option value="11" {{ $_REQUEST["month"] == 11 ? 'selected' : ''}}>Oct-Nov</option>
+                            <option value="12" {{ $_REQUEST["month"] == 12 ? 'selected' : ''}}>Nov-Dec</option>
                         </select>
                       </div>
 
@@ -78,10 +78,10 @@
               </form>
 
               <?php
-                  $monthNames = Array("January", "February", "March", "April", "May", "June", "July",
-          "August", "September", "October", "November", "December");
+              $monthNames = Array('1' => "January", '2' => "February", '3' => "March", '4' => "April", '5' => "May", '6' => "June", '7' => "July",
+                  '8' => "August", '9' => "September", '10' => "October", '11' => "November", '12' => "December");
 
-                  if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
+              if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
                   if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
 
                   $cMonth = $_REQUEST["month"];
@@ -100,6 +100,9 @@
                       $next_month = 1;
                       $next_year = $cYear + 1;
                   }
+
+              $date1 = $prev_year.'-'.$prev_month.'-'.'26';
+              $date2 = $cYear.'-'.$cMonth.'-'.'25';
 
               ?>
               <hr class="attendance-hr">
@@ -135,44 +138,18 @@
                         <a href="<?php echo url()->current() . "?month=". $prev_month . "&year=" . $prev_year; ?>"><button type="button" class="fc-prev-button fc-button fc-state-default fc-corner-left" aria-label="prev"><span class="fc-icon fc-icon-left-single-arrow"></span></button></a>
                         <a href="<?php echo url()->current() . "?month=". $next_month . "&year=" . $next_year; ?>"><button type="button" class="fc-next-button fc-button fc-state-default fc-corner-right" aria-label="next"><span class="fc-icon fc-icon-right-single-arrow"></span></button></a>
                     </div>
+
                     <!-- <button type="button" class="fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled" disabled="">today</button> -->
+
                 </div>
                 <div class="fc-center">
-                     @php
-                    $current_date = date('Y-m-d');
-
-
-
-                    //$today_date = date('d');
-
-                    if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
-                    if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
-
-                    $curr_month = $_REQUEST["month"];
-
-                    if(date("d", strtotime($current_date))>25){
-                      $curr_month = $curr_month+1;
-                     }
-
-                    $curr_year = $_REQUEST["year"];
-
-                    if($curr_month==1){
-                    $start_year= $curr_year-1;
-                    $startmonth = 12;
-                    }else{
-                    $start_year= $curr_year;
-                    $startmonth = $curr_month-1;
-                    }
-                      $date1 = $start_year.'-'.$startmonth.'-'.'26';
-                      $date2 = $curr_year.'-'.$curr_month.'-'.'25';
-
-                  @endphp
                     <h2>
-                        <?php echo $monthNames[$startmonth - 1];
-                  echo "-";
-                   echo $monthNames[$curr_month - 1];
-                 echo " ".$cYear;
-                         ?>
+                        <?php
+                            echo $monthNames[$prev_month];
+                            echo "-";
+                            echo $monthNames[$cMonth];
+                            echo " ".$cYear;
+                        ?>
                     </h2>
                 </div>
                 <div class="fc-clear"></div>
@@ -539,15 +516,17 @@ $(document).ready(function(){
 </script>
 
 <script type="text/javascript">
+
   var defYear = "{{$req['year']}}";
+
   var defMonth = "{{$req['month']}}";
 
   if(defYear != '0'){
-    $('#year').val(defYear);
+    var year = $('#year').val(defYear);
   }
 
   if(defMonth != '0'){
-    $('#month').val(defMonth);
+    var month = $('#month').val(defMonth);
   }
 
   $(".eye-tooltip").on('click',function(){

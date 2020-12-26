@@ -451,7 +451,8 @@
                         <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12 col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0">
                             <div class="box box-primary">
                             <?php
-                            $monthNames = Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+                            $monthNames = Array('1' => "January", '2' => "February", '3' => "March", '4' => "April", '5' => "May", '6' => "June", '7' => "July",
+                                '8' => "August", '9' => "September", '10' => "October", '11' => "November", '12' => "December");
 
                             if (!isset($_REQUEST["month"])) $_REQUEST["month"] = date("n");
                             if (!isset($_REQUEST["year"])) $_REQUEST["year"] = date("Y");
@@ -515,11 +516,7 @@
                                             </div>
                                             <div class="fc-center">
                                                 <h2>
-                                                     @if($cMonth == 1)
-                                                        <?php echo $monthNames[11]."-".$monthNames[$cMonth - 1]." ".$cYear; ?>
-                                                    @else
-                                                        <?php echo $monthNames[$cMonth-2]."-".$monthNames[$cMonth - 1]." ".$cYear; ?>
-                                                    @endif
+                                                        <?php echo $monthNames[$prev_month]."-".$monthNames[$cMonth]." ".$cYear; ?>
                                                 </h2>
                                             </div>
                                             <div class="fc-clear"></div>
