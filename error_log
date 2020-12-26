@@ -18,3 +18,4 @@
 [09-Nov-2020 17:35:13 Asia/Kolkata] PHP Fatal error:  Allowed memory size of 2147483648 bytes exhausted (tried to allocate 4096 bytes) in /home/xeamventures/public_html/undphr/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Worksheet/Worksheet.php on line 1262
 [09-Nov-2020 17:36:52 Asia/Kolkata] PHP Fatal error:  Allowed memory size of 2147483648 bytes exhausted (tried to allocate 4096 bytes) in /home/xeamventures/public_html/undphr/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Worksheet/Worksheet.php on line 1262
 >>>>>>> 22320bb2233cad11f0a250fe2c4994f19572de76
+[26-Dec-2020 08:46:36 UTC] PHP Warning:  Module 'json' already loaded in Unknown on line 0

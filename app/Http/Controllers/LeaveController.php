@@ -479,18 +479,18 @@ class LeaveController extends Controller
         ];
 
 
-        $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
+        // $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
 
-        if(!empty($already_applied_leave)){
-            $unique_error = "You have already applied for leave on the given dates.";
-            return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
-        }
+        // if(!empty($already_applied_leave)){
+        //     $unique_error = "You have already applied for leave on the given dates.";
+        //     return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
+        // }
 
-        if(!empty($last_applied_leave)){
-
-            $chk_existing_date = DB::table('applied_leaves')
-                ->where(['from_date' => $from_date,'user_id'=>$last_applied_leave->user_id,'isactive'=>1])
-                ->first();
+         if(!empty($last_applied_leave)){
+             $chk_existing_date = DB::table('applied_leaves')
+                ->where('from_date', '<=', $from_date)->where('to_date', '>=', $from_date)
+                ->where('user_id', $last_applied_leave->user_id)->where('final_status', '1')
+                ->where('isactive', 1)->first();
 
             if(!empty($chk_existing_date)){
                 $unique_error = "You have already applied for leave on given date.";

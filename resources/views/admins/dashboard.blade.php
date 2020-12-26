@@ -514,7 +514,13 @@
                                                 <!-- <button type="button" class="fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled" disabled="">today</button> -->
                                             </div>
                                             <div class="fc-center">
-                                                <h2><?php echo $monthNames[$cMonth-2]."-".$monthNames[$cMonth-1]." ".$cYear; ?></h2>
+                                                <h2>
+                                                     @if($cMonth == 1)
+                                                        <?php echo $monthNames[11]."-".$monthNames[$cMonth - 1]." ".$cYear; ?>
+                                                    @else
+                                                        <?php echo $monthNames[$cMonth-2]."-".$monthNames[$cMonth - 1]." ".$cYear; ?>
+                                                    @endif
+                                                </h2>
                                             </div>
                                             <div class="fc-clear"></div>
                                         </div>
@@ -779,22 +785,6 @@
                 <!-- Leave detail starts here -->
                 <form method="post" action="{{ route('mark.attendance') }}">
                     @csrf
-                    <div class="text-center">
-                        <h4>Mark Attendance Of</h4>
-
-
-                        <select name="on_date" class="form-group">
-                            <?php
-                            if(date('d') == 22){
-                                $todayDate = date('d') + 1;}
-                            else{
-                                $todayDate = date('d'); }
-                            for($date = $todayDate; $date <= 25; $date++){
-                                ?>
-                            <option value="2020-12-{{ $date }}">2020-12-{{ $date }}</option>
-                            @php } @endphp
-                        </select>
-                    </div>
                     <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-6 any-col-470">
                             <div class="outer-border text-center">

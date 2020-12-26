@@ -1287,8 +1287,8 @@ class AttendanceController extends Controller
                 $last_month = $req['month']-1;
             }
 
+// return $employees_po;
             foreach($employees_po as $emp) {
-
 
                 $user = $emp->user_id;
                 $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
@@ -1304,11 +1304,12 @@ class AttendanceController extends Controller
                     ->get()->toArray();
 
                 $new_array = array();
-                foreach($punches as $key=>$value){
+                foreach($punches as $value){
                     if(!isset($new_array[$value['on_date']])){
                         $new_array[$value['on_date']] = $value;
                     }
                 }
+                
                 $new_array = array_values($new_array);
 
                 $punches = array_reverse($new_array);
@@ -1368,6 +1369,7 @@ class AttendanceController extends Controller
 
                 $data[$key]['Verified'] = $verify_status;
                 $data[$key]['Month'] = $prev_month . "-" . $month;
+
 
 
                 while (strtotime($start_date) <= strtotime($end_month)) {
@@ -1443,6 +1445,7 @@ class AttendanceController extends Controller
                         }
 
                     }
+                    
 
                     if (!$presentstatus) {
                         if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
@@ -1465,6 +1468,8 @@ class AttendanceController extends Controller
 
             }
 
+            
+
             for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
                 $heading_array[] = $i;
             }
@@ -1472,7 +1477,6 @@ class AttendanceController extends Controller
             for($i = 1; $i < 26; $i++){
                 $heading_array[] = $i;
             }
-
             $data = collect($data);
             $export = new AttendanceExport($data, $heading_array);
             return Excel::download($export, 'attendance-punch.xlsx');
@@ -3063,8 +3067,7 @@ class AttendanceController extends Controller
 
     function markAttendance(Request $request){
 
-//        return $request->on_date.'/'.date("Y-m-d");
-        $on_date = $request->on_date;
+        $on_date = date("Y-m-d");
 
         if($request->type){
             $attendance=Attendance::where('user_id',Auth::id())

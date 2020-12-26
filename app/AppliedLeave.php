@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AppliedLeave extends Model
 {
     protected $guarded = [];
-
+    //user funciton
     function user()
     {
     	return $this->belongsTo('App\User');

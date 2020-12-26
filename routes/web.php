@@ -6,6 +6,8 @@ use App\SalarySlip;
 use App\User;
 use Illuminate\Http\Request;
 
+
+
 Route::get('update-salary-slip', function(){
     $salarySlips = SalarySlip::whereNUll('user_id')->get();
     $salarySlipIds = [];
