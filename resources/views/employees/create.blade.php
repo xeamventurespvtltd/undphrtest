@@ -116,7 +116,8 @@
                                         <div class="form-group">
                                             <label for="employeeName" class="col-md-2 control-label basic-detail-label">Employee Name<span style="color: red">*</span></label>
                                             <div class="col-md-1 salu-change">
-                                                <select class="form-control input-sm basic-detail-input-style" name="salutation">
+                                                <select class="form-control input-sm basic-detail-input-style" name="salutation" required>
+                                                    <option ></option>
                                                     <option value="Mr.">Mr.</option>
                                                     <option value="Ms.">Ms.</option>
                                                     <option value="Mrs.">Mrs.</option>
