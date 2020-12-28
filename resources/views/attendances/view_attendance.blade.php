@@ -243,7 +243,6 @@
                                                                             $startday = $thismonth['wday'];
 
 
-
                                                                             $allowAttendanceVerification = 1;
                                                                             $j=array();
                                                                             $i=0;
