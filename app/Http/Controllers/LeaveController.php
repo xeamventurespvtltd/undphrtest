@@ -687,6 +687,7 @@ class LeaveController extends Controller
 
         $reporting_manager_data = Employee::where(['user_id'=>$reporting_manager])
             ->with('user')->first();
+
         $mail_data['to_email'] = $reporting_manager_data->user->email;
         //$mail_data['to_email'] = "xeam.richa@gmail.com";
         $mail_data['subject'] = "Leave Application";
@@ -830,6 +831,7 @@ class LeaveController extends Controller
                 pushNotification($applier->id, $mail_data['subject'], $mail_data['message']);
             }
         }
+
         return redirect("leaves/approve-leaves");
 
     }//end of function
