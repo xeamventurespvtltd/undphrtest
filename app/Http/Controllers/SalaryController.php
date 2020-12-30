@@ -55,9 +55,9 @@ class SalaryController extends Controller
                 if(count($data)){
                     foreach($data[0] as $record){
 
-                        //$user_data = Employee::where("employee_id", $record['emp_code'])->first();
+                        $user_data = Employee::where("employee_id", $record['emp_code'])->first();
 
-                        $user_data = User::where("employee_code", $record['emp_code'])->first();
+//                        $user_data = User::where("employee_code", $record['emp_code'])->first();
 
                         if(isset($user_data)) {
                             if (SalarySlip::where(['salary_month' => $record['salary_month'], 'salary_year' => $record['salary_year'], 'emp_code' => $record['emp_code']])->count()) {//update
