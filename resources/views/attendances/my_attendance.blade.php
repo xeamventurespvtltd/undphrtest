@@ -40,12 +40,12 @@
                         <label>Year<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                             <option value="" selected disabled>Please select Year</option>
-                            <option value="2021" {{ $_REQUEST["year"] == 2021 ? 'selected' : ''}}>2021</option>
-                            <option value="2020" {{ $_REQUEST["year"] == 2020 ? 'selected' : ''}}>2020</option>
-                            <option value="2019" {{ $_REQUEST["year"] == 2019 ? 'selected' : ''}}>2019</option>
-                            <option value="2018" {{ $_REQUEST["year"] == 2018 ? 'selected' : ''}}>2018</option>
-                            <option value="2017" {{ $_REQUEST["year"] == 2017 ? 'selected' : ''}}>2017</option>
-                            <option value="2016" {{ $_REQUEST["year"] == 2016 ? 'selected' : ''}}>2016</option>
+                            <option value="2021" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2021) ? 'selected' : ''}}>2021</option>
+                            <option value="2020" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2020) ? 'selected' : ''}}>2020</option>
+                            <option value="2019" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2019) ? 'selected' : ''}}>2019</option>
+                            <option value="2018" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2018) ? 'selected' : ''}}>2018</option>
+                            <option value="2017" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2017) ? 'selected' : ''}}>2017</option>
+                            <option value="2016" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2016) ? 'selected' : ''}}>2016</option>
                         </select>
                       </div>
 
@@ -53,18 +53,18 @@
                         <label>Month<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="month" name="month">
                             <option value="" selected disabled>Please select Month</option>
-							<option value="1" {{ $_REQUEST["month"] == 1 ? 'selected' : ''}}>Dec-Jan</option>
-                            <option value="2" {{ $_REQUEST["month"] == 2 ? 'selected' : ''}}>Jan-Feb</option>
-                            <option value="3" {{ $_REQUEST["month"] == 3 ? 'selected' : ''}}>Feb-March</option>
-                            <option value="4" {{ $_REQUEST["month"] == 4 ? 'selected' : ''}}>Mar-Apr</option>
-                            <option value="5" {{ $_REQUEST["month"] == 5 ? 'selected' : ''}}>Apr-May</option>
-                            <option value="6" {{ $_REQUEST["month"] == 6 ? 'selected' : ''}}>May-June</option>
-                            <option value="7" {{ $_REQUEST["month"] == 7 ? 'selected' : ''}}>June-Jul</option>
-                            <option value="8" {{ $_REQUEST["month"] == 8 ? 'selected' : ''}}>Jul-Aug</option>
-                            <option value="9" {{ $_REQUEST["month"] == 9 ? 'selected' : ''}}>aug-Sep</option>
-                            <option value="10" {{ $_REQUEST["month"] == 10 ? 'selected' : ''}}>sep-Oct</option>
-                            <option value="11" {{ $_REQUEST["month"] == 11 ? 'selected' : ''}}>Oct-Nov</option>
-                            <option value="12" {{ $_REQUEST["month"] == 12 ? 'selected' : ''}}>Nov-Dec</option>
+							<option value="1" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 1) ? 'selected' : ''}}>Dec-Jan</option>
+                            <option value="2" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 2) ? 'selected' : ''}}>Jan-Feb</option>
+                            <option value="3" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 3) ? 'selected' : ''}}>Feb-March</option>
+                            <option value="4" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 4) ? 'selected' : ''}}>Mar-Apr</option>
+                            <option value="5" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 5) ? 'selected' : ''}}>Apr-May</option>
+                            <option value="6" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 6) ? 'selected' : ''}}>May-June</option>
+                            <option value="7" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 7) ? 'selected' : ''}}>June-Jul</option>
+                            <option value="8" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 8) ? 'selected' : ''}}>Jul-Aug</option>
+                            <option value="9" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 9) ? 'selected' : ''}}>aug-Sep</option>
+                            <option value="10" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 10) ? 'selected' : ''}}>sep-Oct</option>
+                            <option value="11" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 11) ? 'selected' : ''}}>Oct-Nov</option>
+                            <option value="12" {{ (isset($_REQUEST["year"]) && $_REQUEST["month"] == 12) ? 'selected' : ''}}>Nov-Dec</option>
                         </select>
                       </div>
 
