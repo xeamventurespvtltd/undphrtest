@@ -727,18 +727,19 @@ class LeaveController extends Controller
         $leave_approval->leave_status = $request->leaveStatus;
 
         $currentYear = date('Y');
+        $year = $currentYear;
         $lastMonth = date('m', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
-//        if($currentYear != 2020 AND $lastMonth = 10) {
+        if($lastMonth == 12){
+            $year = $year - 1;
+        }
             $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
-                ->whereYear('on_date', $currentYear)->whereMonth('on_date', $lastMonth)
+                ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
                 ->first();
             if(!isset($lastMonthAttendanceVerification)){
                 $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
                 return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
             }
-//        }
-
         // Comment By Hitesh
         $leave_approval->save();
         $applier = $leave_approval->user;
