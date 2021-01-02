@@ -729,7 +729,7 @@ class LeaveController extends Controller
         $currentYear = date('Y');
         $lastMonth = date('m', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
-        if($currentYear != 2020 AND $lastMonth = 10) {
+//        if($currentYear != 2020 AND $lastMonth = 10) {
             $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
                 ->whereYear('on_date', $currentYear)->whereMonth('on_date', $lastMonth)
                 ->first();
@@ -737,7 +737,7 @@ class LeaveController extends Controller
                 $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
                 return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
             }
-        }
+//        }
 
         // Comment By Hitesh
         $leave_approval->save();
