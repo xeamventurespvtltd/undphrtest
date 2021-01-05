@@ -53,19 +53,39 @@ class SalaryController extends Controller
                 $data = Excel::toArray(new SalarySheetImport,request()->file('salary_file'));
 
                 if(count($data)){
-                    foreach($data[0] as $record){
+                    foreach($data[0] as $record) {
+                        if ($record['emp_code'] == 29338) {
+                            $user_data = Employee::where("employee_id", $record['emp_code'])->first();
 
-                        $user_data = Employee::where("employee_id", $record['emp_code'])->first();
-
-                        if(isset($user_data)) {
-                            if (SalarySlip::where(['salary_month' => $record['salary_month'], 'salary_year' => $record['salary_year'], 'emp_code' => $record['emp_code']])->count()) {//update
-                                SalarySlip::where([
-                                    'salary_month' => $record['salary_month'],
-                                    'salary_year' => $record['salary_year'],
-                                    'emp_code' => $record['emp_code']
-                                ])
-                                    ->update([
-                                        'user_id' => $user_data['id'],
+                            if (isset($user_data)) {
+                                if (SalarySlip::where(['salary_month' => $record['salary_month'], 'salary_year' => $record['salary_year'], 'emp_code' => $record['emp_code']])->count()) {//update
+                                    SalarySlip::where([
+                                        'salary_month' => $record['salary_month'],
+                                        'salary_year' => $record['salary_year'],
+                                        'emp_code' => $record['emp_code']
+                                    ])
+                                        ->update([
+                                            'user_id' => $user_data['user_id'],
+                                            'emp_name' => $record['emp_name'],
+                                            'present_days' => $record['present_days'],
+                                            'pf_no' => $record['pf_no'],
+                                            'pay_days' => $record['pay_days'],
+                                            'esi_no' => $record['esi_no'],
+                                            'uan' => $record['uan'],
+                                            'net_pay' => $record['net_pay'],
+                                            'salary_year' => $record['salary_year'],
+                                            'basic_rate' => $record['basic_rate'],
+                                            'ta_rate' => $record['ta_rate'],
+                                            'basic_amount' => $record['basic_amount'],
+                                            'ta_amount' => $record['ta_amount'],
+                                            'deduction_amount1' => $record['tds_deduction_amount1']
+                                        ]);
+                                } else {//insert
+                                    SalarySlip::create([
+                                        'salary_month' => $record['salary_month'],
+                                        'salary_year' => $record['salary_year'],
+                                        'emp_code' => $record['emp_code'],
+                                        'user_id' => $user_data['user_id'],
                                         'emp_name' => $record['emp_name'],
                                         'present_days' => $record['present_days'],
                                         'pf_no' => $record['pf_no'],
@@ -80,26 +100,7 @@ class SalaryController extends Controller
                                         'ta_amount' => $record['ta_amount'],
                                         'deduction_amount1' => $record['tds_deduction_amount1']
                                     ]);
-                            } else {//insert
-                                SalarySlip::create([
-                                    'salary_month' => $record['salary_month'],
-                                    'salary_year' => $record['salary_year'],
-                                    'emp_code' => $record['emp_code'],
-                                    'user_id' => $user_data['id'],
-                                    'emp_name' => $record['emp_name'],
-                                    'present_days' => $record['present_days'],
-                                    'pf_no' => $record['pf_no'],
-                                    'pay_days' => $record['pay_days'],
-                                    'esi_no' => $record['esi_no'],
-                                    'uan' => $record['uan'],
-                                    'net_pay' => $record['net_pay'],
-                                    'salary_year' => $record['salary_year'],
-                                    'basic_rate' => $record['basic_rate'],
-                                    'ta_rate' => $record['ta_rate'],
-                                    'basic_amount' => $record['basic_amount'],
-                                    'ta_amount' => $record['ta_amount'],
-                                    'deduction_amount1' => $record['tds_deduction_amount1']
-                                ]);
+                                }
                             }
                         }
                     }
