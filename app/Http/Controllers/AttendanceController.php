@@ -223,9 +223,9 @@ class AttendanceController extends Controller
             ->where('du.user_id','=',$user->id)
 
             ->select('du.id', 'du.user_id','du.designation_id')->first();
+
         $user_designation = $user_designation_data->designation_id;
         $user->user_designation = $user_designation;
-        //return $user;
 
 
         $req['year'] = 0;
@@ -949,7 +949,7 @@ class AttendanceController extends Controller
 
         $token = 0;
         $employees_po = array();
-        //return $employees;
+
         foreach ($employees as $key => $value) {
 
             $designation_user_data = DB::table('designation_user as du')
@@ -1287,7 +1287,6 @@ class AttendanceController extends Controller
                 $last_month = $req['month']-1;
             }
 
-// return $employees_po;
             foreach($employees_po as $emp) {
 
                 $user = $emp->user_id;
@@ -1309,7 +1308,7 @@ class AttendanceController extends Controller
                         $new_array[$value['on_date']] = $value;
                     }
                 }
-                
+
                 $new_array = array_values($new_array);
 
                 $punches = array_reverse($new_array);
@@ -1445,7 +1444,7 @@ class AttendanceController extends Controller
                         }
 
                     }
-                    
+
 
                     if (!$presentstatus) {
                         if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
@@ -1468,7 +1467,7 @@ class AttendanceController extends Controller
 
             }
 
-            
+
 
             for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
                 $heading_array[] = $i;

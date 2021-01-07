@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeaveDetail extends Model
 {
+//    Protected $table = 'leave_pools';
     protected $guarded = [];
 
     function user()
@@ -13,5 +14,5 @@ class LeaveDetail extends Model
     	return $this->belongsTo('App\User');
     }
 
-  
+
 }

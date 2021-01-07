@@ -486,8 +486,8 @@ class LeaveController extends Controller
         //     return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
         // }
 
-         if(!empty($last_applied_leave)){
-             $chk_existing_date = DB::table('applied_leaves')
+        if(!empty($last_applied_leave)){
+            $chk_existing_date = DB::table('applied_leaves')
                 ->where('from_date', '<=', $from_date)->where('to_date', '>=', $from_date)
                 ->where('user_id', $last_applied_leave->user_id)->where('final_status', '1')
                 ->where('isactive', 1)->first();
@@ -733,13 +733,14 @@ class LeaveController extends Controller
         if($lastMonth == 12){
             $year = $year - 1;
         }
-            $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
-                ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
-                ->first();
-            if(!isset($lastMonthAttendanceVerification)){
-                $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
-                return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
-            }
+        $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+            ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
+            ->first();
+        if(!isset($lastMonthAttendanceVerification)){
+            $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
+            return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
+        }
+
         // Comment By Hitesh
         $leave_approval->save();
         $applier = $leave_approval->user;
@@ -1151,20 +1152,18 @@ class LeaveController extends Controller
 
     public function uploadLeavePool(Request $request)
     {
-//        return "Dg";
         $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
 
         $count = 0;
         if (count($data)) {
             foreach ($data[0] as $key => $record) {
-//                return $record;
                 $empCode = $record['empcode'];
-                $accumulatedCl = $record['actual_balance_cl_sept_oct_20'];
+                $accumulatedCl = $record['actual_balance_cl_nov_dec_20'];
                 $accumulatedSl = $record['sick_leave'];
 
-//                if($key != 0) {
                 if($empCode != ''){
                     $user = User::where("employee_code", $empCode)->with('designation')->first();
+
                     if(isset($user->designation[0])) {
                         $designation = $user->designation[0]->id;
                     }
@@ -1181,132 +1180,159 @@ class LeaveController extends Controller
 
                     if (isset($user)) {
 
-                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')
-                            ->whereMonth('month_info', '10')->first();
+                        $leaveDetail = DB::table('leave_pools')->where('user_id', $user->id)->whereYear('month_info', '2021')
+                            ->whereMonth('month_info', '01')->first();
 
                         if ($leaveDetail != '') {
                             $userOctLeavePoolUpdate[] = $user->employee_code;
-//                            return $leaveDetail->id;
-                            LeaveDetail::where('id', $leaveDetail->id)->update([
+                            DB::table('leave_pools')->where('id', $leaveDetail->id)->update([
                                 'accumalated_casual_leave' => $accumulatedCl,
                                 'accumalated_sick_leave' => $accumulatedSl,
                             ]);
                         }else{
 
-                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
-
-                            if($designation==4){    // for vccm
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
-                                $balance_sick_leave = $accumulatedSl;
-                            }elseif ($designation==3 || $designation==5) {  // for PO
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
-                                $balance_sick_leave = $accumulatedSl;
-
-                            }elseif ($designation==2){    // for SPO
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-                                $balance_sick_leave = $accumulatedSl;
-                            }
-                            if ($designation != 6 ) {    // for TO
-
-                                $approval_data = [
+                            $previousMonthLeaveDetail = DB::table('leave_pools')->where('user_id', $user->id)->whereYear('month_info', '2020')
+                                ->whereMonth('month_info', '12')->OrderBy('id', 'DESC')->first();
+//                            dd($previousMonthLeaveDetail);
+                            if(isset($previousMonthLeaveDetail)) {
+                                DB::table('leave_pools')->insert([
                                     'user_id' => $user->id,
-                                    'month_info' => '2020-10-26',
-                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
-                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
-                                    'balance_casual_leave' => isset($balance_casual_leave) ?
-                                        $balance_casual_leave : 0,
-                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
-                                    'balance_maternity_leave' => '180',
-                                    'balance_paternity_leave' => '15',
+                                    'month_info' => '2021-01-26',
+                                    'accumalated_casual_leave' => $accumulatedCl,
+                                    'accumalated_sick_leave' => $accumulatedSl,
+                                    'balance_casual_leave' => $previousMonthLeaveDetail->balance_casual_leave,
+                                    'balance_sick_leave' => $previousMonthLeaveDetail->balance_sick_leave,
+                                    'balance_maternity_leave' => $previousMonthLeaveDetail->balance_maternity_leave,
+                                    'balance_paternity_leave' => $previousMonthLeaveDetail->balance_maternity_leave,
                                     'unpaid_casual' => 0,
                                     'paid_casual' => 0,
                                     'unpaid_sick' => 0,
                                     'paid_sick' => 0,
                                     'compensatory_count' => 0,
                                     'isactive' => 1
-                                ];
-                                LeaveDetail::create($approval_data);
-                                $userOctLeavePoolCreate[] = $user->employee_code;
+                                ]);
                             }
+//                            DB::table('leave_pools')->store($approval_data);
+
+//                                $userNovLeavePoolCreate[] = $user->employee_code;
+//                            LeaveDetail::where('id', $leaveDetail->id)->create([
+//                                'accumalated_casual_leave' => $accumulatedCl,
+//                                'accumalated_sick_leave' => $accumulatedSl,
+//                            ]);
+//                            if($designation==4){    // for vccm
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+//                                $balance_sick_leave = $accumulatedSl;
+//                            }elseif ($designation==3 || $designation==5) {  // for PO
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+//                                $balance_sick_leave = $accumulatedSl;
+//
+//                            }elseif ($designation==2){    // for SPO
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+//                                $balance_sick_leave = $accumulatedSl;
+//                            }
+//                            if ($designation != 6 ) {    // for TO
+//
+//                                $approval_data = [
+//                                    'user_id' => $user->id,
+//                                    'month_info' => '2020-10-26',
+//                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+//                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+//                                    'balance_casual_leave' => isset($balance_casual_leave) ?
+//                                        $balance_casual_leave : 0,
+//                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
+//                                    'balance_maternity_leave' => '180',
+//                                    'balance_paternity_leave' => '15',
+//                                    'unpaid_casual' => 0,
+//                                    'paid_casual' => 0,
+//                                    'unpaid_sick' => 0,
+//                                    'paid_sick' => 0,
+//                                    'compensatory_count' => 0,
+//                                    'isactive' => 1
+//                                ];
+//                                LeaveDetail::create($approval_data);
+//                                $userOctLeavePoolCreate[] = $user->employee_code;
+//                            }
 
                         }
 
 
-                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
-                        if ($leaveDetail != '') {
-                            if($designation==4){    // for vccm
-//                                return $accumulatedCl;
-                                $accumlated_casual = $accumulatedCl + 1.5;
-                                $accumlated_sick = $accumulatedSl;
-                            }elseif ($designation==3 || $designation==5) {  // for PO
-                                $accumlated_casual = $accumulatedCl + 2;
-                                $accumlated_sick = $accumulatedSl;
-                            }elseif ($designation==2){    // for SPO
-                                $accumlated_casual = $accumulatedCl;
-                                $accumlated_sick = $accumulatedSl;
-                            }
-
-                            LeaveDetail::where('id', $leaveDetail->id)->update([
-                                'accumalated_casual_leave' => $accumlated_casual,
-                                'accumalated_sick_leave' => $accumlated_sick,
-                            ]);
-
-                            $userNovLeavePoolUpdate[] = $user->employee_code;
-
-                        }else{
-                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
-
-                            if($designation==4){    // for vccm
-                                $accumlated_casual = $accumulatedCl + 1.5;
-                                $accumlated_sick = $accumulatedSl;
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
-                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
-                            }elseif ($designation==3 || $designation==5) {  // for PO
-                                $accumlated_casual = $accumulatedCl + 2;
-                                $accumlated_sick = $accumulatedSl;
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
-                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
-
-                            }elseif ($designation==2){    // for SPO
-                                $accumlated_casual = $accumulatedCl;
-                                $accumlated_sick = $accumulatedSl;
-                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-                                $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
-
-                            }
-                            if ($designation!=6) {    // for TO
-                                $approval_data = [
-                                    'user_id' => $user->id,
-                                    'month_info' => '2020-11-26',
-                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
-                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
-                                    'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
-                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
-                                    'balance_maternity_leave' => '180',
-                                    'balance_paternity_leave' => '15',
-                                    'unpaid_casual' => 0,
-                                    'paid_casual' => 0,
-                                    'unpaid_sick' => 0,
-                                    'paid_sick' => 0,
-                                    'compensatory_count' => 0,
-                                    'isactive' => 1
-                                ];
-                                LeaveDetail::create($approval_data);
-
-                                $userNovLeavePoolCreate[] = $user->employee_code;
-                            }
-                        }
+//                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
+//                        if ($leaveDetail != '') {
+//                            if($designation==4){    // for vccm
+////                                return $accumulatedCl;
+//                                $accumlated_casual = $accumulatedCl + 1.5;
+//                                $accumlated_sick = $accumulatedSl;
+//                            }elseif ($designation==3 || $designation==5) {  // for PO
+//                                $accumlated_casual = $accumulatedCl + 2;
+//                                $accumlated_sick = $accumulatedSl;
+//                            }elseif ($designation==2){    // for SPO
+//                                $accumlated_casual = $accumulatedCl;
+//                                $accumlated_sick = $accumulatedSl;
+//                            }
+//
+//                            LeaveDetail::where('id', $leaveDetail->id)->update([
+//                                'accumalated_casual_leave' => $accumlated_casual,
+//                                'accumalated_sick_leave' => $accumlated_sick,
+//                            ]);
+//
+//                            $userNovLeavePoolUpdate[] = $user->employee_code;
+//
+//                        }else{
+//                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+//
+//                            if($designation==4){    // for vccm
+//                                $accumlated_casual = $accumulatedCl + 1.5;
+//                                $accumlated_sick = $accumulatedSl;
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+//                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
+//                            }elseif ($designation==3 || $designation==5) {  // for PO
+//                                $accumlated_casual = $accumulatedCl + 2;
+//                                $accumlated_sick = $accumulatedSl;
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+//                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
+//
+//                            }elseif ($designation==2){    // for SPO
+//                                $accumlated_casual = $accumulatedCl;
+//                                $accumlated_sick = $accumulatedSl;
+//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+//                                $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
+//
+//                            }
+//                            if ($designation!=6) {    // for TO
+//                                $approval_data = [
+//                                    'user_id' => $user->id,
+//                                    'month_info' => '2020-11-26',
+//                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+//                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+//                                    'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
+//                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
+//                                    'balance_maternity_leave' => '180',
+//                                    'balance_paternity_leave' => '15',
+//                                    'unpaid_casual' => 0,
+//                                    'paid_casual' => 0,
+//                                    'unpaid_sick' => 0,
+//                                    'paid_sick' => 0,
+//                                    'compensatory_count' => 0,
+//                                    'isactive' => 1
+//                                ];
+//                                LeaveDetail::create($approval_data);
+//
+//                                $userNovLeavePoolCreate[] = $user->employee_code;
+//                            }
+//                        }
                     }else{
                         $userNotExist[] = $empCode;
                     }
                 }
             }
         }
+
         if(isset($userNotExist)) {
             echo "User Not Exist" . '=>' . ' ';
             print_r($userNotExist);
             echo "<br/>";
         }
+
         if(isset($userOctLeavePoolUpdate)) {
             echo "User Oct Leave Pool Update" . '=>'. ' ';
             print_r($userOctLeavePoolUpdate);
@@ -1317,6 +1343,7 @@ class LeaveController extends Controller
             print_r($userOctLeavePoolCreate);
             echo "<br/>";
         }
+
         if(isset($userNovLeavePoolUpdate)) {
             echo "User Nov Leave Pool Update" . '=>' . ' ';
             print_r($userNovLeavePoolUpdate);
@@ -1362,5 +1389,325 @@ class LeaveController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download($export, 'CG_oct_nov_leave_pool.xlsx');
     }
 
+    public function allLeavePool(Request $request){
+
+        if($request->year == NULL) {
+            $year = date('Y');
+            $month = date('m');
+        }else{
+            $year = $request->year;
+            $month = $request->month;
+        }
+
+
+        $userid = Auth::user()->id;
+        $employees = DB::table('projects as p')
+            ->join('project_user as pu', 'p.id', '=', 'pu.project_id')
+            ->join('employee_profiles as ep', 'ep.user_id', '=', 'pu.user_id')
+            ->join('employees as e', 'ep.user_id', '=', 'e.user_id')
+            ->join('users as u', 'ep.user_id', '=', 'u.id')
+            ->where('e.user_id', '!=', 1)
+            ->where(['pu.isactive' => 1, 'p.isactive' => 1, 'p.approval_status' => '1', 'e.approval_status' => '1']);
+
+        $employees = $employees->select('ep.user_id', 'e.fullname', 'e.employee_id', 'u.employee_code', 'e.joining_date', 'ep.state_id')->get();
+
+        $designation_login_data = DB::table('designation_user as du')
+            ->where('du.user_id', '=', $userid)
+            ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+        $designation_login_user = $designation_login_data->designation_id;
+
+        $token = 0;
+        $employees_po = array();
+
+        foreach ($employees as $key => $value) {
+
+            $designation_user_data = DB::table('designation_user as du')
+                ->where('du.user_id', '=', $value->user_id)
+                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+            if ($designation_user_data) {
+                $designation_user = $designation_user_data->designation_id;
+                $employees[$key]->designation_id = $designation_user;
+
+                $district_listed_user = DB::table('location_user as lu')
+                    ->where('lu.user_id', '=', $designation_user_data->user_id)
+                    ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
+            }
+
+
+            if (!empty($district_listed_user) and $district_listed_user->location_id) {
+                $listed_user_district_id = $district_listed_user->location_id;
+                $employees[$key]->district_id = $listed_user_district_id;
+            } else {
+                $employees[$key]->district_id = "";
+            }
+
+
+            $state_listed_user = EmployeeProfile::where(['user_id' => $value->user_id])
+                ->first();
+
+            $listed_user_state_id = $state_listed_user->state_id;
+            $employees[$key]->state_id = $listed_user_state_id;
+        }
+
+        //check for district if po
+        if ($designation_login_user == 5) {
+            $token = 5;
+            $district_login_user = DB::table('location_user as lu')
+                ->where('lu.user_id', '=', $designation_login_data->user_id)
+                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+
+            $login_user_district_id = array();
+            foreach ($district_login_user as $district) {
+                if (!empty($district) and $district->location_id) {
+                    $login_user_district_id[] = $district->location_id;
+                } else {
+                    $login_user_district_id[] = "";
+                }
+
+            }
+            $choose_desg_id = 4;
+            $i = 0;
+            foreach ($employees as $employee) {
+
+                if (isset($employee->designation_id)) {
+
+                    if ($employee->designation_id == $choose_desg_id) {
+                        foreach ($login_user_district_id as $district_id) {
+                            if ($employee->district_id == $district_id) {
+                                $employees_po[$i] = $employee;
+                                $i++;
+                                break;
+                            }
+                        }
+                    }
+
+                } else {
+                    $user_with_no_designation = $employee->employee_id;
+                    $has_no_designation = 1;
+                    break;
+                }
+
+            }
+        }
+
+        if ($designation_login_user == 3) {
+
+            $token = 3;
+            $district_login_user = DB::table('location_user as lu')
+                ->where('lu.user_id', '=', $designation_login_data->user_id)
+                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+
+            $login_user_district_id = array();
+            foreach ($district_login_user as $district) {
+                if (!empty($district) and $district->location_id) {
+                    $login_user_district_id[] = $district->location_id;
+                } else {
+                    $login_user_district_id[] = "";
+                }
+            }
+
+            $i = 0;
+            $choose_desg_id = 4;
+
+            foreach ($employees as $employee) {
+
+                if ($employee->designation_id == $choose_desg_id) {
+                    foreach ($login_user_district_id as $district_id) {
+                        if ($employee->district_id == $district_id) {
+                            $employees_po[$i] = $employee;
+                            $i++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if ($designation_login_user == 4) {
+            $token = 4;
+            $employees_po = array();
+        }
+
+        if ($designation_login_user == 1) {
+            $token++;
+            $i = 0;
+
+            foreach ($employees as $emp) {
+                if (isset($emp->designation_id) and ($emp->designation_id != "")) {
+
+
+                    if ($emp->designation_id == 2) { //spo
+                        $empDesg_NPA = DB::table('designation_user as du')
+                            ->where('du.designation_id', '=', 1)
+                            ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+                        if ($empDesg_NPA != "") {
+
+                            $u_id = $empDesg_NPA->user_id;
+
+                            $emp_data = Employee::where(['user_id' => $u_id])
+                                ->first();
+                            $emp->reporting_head = $emp_data->fullname;
+
+                            $user_data = User::where(['id' => $u_id])
+                                ->first();
+                            $emp->reporting_head_uId = $user_data->employee_code;
+
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 3) { //po-op
+
+                        $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                            ->first();
+
+                        $user_state_id = $User_state->state_id;
+                        $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                            ->get();
+
+                        foreach ($employees_under_states as $employees_state) {
+                            $employeeId_under_state = $employees_state->user_id;
+                            $empDesg_under_state = DB::table('designation_user as du')
+                                ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                            if ($empDesg_under_state != "") {
+
+                                $arr_underlaying_emp[] = $empDesg_under_state;
+
+                                $u_id = $empDesg_under_state->user_id;
+
+                                $emp_data = Employee::where(['user_id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head = $emp_data->fullname;
+
+                                $user_data = User::where(['id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head_uId = $user_data->employee_code;
+                            }
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 5) { //po-it
+
+                        $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                            ->first();
+
+                        $user_state_id = $User_state->state_id;
+                        $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                            ->get();
+
+                        foreach ($employees_under_states as $employees_state) {
+                            $employeeId_under_state = $employees_state->user_id;
+                            $empDesg_under_state = DB::table('designation_user as du')
+                                ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                            if ($empDesg_under_state != "") {
+
+                                //$arr_underlaying_emp[] = $empDesg_under_state;
+
+                                $u_id = $empDesg_under_state->user_id;
+
+                                $emp_data = Employee::where(['user_id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head = $emp_data->fullname;
+
+                                $user_data = User::where(['id' => $u_id])
+                                    ->first();
+                                $emp->reporting_head_uId = $user_data->employee_code;
+                            }
+                        }
+
+                    }
+
+                    if ($emp->designation_id == 4) { //vccm
+                        $user_district = DB::table('location_user as lu')
+                            ->where('lu.user_id', '=', $emp->user_id)
+                            ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
+                        $user_district_id = $user_district->location_id;
+
+                        if ($user_district_id != "") {
+                            $employeesDistrict = DB::table('location_user as lu')
+                                ->where(['lu.location_id' => $user_district_id])
+                                ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+                        }
+
+
+                        if ($employeesDistrict) {
+                            foreach ($employeesDistrict as $empDistrict) {
+                                $user_id = $empDistrict->user_id;
+                                $empDesg_under_district = DB::table('designation_user as du')
+                                    ->where(['du.user_id' => $user_id])
+                                    ->where(function ($query) {
+                                        $query->where('du.designation_id', '=', 5)
+                                            ->orWhere('du.designation_id', '=', 3);
+                                    })
+                                    ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                                if ($empDesg_under_district != "") {
+                                    $u_id = $empDesg_under_district->user_id;
+
+                                    $emp_data = Employee::where(['user_id' => $u_id])
+                                        ->first();
+                                    $emp->reporting_head = $emp_data->fullname;
+
+                                    $user_data = User::where(['id' => $u_id])
+                                        ->first();
+                                    $emp->reporting_head_uId = $user_data->employee_code;
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+
+
+            }
+            $employees_po = $employees;
+
+        }
+
+        //check for state if spo
+        if ($designation_login_user == 2) {
+
+
+            $token++;
+            $state_login_user = EmployeeProfile::where(['user_id' => $designation_login_data->user_id])->first();
+
+            $login_user_state_id = $state_login_user->state_id;
+
+            $i = 0;
+            foreach ($employees as $employee) {
+
+                if ($employee->state_id == $login_user_state_id and ($employee->designation_id == 3 or $employee->designation_id == 5)) {
+                    if (!empty($employee)) {
+                        $employees_po[$i] = $employee;
+                    }
+                }
+                $i++;
+            }
+        }
+
+        foreach($employees_po as $key => $employee){
+            $allEmployees[$key]['employee'] = $employee;
+            $allEmployees[$key]['leaveDetail'] =  LeaveDetail::where('user_id', $employee->user_id)->whereYear('month_info', $year)->whereMonth('month_info', $month)->first();
+        }
+
+        return view('leaves.leave_pool', compact('allEmployees'));
+    }
 
 }//end of class

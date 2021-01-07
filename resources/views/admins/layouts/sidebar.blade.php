@@ -84,6 +84,8 @@ if(!empty($usser)) {
 
                         @if($designation_login_user!=4)
                             <li class=""><a title="list of Approval Employee's leave" href="{{ url('leaves/approve-leaves') }}"><i class="fa fa-circle-o text-success"></i>Approve Leaves</a></li>
+                            <li class=""><a title="list of Employee's leave Pool" href="{{ url('leaves/leave-pools') }}"><i class="fa fa-circle-o text-success"></i>Leaves Pool</a></li>
+
                     @endif
                     <!-- <li class=""><a title="View leave report" href="{{ url('leaves/leave-report-form') }}"><i class="fa fa-circle-o text-red"></i>Leave Report</a></li>-->
 
