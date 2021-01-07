@@ -60,8 +60,8 @@
 
   $messageIds = [];
   $notificationIds = [];
-  $unread = 0; 
-  $unread2 = 0;            
+  $unread = 0;
+  $unread2 = 0;
 
   if(!empty($usser)) {
     $user = getEmployeeProfileData($usser->id);
@@ -86,6 +86,7 @@
   <![endif]-->
   <!-- Google Font -->
   <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"> -->
+    @yield('style')
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -230,7 +231,7 @@
   <script type="text/javascript">
     var unread = "{{$unread}}";
     $(".unreadMessagesCount").text(unread);
-    
+
     $("#messages-menu").on('click',function() {
       var messageIds = "<?php echo json_encode($messageIds); ?>";
       messageIds = JSON.parse(messageIds);
@@ -250,7 +251,7 @@
 
     var unread2 = "{{$unread2}}";
     $(".unreadNotificationsCount").text(unread2);
-    
+
     $("#notifications-menu").on('click',function(){
       var notificationIds = "<?php echo json_encode($notificationIds); ?>";
       notificationIds = JSON.parse(notificationIds);

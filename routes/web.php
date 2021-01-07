@@ -79,7 +79,9 @@ Route::get('test', function () {
 Route::get('leave-detail/upload', function () {
     return view('leaves.upload');
 });
+
 Route::post('upload', 'LeaveController@uploadLeavePool');
+
 
 
 
@@ -396,6 +398,9 @@ Route::group(['prefix' => 'leaves', 'middleware' => 'App\Http\Middleware\Restric
 
     Route::get('approve-leaves/{leave_status?}', 'LeaveController@approveLeaves');
     Route::post('save-leave-approval', 'LeaveController@saveLeaveApproval');
+
+    Route::get('leave-pools/{year?}/{month?}', 'LeaveController@allLeavePool')->name('leave.pool.index');
+
     Route::group(['middleware' => ['permission:approve-leave']], function () {
 
 
@@ -403,6 +408,8 @@ Route::group(['prefix' => 'leaves', 'middleware' => 'App\Http\Middleware\Restric
         Route::get('leave-report-form', 'LeaveController@leaveReportForm');
         Route::post('create-leave-report', 'LeaveController@createLeaveReport');
         Route::get('additional-leave-report-info', 'LeaveController@additionalLeaveReportInfo');
+
+
     }); //end of approve-leave group
 }); //end of leaves group
 
