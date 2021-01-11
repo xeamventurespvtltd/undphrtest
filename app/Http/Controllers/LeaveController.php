@@ -1153,7 +1153,6 @@ class LeaveController extends Controller
 
  public function uploadLeavePool(Request $request)
     {
-//        return "Dg";
         $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
 
         $count = 0;
@@ -1161,7 +1160,7 @@ class LeaveController extends Controller
             foreach ($data[0] as $key => $record) {
 //                return $record;
                 $empCode = $record['empcode'];
-                $accumulatedCl = $record['actual_balance_cl_sept_oct_20'];
+                    $accumulatedCl = $record['casual_leave'];
                 $accumulatedSl = $record['sick_leave'];
 
 //                if($key != 0) {
@@ -1184,7 +1183,7 @@ class LeaveController extends Controller
                     if (isset($user)) {
 
                         $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')
-                            ->whereMonth('month_info', '10')->first();
+                            ->whereMonth('month_info', '12')->first();
 
                         if ($leaveDetail != '') {
                             $userOctLeavePoolUpdate[] = $user->employee_code;
@@ -1212,7 +1211,7 @@ class LeaveController extends Controller
 
                                 $approval_data = [
                                     'user_id' => $user->id,
-                                    'month_info' => '2020-10-26',
+                                    'month_info' => '2020-12-26',
                                     'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
                                     'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
                                     'balance_casual_leave' => isset($balance_casual_leave) ?
@@ -1234,7 +1233,8 @@ class LeaveController extends Controller
                         }
 
 
-                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2021')
+                            ->whereMonth('month_info', '01')->first();
                         if ($leaveDetail != '') {
                             if($designation==4){    // for vccm
 //                                return $accumulatedCl;
@@ -1279,7 +1279,7 @@ class LeaveController extends Controller
                             if ($designation!=6) {    // for TO
                                 $approval_data = [
                                     'user_id' => $user->id,
-                                    'month_info' => '2020-11-26',
+                                    'month_info' => '2021-01-26',
                                     'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
                                     'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
                                     'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
