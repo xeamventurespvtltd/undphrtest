@@ -317,9 +317,7 @@
                                                                                                 @if($attendanceArray['status'] == 'Leave')
 
                                                                                                 @else
-                                                                                                    {{--                                                                                                    @if(strtotime($date1) <= strtotime(date("Y-m-d")))--}}
-                                                                                                    @if(strtotime($date1) <= strtotime('2020-12-25'))
-
+                                                                                                    @if(strtotime($date1) <= strtotime(date("Y-m-d")))
                                                                                                         <div class="status-tooltip" data-date="{{date('d-m-Y',strtotime($date1))}}" data-userid="{{$user->id}}" data-status="{{$status}}">
                                                                                                             <!--<i class="fa fa-clock-o a-icon5"></i>-->
                                                                                                             <i class="fa fa-user-times" aria-hidden="true"></i>

@@ -1150,20 +1150,23 @@ class LeaveController extends Controller
 
     }//end of function
 
-    public function uploadLeavePool(Request $request)
+
+ public function uploadLeavePool(Request $request)
     {
+//        return "Dg";
         $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
 
         $count = 0;
         if (count($data)) {
             foreach ($data[0] as $key => $record) {
+//                return $record;
                 $empCode = $record['empcode'];
-                $accumulatedCl = $record['actual_balance_cl_nov_dec_20'];
+                $accumulatedCl = $record['actual_balance_cl_sept_oct_20'];
                 $accumulatedSl = $record['sick_leave'];
 
+//                if($key != 0) {
                 if($empCode != ''){
                     $user = User::where("employee_code", $empCode)->with('designation')->first();
-
                     if(isset($user->designation[0])) {
                         $designation = $user->designation[0]->id;
                     }
@@ -1180,159 +1183,132 @@ class LeaveController extends Controller
 
                     if (isset($user)) {
 
-                        $leaveDetail = DB::table('leave_pools')->where('user_id', $user->id)->whereYear('month_info', '2021')
-                            ->whereMonth('month_info', '01')->first();
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')
+                            ->whereMonth('month_info', '10')->first();
 
                         if ($leaveDetail != '') {
                             $userOctLeavePoolUpdate[] = $user->employee_code;
-                            DB::table('leave_pools')->where('id', $leaveDetail->id)->update([
+//                            return $leaveDetail->id;
+                            LeaveDetail::where('id', $leaveDetail->id)->update([
                                 'accumalated_casual_leave' => $accumulatedCl,
                                 'accumalated_sick_leave' => $accumulatedSl,
                             ]);
                         }else{
 
-                            $previousMonthLeaveDetail = DB::table('leave_pools')->where('user_id', $user->id)->whereYear('month_info', '2020')
-                                ->whereMonth('month_info', '12')->OrderBy('id', 'DESC')->first();
-//                            dd($previousMonthLeaveDetail);
-                            if(isset($previousMonthLeaveDetail)) {
-                                DB::table('leave_pools')->insert([
+                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+
+                            if($designation==4){    // for vccm
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+                                $balance_sick_leave = $accumulatedSl;
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+                                $balance_sick_leave = $accumulatedSl;
+
+                            }elseif ($designation==2){    // for SPO
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+                                $balance_sick_leave = $accumulatedSl;
+                            }
+                            if ($designation != 6 ) {    // for TO
+
+                                $approval_data = [
                                     'user_id' => $user->id,
-                                    'month_info' => '2021-01-26',
-                                    'accumalated_casual_leave' => $accumulatedCl,
-                                    'accumalated_sick_leave' => $accumulatedSl,
-                                    'balance_casual_leave' => $previousMonthLeaveDetail->balance_casual_leave,
-                                    'balance_sick_leave' => $previousMonthLeaveDetail->balance_sick_leave,
-                                    'balance_maternity_leave' => $previousMonthLeaveDetail->balance_maternity_leave,
-                                    'balance_paternity_leave' => $previousMonthLeaveDetail->balance_maternity_leave,
+                                    'month_info' => '2020-10-26',
+                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+                                    'balance_casual_leave' => isset($balance_casual_leave) ?
+                                        $balance_casual_leave : 0,
+                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
+                                    'balance_maternity_leave' => '180',
+                                    'balance_paternity_leave' => '15',
                                     'unpaid_casual' => 0,
                                     'paid_casual' => 0,
                                     'unpaid_sick' => 0,
                                     'paid_sick' => 0,
                                     'compensatory_count' => 0,
                                     'isactive' => 1
-                                ]);
+                                ];
+                                LeaveDetail::create($approval_data);
+                                $userOctLeavePoolCreate[] = $user->employee_code;
                             }
-//                            DB::table('leave_pools')->store($approval_data);
-
-//                                $userNovLeavePoolCreate[] = $user->employee_code;
-//                            LeaveDetail::where('id', $leaveDetail->id)->create([
-//                                'accumalated_casual_leave' => $accumulatedCl,
-//                                'accumalated_sick_leave' => $accumulatedSl,
-//                            ]);
-//                            if($designation==4){    // for vccm
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
-//                                $balance_sick_leave = $accumulatedSl;
-//                            }elseif ($designation==3 || $designation==5) {  // for PO
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
-//                                $balance_sick_leave = $accumulatedSl;
-//
-//                            }elseif ($designation==2){    // for SPO
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-//                                $balance_sick_leave = $accumulatedSl;
-//                            }
-//                            if ($designation != 6 ) {    // for TO
-//
-//                                $approval_data = [
-//                                    'user_id' => $user->id,
-//                                    'month_info' => '2020-10-26',
-//                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
-//                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
-//                                    'balance_casual_leave' => isset($balance_casual_leave) ?
-//                                        $balance_casual_leave : 0,
-//                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
-//                                    'balance_maternity_leave' => '180',
-//                                    'balance_paternity_leave' => '15',
-//                                    'unpaid_casual' => 0,
-//                                    'paid_casual' => 0,
-//                                    'unpaid_sick' => 0,
-//                                    'paid_sick' => 0,
-//                                    'compensatory_count' => 0,
-//                                    'isactive' => 1
-//                                ];
-//                                LeaveDetail::create($approval_data);
-//                                $userOctLeavePoolCreate[] = $user->employee_code;
-//                            }
 
                         }
 
 
-//                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
-//                        if ($leaveDetail != '') {
-//                            if($designation==4){    // for vccm
-////                                return $accumulatedCl;
-//                                $accumlated_casual = $accumulatedCl + 1.5;
-//                                $accumlated_sick = $accumulatedSl;
-//                            }elseif ($designation==3 || $designation==5) {  // for PO
-//                                $accumlated_casual = $accumulatedCl + 2;
-//                                $accumlated_sick = $accumulatedSl;
-//                            }elseif ($designation==2){    // for SPO
-//                                $accumlated_casual = $accumulatedCl;
-//                                $accumlated_sick = $accumulatedSl;
-//                            }
-//
-//                            LeaveDetail::where('id', $leaveDetail->id)->update([
-//                                'accumalated_casual_leave' => $accumlated_casual,
-//                                'accumalated_sick_leave' => $accumlated_sick,
-//                            ]);
-//
-//                            $userNovLeavePoolUpdate[] = $user->employee_code;
-//
-//                        }else{
-//                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
-//
-//                            if($designation==4){    // for vccm
-//                                $accumlated_casual = $accumulatedCl + 1.5;
-//                                $accumlated_sick = $accumulatedSl;
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
-//                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
-//                            }elseif ($designation==3 || $designation==5) {  // for PO
-//                                $accumlated_casual = $accumulatedCl + 2;
-//                                $accumlated_sick = $accumulatedSl;
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
-//                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
-//
-//                            }elseif ($designation==2){    // for SPO
-//                                $accumlated_casual = $accumulatedCl;
-//                                $accumlated_sick = $accumulatedSl;
-//                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
-//                                $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
-//
-//                            }
-//                            if ($designation!=6) {    // for TO
-//                                $approval_data = [
-//                                    'user_id' => $user->id,
-//                                    'month_info' => '2020-11-26',
-//                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
-//                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
-//                                    'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
-//                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
-//                                    'balance_maternity_leave' => '180',
-//                                    'balance_paternity_leave' => '15',
-//                                    'unpaid_casual' => 0,
-//                                    'paid_casual' => 0,
-//                                    'unpaid_sick' => 0,
-//                                    'paid_sick' => 0,
-//                                    'compensatory_count' => 0,
-//                                    'isactive' => 1
-//                                ];
-//                                LeaveDetail::create($approval_data);
-//
-//                                $userNovLeavePoolCreate[] = $user->employee_code;
-//                            }
-//                        }
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', '2020')->whereMonth('month_info', '11')->first();
+                        if ($leaveDetail != '') {
+                            if($designation==4){    // for vccm
+//                                return $accumulatedCl;
+                                $accumlated_casual = $accumulatedCl + 1.5;
+                                $accumlated_sick = $accumulatedSl;
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $accumlated_casual = $accumulatedCl + 2;
+                                $accumlated_sick = $accumulatedSl;
+                            }elseif ($designation==2){    // for SPO
+                                $accumlated_casual = $accumulatedCl;
+                                $accumlated_sick = $accumulatedSl;
+                            }
+
+                            LeaveDetail::where('id', $leaveDetail->id)->update([
+                                'accumalated_casual_leave' => $accumlated_casual,
+                                'accumalated_sick_leave' => $accumlated_sick,
+                            ]);
+
+                            $userNovLeavePoolUpdate[] = $user->employee_code;
+
+                        }else{
+                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+
+                            if($designation==4){    // for vccm
+                                $accumlated_casual = $accumulatedCl + 1.5;
+                                $accumlated_sick = $accumulatedSl;
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 1.5;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave;
+                            }elseif ($designation==3 || $designation==5) {  // for PO
+                                $accumlated_casual = $accumulatedCl + 2;
+                                $accumlated_sick = $accumulatedSl;
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave - 2;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumalated_sick_leave ;
+
+                            }elseif ($designation==2){    // for SPO
+                                $accumlated_casual = $accumulatedCl;
+                                $accumlated_sick = $accumulatedSl;
+                                $balance_casual_leave = $previousMonthLeaveDetail->balance_casual_leave;
+                                $balance_sick_leave = $previousMonthLeaveDetail->accumlated_sick;
+
+                            }
+                            if ($designation!=6) {    // for TO
+                                $approval_data = [
+                                    'user_id' => $user->id,
+                                    'month_info' => '2020-11-26',
+                                    'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
+                                    'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
+                                    'balance_casual_leave' => isset($balance_casual_leave) ? $balance_casual_leave : 0,
+                                    'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
+                                    'balance_maternity_leave' => '180',
+                                    'balance_paternity_leave' => '15',
+                                    'unpaid_casual' => 0,
+                                    'paid_casual' => 0,
+                                    'unpaid_sick' => 0,
+                                    'paid_sick' => 0,
+                                    'compensatory_count' => 0,
+                                    'isactive' => 1
+                                ];
+                                LeaveDetail::create($approval_data);
+
+                                $userNovLeavePoolCreate[] = $user->employee_code;
+                            }
+                        }
                     }else{
                         $userNotExist[] = $empCode;
                     }
                 }
             }
         }
-
         if(isset($userNotExist)) {
             echo "User Not Exist" . '=>' . ' ';
             print_r($userNotExist);
             echo "<br/>";
         }
-
         if(isset($userOctLeavePoolUpdate)) {
             echo "User Oct Leave Pool Update" . '=>'. ' ';
             print_r($userOctLeavePoolUpdate);
@@ -1343,7 +1319,6 @@ class LeaveController extends Controller
             print_r($userOctLeavePoolCreate);
             echo "<br/>";
         }
-
         if(isset($userNovLeavePoolUpdate)) {
             echo "User Nov Leave Pool Update" . '=>' . ' ';
             print_r($userNovLeavePoolUpdate);
@@ -1355,6 +1330,7 @@ class LeaveController extends Controller
             echo "<br/>";
         }
     }
+
 
     public function exportLeavePool(Request $request)
     {
