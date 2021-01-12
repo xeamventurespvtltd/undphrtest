@@ -1291,7 +1291,6 @@ class LeaveController extends Controller
                                     'unpaid_sick' => 0,
                                     'paid_sick' => 0,
                                     'compensatory_count' => 0,
-
                                     'isactive' => 1
                                 ];
                                 LeaveDetail::create($approval_data);
