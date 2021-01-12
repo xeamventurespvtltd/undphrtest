@@ -573,7 +573,6 @@ class LeaveController extends Controller
 
         //////////////////////////Segregation///////////////////////////
         if(!empty($request->newAllDatesArray)){   //for multi-month leave calculations in full day leaves
-
             if(date("d",strtotime($request->toDate)) > 25 || date("m",strtotime($request->toDate)) > date("m",strtotime($request->fromDate)))
             {
                 $date = explode('/',$request->fromDate);
@@ -581,8 +580,8 @@ class LeaveController extends Controller
                 $month = $date[0];
                 $firstEndDate = $year.'-'.$month.'-25';
                 $firstSegregation = $request->fromDate.' - '. $firstEndDate;
-                $fromDate = $request->fromDate;
-                $firstEndDate = date("yy-m-d", strtotime($firstEndDate));
+                $fromDate = date("Y-m-d", strtotime($request->fromDate));
+                $firstEndDate = date("Y-m-d", strtotime($firstEndDate));
                 $date1 = Carbon::createFromDate($fromDate);
                 $date2 = Carbon::createFromDate($firstEndDate);
 
@@ -1151,7 +1150,7 @@ class LeaveController extends Controller
     }//end of function
 
 
- public function uploadLeavePool(Request $request)
+    public function uploadLeavePool(Request $request)
     {
         $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
 
@@ -1160,7 +1159,7 @@ class LeaveController extends Controller
             foreach ($data[0] as $key => $record) {
 //                return $record;
                 $empCode = $record['empcode'];
-                    $accumulatedCl = $record['casual_leave'];
+                $accumulatedCl = $record['casual_leave'];
                 $accumulatedSl = $record['sick_leave'];
 
 //                if($key != 0) {
