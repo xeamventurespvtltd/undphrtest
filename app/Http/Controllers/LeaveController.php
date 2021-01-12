@@ -728,11 +728,13 @@ class LeaveController extends Controller
         $currentYear = date('Y');
         $year = $currentYear;
         $lastMonth = date('m', strtotime('-1 month',strtotime($applied_leave->from_date)));
+        $year = date('Y', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
         if($lastMonth == 12){
             $year = $year - 1;
         }
-        $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+
+         $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
             ->first();
         if(!isset($lastMonthAttendanceVerification)){
