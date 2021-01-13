@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="7941cd0e-f5e1-4e29-b1ff-6c354cd0916a" name="undphr" url="http://ftp.xeamventures.com">
-        <fileTransfer host="ftp.xeamventures.com" port="21">
+      <webServer id="7941cd0e-f5e1-4e29-b1ff-6c354cd0916a" name="undphr" url="http://3.17.51.167">
+        <fileTransfer accessType="SFTP" host="3.17.51.167" port="22" sshConfigId="4f4f5ace-60dc-4c0b-a9ce-316b7cb78531" sshConfig="sftp_bpo@3.17.51.167:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
