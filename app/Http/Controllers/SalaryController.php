@@ -188,9 +188,6 @@ class SalaryController extends Controller
                 return view('salary.view_salary_slip', ['data'=>$query]);
             }
 
-
-
-
         }else{
 
             $data=[];

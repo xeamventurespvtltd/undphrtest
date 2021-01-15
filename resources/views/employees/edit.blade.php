@@ -181,6 +181,19 @@
                               <span class="birthDateErrors"></span>
                             </div>
                           </div>
+
+                            <div class="row field-changes-below">
+                                <label for="fatherName" class="col-md-4 control-label
+                                                        basic-detail-label bdl-exp">Father's Name</label>
+                                <div class="col-md-8 basic-input-right">
+                                    <input autocomplete="off" type="text" class="form-control
+                                                             input-sm basic-detail-input-style" id="fatherName"
+                                           name="fatherName" placeholder="Enter fatherName" value="{{
+                                           $data['user']->employee->father_name }}"
+                                           required>
+                                    <span class="fatherName"></span>
+                                </div>
+                            </div>
                             <br/>
                           <div class="row field-changes-below">
                             <span class="col-md-4 control-label radio basic-detail-label basic-radio-label"><strong>Gender</strong></span>
@@ -298,6 +311,27 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="row field-changes-below">
+                                    <label class="col-md-4 control-label
+                                                        basic-detail-label">Consultant</label>
+                                    <div class="col-md-8 basic-input-right">
+                                        <label class="basicradio1">
+                                            <input type="radio" name="is_consultant"
+                                                   class="radio-style-basic" id="optionsRadios1"
+                                                   value="1" @if($data['user']->is_consultant == "1")
+                                                {{"checked"}}@endif>
+                                            Is Consultant
+                                        </label>
+                                        <label class="basicradio2-gender">
+                                            <input type="radio" name="is_consultant"
+                                                   class="radio-style-basic2" id="optionsRadios2"
+                                                   value="0" @if($data['user']->is_consultant == "0")
+                                                {{"checked"}}@endif> Not Consultant
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <input type="hidden" name="employeeId" value="{{$data['user']->id}}">
                                 <input type="hidden" name="formSubmitButton" class="profileFormSubmitButton">
                                 <!-- </div>   -->
@@ -306,72 +340,65 @@
                     </div>
                 </div>
 
-{{--                <hr/>--}}
-{{--                <h3>Location</h3>--}}
 
 
-{{--                <div class="box-body">--}}
-{{--                    <hr>--}}
-{{--                    <div class="form-group form-sidechange">--}}
-{{--                        <div class="row">--}}
-{{--                            <div class="col-md-6">--}}
-{{--                                @if(isset($data['user']->designation[0]) && $data['user']->designation[0]->id==2)--}}
-{{--                                    <div class="row field-changes-below">--}}
-{{--                                        <label class="col-md-4 control-label basic-detail-label">State</label>--}}
-{{--                                        <div class="col-md-8 basic-input-right">--}}
-{{--                                            <select required="" class="form-control input-sm basic-detail-input-style" name="stateId">--}}
-{{--                                                <option value="" selected disabled>Please Select Employee's State.</option>--}}
-{{--                                                @if(!$data['states']->isEmpty())--}}
-{{--                                                    @foreach($data['states'] as $state)--}}
-{{--                                                        <option value="{{$state->id}}" @if($state->id == @$data['user']->employeeProfile->state_id){{'selected'}}@endif>{{$state->name}}</option>--}}
-{{--                                                    @endforeach--}}
-{{--                                                @endif--}}
-{{--                                            </select>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                                @if((isset($data['user']->designation[0]) && $data['user']->designation[0]->id==3) || (isset($data['user']->designation[0]) && $data['user']->designation[0]->id==5))--}}
-{{--                                    <div class="row field-changes-below">--}}
-{{--                                        <label class="col-md-4 control-label basic-detail-label">District</label>--}}
-{{--                                        <div class="col-md-8 basic-input-right">--}}
-{{--                                            <select required="" class="form-control input-sm basic-detail-input-style select2" multiple="" name="locationId[]" style="width: 300px; height: 200px;">--}}
-{{--                                                <option value=""  disabled>Please Select Employee's Location.</option>--}}
-{{--                                                @if(!$data['locations']->isEmpty())--}}
-{{--                                                    @foreach($data['locations'] as $location)--}}
-{{--                                                        <option value="{{$location->id}}" @if(@$data['user']->locations->contains('id',$location->id)){{'selected'}}@endif>{{$location->name}}</option>--}}
-{{--                                                    @endforeach--}}
-{{--                                                @endif--}}
-{{--                                            </select>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                                @if(isset($data['user']->designation[0]) && $data['user']->designation[0]->id==4)--}}
-{{--                                    <div class="row field-changes-below">--}}
-{{--                                        <label class="col-md-4 control-label basic-detail-label">District</label>--}}
-{{--                                        <div class="col-md-8 basic-input-right">--}}
-{{--                                            <select class="form-control input-sm basic-detail-input-style select2" name="locationId">--}}
-{{--                                                <option value="" selected disabled>Please Select Employee's Location.</option>--}}
-{{--                                                @if(!$data['locations']->isEmpty())--}}
-{{--                                                    @foreach($data['locations'] as $location)--}}
-{{--                                                        <option value="{{$location->id}}" @if(@$data['user']->locations->contains('id',$location->id)){{'selected'}}@endif>{{$location->name}}</option>--}}
-{{--                                                    @endforeach--}}
-{{--                                                @endif--}}
-{{--                                            </select>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                            </div>--}}
-{{--                            <div class="col-md-6">--}}
-{{--                                <input type="hidden" name="employeeId" value="{{$data['user']->id}}">--}}
-{{--                                @if(isset($data['user']->designation[0]))--}}
-{{--                                    <input type="hidden" name="designation_id" value="{{$data['user']->designation[0]->id}}">--}}
-{{--                                @endif--}}
-{{--                                <input type="hidden" name="formSubmitButton" class="profileFormSubmitButton">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-          <!-- /.box-body -->
+                <hr/>
+                <h3>Bank Details</h3>
+                <div class="box-body">
+                    <div class="form-group form-sidechange">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row field-changes-below">
+                                    <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank<span style="color:
+                                                        red">*</span></label>
+                                    <div class="col-md-8 basic-input-left">
+                                        <select class="form-control input-sm
+                                                            basic-detail-input-style" id="bankId" name="bankId" required>
+                                            <option value="" selected disabled>Please Select
+                                                Employee's Bank.</option>
+                                            @if(!$data['banks']->isEmpty())
+                                                @foreach($data['banks'] as  $bank)
+                                                    <option value="{{ $bank->id }}"
+                                                    @if(@$data['user']->employeeAccount->bank_id == $bank->id)
+                                                        selected="selected"@endif>
+                                                        {{ $bank->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row field-changes-below">
+                                    <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank Account Number <span style="color:
+                                                        red">*</span></label>
+                                    <div class="col-md-8 basic-input-right">
+                                        <input class="form-control input-sm
+                                                            basic-detail-input-style" type="text" name="bankAccNo"
+                                               id="bankAccNo" value="{{
+                                               @$data['user']->employeeAccount->bank_account_number }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row field-changes-below">
+                                    <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank IFSC Code <span style="color:
+                                                        red">*</span></label>
+                                    <div class="col-md-8 basic-input-right">
+                                        <input class="form-control input-sm
+                                                            basic-detail-input-style" type="text" name="ifsc"
+                                               id="ifsc" value="{{ @$data['user']->employeeAccount->ifsc_code }}"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
           <div class="box-footer">
                 <button type="button" class="btn btn-info basicFormSubmit" id="basicFormSubmit" name="formSubmitButton" value="sc">Save</button>
               </div>

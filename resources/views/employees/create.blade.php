@@ -82,28 +82,28 @@
                                         {{ session()->get('profileError') }}
                                     </div>
                                 @endif
-                                    @if(session()->has('profileSuccess'))
-                                        <div class="alert alert-success alert-dismissible">
-                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                            {{ session()->get('profileSuccess') }}
-                                        </div>
-                                    @endif
-                                    @if ($errors->profile->any())
-                                        <div class="alert alert-danger alert-dismissible">
-                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                            <ul>
-                                                @foreach ($errors->profile->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
-                                    @if(session()->has('poError'))
-                                        <div class="alert alert-danger alert-dismissible">
-                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                            {{ session()->get('poError') }}
-                                        </div>
-                                    @endif
+                                @if(session()->has('profileSuccess'))
+                                    <div class="alert alert-success alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        {{ session()->get('profileSuccess') }}
+                                    </div>
+                                @endif
+                                @if ($errors->profile->any())
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <ul>
+                                            @foreach ($errors->profile->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                                @if(session()->has('poError'))
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        {{ session()->get('poError') }}
+                                    </div>
+                                @endif
                                 <button class="btn btn-primary">UID {{$data['next_available_uid']}}</button>
                                 <!-- form start -->
                                 <form id="basicDetailsForm" class="form-horizontal" action="{{ url('employees/create-basic-details') }}" method="POST" enctype="multipart/form-data">
@@ -184,7 +184,8 @@
                                                     <div class="row field-changes-below">
                                                         <label for="sickLeave" class="col-md-4 control-label basic-detail-label bdl-exp">Sick Leave Pool*</label>
                                                         <div class="col-md-8 basic-input-right">
-                                                            <input type="text" class="form-control input-sm basic-detail-input-style text-capitalize" id="leavePool_sick" name="leavePool_sick" placeholder="Please Enter Sick Leave pool" value="">
+                                                            <input type="text" class="form-control input-sm
+                                                            basic-detail-input-style text-capitalize" id="leavePool_sick" name="leavePool_sick" placeholder="Please Enter Sick Leave pool" value="" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -193,8 +194,21 @@
                                                     <div class="row field-changes-below">
                                                         <label for="birthDate" class="col-md-4 control-label basic-detail-label bdl-exp">Date Of Birth</label>
                                                         <div class="col-md-8 basic-input-right">
-                                                            <input autocomplete="off" type="text" class="form-control input-sm basic-detail-input-style" id="birthDate" name="birthDate" placeholder="MM/DD/YYYY" value="" readonly>
+                                                            <input autocomplete="off" type="text" class="form-control
+                                                             input-sm basic-detail-input-style" id="birthDate" name="birthDate" placeholder="MM/DD/YYYY" value="" readonly required>
                                                             <span class="birthDateErrors"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row field-changes-below">
+                                                        <label for="fatherName" class="col-md-4 control-label
+                                                        basic-detail-label bdl-exp">Father's Name</label>
+                                                        <div class="col-md-8 basic-input-right">
+                                                            <input autocomplete="off" type="text" class="form-control
+                                                             input-sm basic-detail-input-style" id="fatherName"
+                                                                   name="fatherName" placeholder="Enter fatherName" value=""
+                                                                   required>
+                                                            <span class="fatherName"></span>
                                                         </div>
                                                     </div>
                                                     <br/>
@@ -214,7 +228,8 @@
                                                     <div class="row field-changes-below">
                                                         <label for="joiningDate" class="col-md-4 control-label basic-detail-label bdl-exp">Date Of Joining*</label>
                                                         <div class="col-md-8 basic-input-right">
-                                                            <input autocomplete="off" type="text" class="form-control input-sm basic-detail-input-style" id="joiningDate" name="joiningDate" placeholder="MM/DD/YYYY" value="" readonly>
+                                                            <input autocomplete="off" type="text" class="form-control
+                                                             input-sm basic-detail-input-style" id="joiningDate" name="joiningDate" placeholder="MM/DD/YYYY" value="" readonly required>
                                                         </div>
                                                     </div>
                                                     <div class="row field-changes-below">
@@ -226,11 +241,12 @@
                                                     <div class="row field-changes-below">
                                                         <label for="casualLeave" class="col-md-4 control-label basic-detail-label bdl-exp">Casual Leave Pool*</label>
                                                         <div class="col-md-8 basic-input-right">
-                                                            <input type="text" class="form-control input-sm basic-detail-input-style text-capitalize" id="leavePool_casual" name="leavePool_casual" placeholder="Please Enter Casual Leave pool" value="">
+                                                            <input type="text" class="form-control input-sm
+                                                            basic-detail-input-style text-capitalize"
+                                                                   id="leavePool_casual" name="leavePool_casual"
+                                                                   placeholder="Please Enter Casual Leave pool" value="" required>
                                                         </div>
                                                     </div>
-
-                                                    <input type="hidden" name="formSubmitButton" class="basicFormSubmitButton">
                                                 </div>
                                             </div>
                                         </div>
@@ -311,7 +327,78 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <input type="hidden" name="formSubmitButton" class="profileFormSubmitButton">
+
+                                                    <div class="row field-changes-below">
+                                                        <label class="col-md-4 control-label
+                                                        basic-detail-label">Consultant</label>
+                                                        <div class="col-md-8 basic-input-right">
+                                                            <label class="basicradio1">
+                                                                <input type="radio" name="is_consultant"
+                                                                       class="radio-style-basic" id="optionsRadios1"
+                                                                       value="1" checked="">
+                                                                Is Consultant
+                                                            </label>
+                                                            <label class="basicradio2-gender">
+                                                                <input type="radio" name="is_consultant"
+                                                                       class="radio-style-basic2" id="optionsRadios2"
+                                                                       value="0"> Not Consultant
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <hr/>
+                                    <h3>Bank Details</h3>
+                                    <div class="box-body">
+                                        <div class="form-group form-sidechange">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row field-changes-below">
+                                                        <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank<span style="color:
+                                                        red">*</span></label>
+                                                        <div class="col-md-8 basic-input-left">
+                                                            <select class="form-control input-sm
+                                                            basic-detail-input-style" id="bankId" name="bankId" required>
+                                                                <option value="" selected disabled>Please Select
+                                                                    Employee's Bank.</option>
+                                                                @if(!$data['banks']->isEmpty())
+                                                                    @foreach($data['banks'] as  $bank)
+                                                                        <option value="{{ $bank->id }}">
+                                                                            {{ $bank->name }}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row field-changes-below">
+                                                        <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank Account Number <span style="color:
+                                                        red">*</span></label>
+                                                        <div class="col-md-8 basic-input-right">
+                                                            <input class="form-control input-sm
+                                                            basic-detail-input-style" type="text" name="bankAccNo"
+                                                                   id="bankAccNo" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row field-changes-below">
+                                                        <label class="col-md-4 control-label
+                                                        basic-detail-label">Bank IFSC Code <span style="color:
+                                                        red">*</span></label>
+                                                        <div class="col-md-8 basic-input-right">
+                                                            <input class="form-control input-sm
+                                                            basic-detail-input-style" type="text" name="ifsc"
+                                                                   id="ifsc" required>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -321,7 +408,7 @@
                                     <!-- /.box-body -->
                                     <div class="box-footer create-footer">
                                         <button type="button" class="btn btn-info basicFormSubmit" id="basicFormSubmit" value="sc">Save</button>
-{{--                                        <button type="button" class="btn btn-default basicFormSubmit" value="sc">Save & Exit</button>--}}
+                                        {{--                                        <button type="button" class="btn btn-default basicFormSubmit" value="sc">Save & Exit</button>--}}
                                     </div>
                                     <!-- /.box-footer -->
                                 </form>
