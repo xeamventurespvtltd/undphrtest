@@ -2255,7 +2255,7 @@ class UserController extends Controller
                 'bank_id'   => $request->bankId,
             ];
 
-            $user->employeeAccount()->update($employeeAccountdata);
+            $user->employeeAccount()->updateOrCreate($employeeAccountdata);
 
             /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
 
