@@ -181,6 +181,19 @@
                               <span class="birthDateErrors"></span>
                             </div>
                           </div>
+
+                            <div class="row field-changes-below">
+                                <label for="fatherName" class="col-md-4 control-label
+                                                        basic-detail-label bdl-exp">Father's Name</label>
+                                <div class="col-md-8 basic-input-right">
+                                    <input autocomplete="off" type="text" class="form-control
+                                                             input-sm basic-detail-input-style" id="fatherName"
+                                           name="fatherName" placeholder="Enter fatherName" value="{{
+                                           $data['user']->employee->father_name }}"
+                                           required>
+                                    <span class="fatherName"></span>
+                                </div>
+                            </div>
                             <br/>
                           <div class="row field-changes-below">
                             <span class="col-md-4 control-label radio basic-detail-label basic-radio-label"><strong>Gender</strong></span>
