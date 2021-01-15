@@ -2242,7 +2242,12 @@ class UserController extends Controller
             $user->employeeProfile()->create($employee_profile_data);
 
             //$user->userManager()->create(['manager_id'=>$request->employeeIds]);
-
+            $employeeAccountdata = [
+                'bank_account_number'   => $request->bankAccNo,
+                'ifsc_code'   => $request->ifsc,
+                'bank_id'   => $request->bankId,
+            ];
+            $user->employeeAccount()->updateOrCreate($employeeAccountdata);
 
 
         }else{
