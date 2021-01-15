@@ -1,9 +1,13 @@
 /.idea
 /node_modules
 /public/hot
-/public/
+/public
 /storage/*.key
 /vendor
+.idea
+/.idea
+composer.json
+composer.lock
 .env
 .env.backup
 .phpunit.result.cache
