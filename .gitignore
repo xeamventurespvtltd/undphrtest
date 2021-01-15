@@ -6,6 +6,8 @@
 /vendor
 .idea
 /.idea
+composer.json
+composer.lock
 .env
 .env.backup
 .phpunit.result.cache
