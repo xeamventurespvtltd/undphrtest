@@ -1075,13 +1075,12 @@ class UserController extends Controller
         $data['next_available_uid'] = User::max('id') + 1;
         $maxId = User::max('id');
         $data['next_available_empCode'] = User::count();
-        //$next_available_empcode_data = User::where(['id'=>$maxId])->first();
-        //$data['next_available_empCode'] = $next_available_empcode_data->employee_code +1;
-        //exit;
 
         $data['salary_cycles'] = SalaryCycle::where(['isactive'=>1])->get();
 
         $data['salary_structures'] = SalaryStructure::where(['isactive'=>1])->get();
+
+        $data['banks'] = Bank::where(['isactive'=>1])->get();
 
 
 
@@ -1363,6 +1362,9 @@ class UserController extends Controller
         $data['leave_details'] = LeaveDetail::where(['user_id'=>$user_id])
             ->first();
 
+        $data['banks'] = Bank::where(['isactive'=>1])->get();
+
+
         return view('employees.edit')->with(['data'=>$data]);
 
 
@@ -1418,7 +1420,6 @@ class UserController extends Controller
     */
     function createBasicDetails(Request $request){
 
-        //dd($request->all());
 
         $validator = Validator::make($request->all(), [
 
@@ -1433,6 +1434,10 @@ class UserController extends Controller
             'employeeXeamCode' => 'bail|required|unique:users,employee_code',
 
             'projectId' => 'bail|required',
+
+            'bankAccNo' => 'required',
+
+            'ifsc' => 'required'
         ]);
 
 
@@ -1464,6 +1469,7 @@ class UserController extends Controller
 
             'password' => Hash::make($request->password),
 
+            'is_consultant' => $request->is_consultant
 
         ];
 
@@ -1865,16 +1871,18 @@ class UserController extends Controller
             }
 
 
+            $employeeAccountdata = [
+                'bank_account_number'   => $request->bankAccNo,
+                'ifsc_code'   => $request->ifsc,
+                'bank_id'   => $request->bankId,
+            ];
 
-                return redirect("employees/list/")->with('success','Details saved successfully.!');
-
-
-
-
+            $user->employeeAccount()->create($employeeAccountdata);
+            return redirect("employees/list/")->with('success','Details saved successfully.!');
 
         }
 
-            return redirect("employees/list");
+        return redirect("employees/list")->with('success','Details saved successfully.!');
     }//end of function
 
 
@@ -1887,7 +1895,9 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'employeeName' => 'bail|required',
             'projectId' => 'bail|required',
+            'bankAccNo' => 'required',
 
+            'ifsc' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -1942,7 +1952,9 @@ class UserController extends Controller
 
         $user_info_data = [
             'email' => $request->email,
-            'employee_code' => $request->employeeXeamCode
+            'employee_code' => $request->employeeXeamCode,
+            'is_consultant' => $request->is_consultant
+
         ];
         $user_info_update = User::where(['id'=>$user->id])->update($user_info_data);
 
@@ -2098,99 +2110,8 @@ class UserController extends Controller
         $employee = Employee::where(['user_id'=>$user->id])->update($employee_data);
 
 
-
-        if(!empty($request->skillIds)){
-
-            $user->skills()->sync($request->skillIds);
-
-        }
-
-
-
-        if(!empty($request->qualificationIds)){
-
-            $user->qualifications()->sync($request->qualificationIds);
-
-        }
-
-
-
-        if(!empty($request->languageIds)){
-
-            $user->languages()->sync($request->languageIds);
-
-        }
-
-
-
         $post_array = $request->all();
 
-        $language_check_boxes = [];
-
-
-        if($request->languageIds){
-            foreach ($request->languageIds as $key => $value) {
-
-                $key2 = 'lang'.$value;
-
-
-
-                if(!empty($post_array[$key2])){
-
-                    $language_check_boxes[$value] = $post_array[$key2];
-
-                }else{
-
-                    $language_check_boxes[$value] = array();
-
-                }
-
-
-
-                if(in_array('1',$language_check_boxes[$value])){
-
-                    $check_box_data['read_language'] = true;
-
-                }else{
-
-                    $check_box_data['read_language'] = false;
-
-                }
-
-
-
-                if(in_array('2',$language_check_boxes[$value])){
-
-                    $check_box_data['write_language'] = true;
-
-                }else{
-
-                    $check_box_data['write_language'] = false;
-
-                }
-
-
-
-                if(in_array('3',$language_check_boxes[$value])){
-
-                    $check_box_data['speak_language'] = true;
-
-                }else{
-
-                    $check_box_data['speak_language'] = false;
-
-                }
-
-
-
-                $find_language = DB::table('language_user')
-
-                    ->where(['user_id'=>$user->id,'language_id'=>$value])
-
-                    ->update($check_box_data);
-
-            }
-        }
 
         $approval_data =   [
 
@@ -2207,7 +2128,6 @@ class UserController extends Controller
             'paid_sick' => 0,
             'isactive' => 1
         ];
-        //LeaveDetail::create($approval_data);
         LeaveDetail::updateOrCreate(['user_id'=>$user->id],$approval_data);
         //$LeavePool_update = LeaveDetail::where(['user_id'=>$user->id])->update($employee_data);
 
@@ -2328,6 +2248,14 @@ class UserController extends Controller
         }else{
 
             $user->employeeProfile()->update($employee_profile_data);
+
+            $employeeAccountdata = [
+                'bank_account_number'   => $request->bankAccNo,
+                'ifsc_code'   => $request->ifsc,
+                'bank_id'   => $request->bankId,
+            ];
+
+            $user->employeeAccount()->update($employeeAccountdata);
 
             /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
 
@@ -2462,10 +2390,10 @@ class UserController extends Controller
 
         }
 
-            return redirect("/employees/edit/$request->employeeId/projectDetailsTab")->with('profileSuccess',"Details updated successfully.");
 
 
 
+        return redirect("employees/list")->with('success',"Details updated successfully.");
 
     }//end of function
 
@@ -2989,7 +2917,7 @@ class UserController extends Controller
 
 
 
-            return redirect("/employees/edit/$request->employeeId")->with('documentSuccess',"Details updated successfully.");
+        return redirect("/employees/edit/$request->employeeId")->with('documentSuccess',"Details updated successfully.");
 
 
     }//end of function
