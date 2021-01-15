@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig authType="PASSWORD" host="3.17.51.167" id="4f4f5ace-60dc-4c0b-a9ce-316b7cb78531" port="22" nameFormat="DESCRIPTIVE" username="sftp_bpo" />
-    </configs>
-  </component>
-</project>
