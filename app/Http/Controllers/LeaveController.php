@@ -284,6 +284,7 @@ class LeaveController extends Controller
     function createLeaveApplication(Request $request)
     {
 
+
         // Validate
 
         $request->validate([
@@ -560,6 +561,7 @@ class LeaveController extends Controller
 
         $applied_leave = $user->appliedLeaves()->create($leave_data);
 
+
         if(!empty($request->fileNames)){
             $documents = $request->fileNames;
             foreach($documents as $doc) {
@@ -677,7 +679,11 @@ class LeaveController extends Controller
             'read_status' => '0'
         ];
 
-        $message = $user->employee->fullname." has applied for a leave, from ".date('d/m/Y',strtotime($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.';
+
+        $leaveType  = LeaveType::where('id', $request->leaveTypeId)->first();
+        $message = $user->employee->fullname." has applied for a ".$leaveType->name." leave, from ".date('d/m/Y',
+                strtotime
+            ($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.'."Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
 
         $notification_data['message'] = $message;
         $applied_leave->notifications()->create($notification_data);
@@ -688,9 +694,8 @@ class LeaveController extends Controller
             ->with('user')->first();
 
         $mail_data['to_email'] = $reporting_manager_data->user->email;
-        //$mail_data['to_email'] = "xeam.richa@gmail.com";
         $mail_data['subject'] = "Leave Application";
-        $mail_data['message'] = $user->employee->fullname." has applied for a leave. Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
+        $mail_data['message'] = $message;
         $mail_data['fullname'] = $reporting_manager_data->fullname;
 
         $this->sendGeneralMail($mail_data);
