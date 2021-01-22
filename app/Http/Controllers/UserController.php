@@ -1875,6 +1875,7 @@ class UserController extends Controller
                 'bank_account_number'   => $request->bankAccNo,
                 'ifsc_code'   => $request->ifsc,
                 'bank_id'   => $request->bankId,
+                'pan_number' => $request->pan_number
             ];
 
             $user->employeeAccount()->create($employeeAccountdata);
@@ -2246,8 +2247,9 @@ class UserController extends Controller
                 'bank_account_number'   => $request->bankAccNo,
                 'ifsc_code'   => $request->ifsc,
                 'bank_id'   => $request->bankId,
+                'pan_number' => $request->pan_number
             ];
-            $user->employeeAccount()->updateOrCreate($employeeAccountdata);
+            $user->employeeAccount()->create($employeeAccountdata);
 
 
         }else{
@@ -2258,9 +2260,11 @@ class UserController extends Controller
                 'bank_account_number'   => $request->bankAccNo,
                 'ifsc_code'   => $request->ifsc,
                 'bank_id'   => $request->bankId,
+                'pan_number' => $request->pan_number
+
             ];
 
-            $user->employeeAccount()->updateOrCreate($employeeAccountdata);
+            $user->employeeAccount()->update($employeeAccountdata);
 
             /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
 

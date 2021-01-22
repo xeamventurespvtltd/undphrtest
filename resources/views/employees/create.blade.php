@@ -399,6 +399,17 @@
                                                                    id="ifsc" required>
                                                         </div>
                                                     </div>
+
+                                                    <div class="row field-changes-below">
+                                                        <label class="col-md-4 control-label
+                                                        basic-detail-label">Pan Card <span style="color:
+                                                        red">*</span></label>
+                                                        <div class="col-md-8 basic-input-right">
+                                                            <input class="form-control input-sm
+                                                            basic-detail-input-style" type="text" name="pan_number"
+                                                                   id="pan_number" placeholder="PAN No." maxlength="10" pattern="[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}" title="Please enter valid PAN number. E.g. AAAAA9999A">
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
