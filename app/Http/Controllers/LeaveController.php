@@ -389,6 +389,7 @@ class LeaveController extends Controller
             $employeesDistrict = DB::table('location_user as lu')
                 ->where(['lu.location_id'=>$login_user_district_id])
                 ->select('lu.id', 'lu.user_id','lu.location_id')->get();
+
             //dd($employeesDistrict);
 
             if($employeesDistrict)
@@ -430,6 +431,7 @@ class LeaveController extends Controller
             }
         }
 
+//        return $arr_underlaying_emp;
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
         }else{
             $manager_error = "You do not have reporting manger under Your area.";
@@ -683,7 +685,7 @@ class LeaveController extends Controller
         $leaveType  = LeaveType::where('id', $request->leaveTypeId)->first();
         $message = $user->employee->fullname." has applied for a ".$leaveType->name." leave, from ".date('d/m/Y',
                 strtotime
-            ($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.'."Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
+                ($applied_leave->from_date)).' to '.date('d/m/Y',strtotime($applied_leave->to_date)).'.'."Please take an action. Here is the link for website <a href='".url('/')."'>Click here</a>";
 
         $notification_data['message'] = $message;
         $applied_leave->notifications()->create($notification_data);
@@ -739,7 +741,7 @@ class LeaveController extends Controller
 //            $year = $year - 1;
 //        }
 
-         $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+        $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
             ->first();
         if(!isset($lastMonthAttendanceVerification)){

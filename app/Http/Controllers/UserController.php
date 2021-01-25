@@ -2215,11 +2215,11 @@ class UserController extends Controller
 
 
 
-        $check_unique = EmployeeProfile::where(['user_id'=>$request->employeeId])->first();
+        $checkEmployeeProfile = EmployeeProfile::where(['user_id'=>$request->employeeId])->first();
 
 
 
-        if(empty($check_unique)){
+        if(empty($checkEmployeeProfile)){
 
             //$employee_profile_data['probation_period_id'] = $request->probationPeriodId;
             $employee_profile_data['probation_period_id'] = 2;
@@ -2265,34 +2265,33 @@ class UserController extends Controller
             ];
 
             $user->employeeAccount()->update($employeeAccountdata);
-
-            /*  if(is_array($request->exceptionshiftTimingId) && is_array($request->exceptionshiftday)){
-
-                 for($i=0;$i<count($request->shiftexcept); $i++){
-                     ShiftException::where('id', $request->shiftexcept[$i])
-                         ->update([
-                             'user_id'=> $request->employeeId,
-                             'shift_id'=>$request->exceptionshiftTimingId[$i],
-                             'week_day'=> $request->exceptionshiftday[$i]
-                             ]);
-                     }
-
-             } */
-
-            /* if(!empty($request->exceptionshiftTimingId_new) && !empty($request->exceptionshiftday_new)){
-                        for($j=0;$j<count($request->exceptionshiftTimingId_new); $j++){
-                            $Shift_Except = new ShiftException;
-                            $Shift_Except->user_id       = $request->employeeId;
-                            $Shift_Except->shift_id      = $request->exceptionshiftTimingId_new[$j];
-                            $Shift_Except->week_day = $request->exceptionshiftday_new[$j];
-                            $Shift_Except->save();
-
-                        }
-                    } */
-
-            //$user->userManager()->update(['manager_id'=>$request->employeeIds]);
-
         }
+
+//        $checkEmployeeAccount = EmployeeAccount::where(['user_id'=>$request->employeeId])->first();
+//
+//        if(empty($checkEmployeeAccount)){
+//
+//            $employeeAccountdata = [
+//                'bank_account_number'   => $request->bankAccNo,
+//                'ifsc_code'   => $request->ifsc,
+//                'bank_id'   => $request->bankId,
+//                'pan_number' => $request->pan_number
+//            ];
+//            $user->employeeAccount()->create($employeeAccountdata);
+//
+//
+//        }else{
+
+            $employeeAccountdata = [
+                'bank_account_number'   => $request->bankAccNo,
+                'ifsc_code'   => $request->ifsc,
+                'bank_id'   => $request->bankId,
+                'pan_number' => $request->pan_number
+
+            ];
+
+            $user->employeeAccount()->updateorcreate($employeeAccountdata);
+//        }
 
 
 
