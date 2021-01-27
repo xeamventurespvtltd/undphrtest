@@ -176,7 +176,7 @@
                                         <!--if(strtotime($on_date) < strtotime(date("Y-m-d")) && $verify['isverified'] == 0  ) unverified  -->
 
 
-                                        @if($_REQUEST["month"] == date('n'))
+                                        @if($_REQUEST["month"] == date('n') || Auth::user()->employee_code == 'PO00219')
                                             @if($verify['isverified'] == 0 )
                                                 @if($verify['verifier']!=$user->id)
 
