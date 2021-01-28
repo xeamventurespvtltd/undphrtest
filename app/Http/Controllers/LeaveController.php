@@ -729,15 +729,26 @@ class LeaveController extends Controller
         }else {
             $lastMonth = date('m', strtotime('-1 month', strtotime($applied_leave->from_date)));
         }
-        $year = date('Y', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
-        $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+        if($lastMonth == 01) {
+            $year = date('Y', strtotime('-1 month', strtotime($applied_leave->from_date)));
+        }
+
+        if(AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
-            ->first();
-        if(!isset($lastMonthAttendanceVerification)){
+            ->exists()){
+        }else{
             $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
             return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
         }
+
+//       $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+//            ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
+//            ->first();
+//        if(!isset($lastMonthAttendanceVerification) && empty($lastMonthAttendanceVerification)){
+//            $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
+//            return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
+//        }
 
         // Comment By Hitesh
         $leave_approval->save();
