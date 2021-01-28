@@ -284,9 +284,7 @@ class LeaveController extends Controller
     function createLeaveApplication(Request $request)
     {
 
-
         // Validate
-
         $request->validate([
             'toDate' => "required_if:secondaryLeaveType,==,Full",
             'fromDate' => 'required',
@@ -415,10 +413,8 @@ class LeaveController extends Controller
             }
         }
 
-        // dd("+++++++++++");
         //check for spo reporting manager exist
         if($designation_login_user==2){
-
 
             $empDesg_NPA = DB::table('designation_user as du')
 
@@ -431,7 +427,6 @@ class LeaveController extends Controller
             }
         }
 
-//        return $arr_underlaying_emp;
         if(isset($arr_underlaying_emp) AND !empty($arr_underlaying_emp)){
         }else{
             $manager_error = "You do not have reporting manger under Your area.";
@@ -481,13 +476,6 @@ class LeaveController extends Controller
             'isactive' => 1
         ];
 
-
-        // $already_applied_leave = $user->appliedLeaves()->where($check_dates)->first();
-
-        // if(!empty($already_applied_leave)){
-        //     $unique_error = "You have already applied for leave on the given dates.";
-        //     return redirect('leaves/apply-leave')->with('leaveError',$unique_error);
-        // }
 
         if(!empty($last_applied_leave)){
             $chk_existing_date = DB::table('applied_leaves')
@@ -734,12 +722,14 @@ class LeaveController extends Controller
 
         $currentYear = date('Y');
         $year = $currentYear;
-        $lastMonth = date('m', strtotime('-1 month',strtotime($applied_leave->from_date)));
-        $year = date('Y', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
-//        if($lastMonth == 12){
-//            $year = $year - 1;
-//        }
+       $date = date('d', strtotime($applied_leave->from_date));
+        if($date <= 25){
+            $lastMonth = date('m', strtotime($applied_leave->from_date));
+        }else {
+            $lastMonth = date('m', strtotime('-1 month', strtotime($applied_leave->from_date)));
+        }
+        $year = date('Y', strtotime('-1 month',strtotime($applied_leave->from_date)));
 
         $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
