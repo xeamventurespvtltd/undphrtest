@@ -723,17 +723,23 @@ class LeaveController extends Controller
         $currentYear = date('Y');
         $year = $currentYear;
 
-       $date = date('d', strtotime($applied_leave->from_date));
-        if($date <= 25){
+        $date = date('d', strtotime($applied_leave->from_date));
+        $appliedLeaveMonth = date('m', strtotime($applied_leave->from_date));
+
+        if($date > 25 && $date <= 31){
             $lastMonth = date('m', strtotime($applied_leave->from_date));
-        }else {
+        }
+        else {
             $lastMonth = date('m', strtotime('-1 month', strtotime($applied_leave->from_date)));
         }
 
-        if($lastMonth == 01) {
+        if($lastMonth == 12 && $appliedLeaveMonth == 01) {
             $year = date('Y', strtotime('-1 month', strtotime($applied_leave->from_date)));
         }
 
+//        return $year.'-'. $lastMonth;
+
+//        return $applied_leave;
         if(AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
             ->exists()){
@@ -750,7 +756,7 @@ class LeaveController extends Controller
 //            return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
 //        }
 
-        // Comment By Hitesh
+// Comment By Hitesh
         $leave_approval->save();
         $applier = $leave_approval->user;
 
