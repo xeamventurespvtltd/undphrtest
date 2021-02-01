@@ -54,8 +54,9 @@ class SalaryController extends Controller
                 $data = Excel::toArray(new SalarySheetImport,request()->file('salary_file'));
 
                 if(count($data)){
-                    foreach($data[0] as $record) {
-//                        if ($record['emp_code'] == 29338) {
+                    foreach($data[0] as $key => $record) {
+                        if(isset($record['emp_code']) || !empty($record['emp_code']) ) {
+
                             $user_data = Employee::where("employee_id", $record['emp_code'])->first();
 
                             if (isset($user_data)) {
@@ -64,8 +65,7 @@ class SalaryController extends Controller
                                         'salary_month' => $record['salary_month'],
                                         'salary_year' => $record['salary_year'],
                                         'emp_code' => $record['emp_code']
-                                    ])
-                                        ->update([
+                                    ])->update([
                                             'user_id' => $user_data['user_id'],
                                             'emp_name' => $record['emp_name'],
                                             'present_days' => $record['present_days'],
@@ -103,7 +103,11 @@ class SalaryController extends Controller
                                     ]);
                                 }
                             }
-//                        }
+//else{
+//                                $userNotFound[] = $record['emp_code']. '=>'. $record['emp_name'];
+//                            }
+
+                        }
                     }
                 }
 
@@ -114,6 +118,7 @@ class SalaryController extends Controller
                 return redirect()->back()->with('Error', 'There is some error.');
             }
         }
+
 
         return view('salary.upload_salary_slip', $data);
 
@@ -129,7 +134,7 @@ class SalaryController extends Controller
 
     function viewSalary(Request $request)
     {
-                $data = [];
+        $data = [];
         $user = Auth::user();
 
         $salary_month = $request->salary_month;
