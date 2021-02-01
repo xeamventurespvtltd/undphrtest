@@ -159,6 +159,7 @@ if(!empty($usser)) {
                         <li class=""><a title="Download mediclaim policy" href="{{ asset('public/uploads/documents/BHARTI').'/Bharti GMC addition.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>Mediclaim(3L) 6</a></li>
                         <li class=""><a title="Download mediclaim policy" href="{{ asset('public/uploads/documents/BHARTI').'/BHARTI_00015_EN_00_20201005194510 Additions 21.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>Mediclaim(3L) 7</a></li>
                         <li class=""><a title="Download mediclaim policy" href="{{ asset('public/uploads/documents/BHARTI').'/BHARTI_AXA_Group_Mediclaim_Policy.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>Mediclaim(3L) 8</a></li>
+                        <li class=""><a title="Download mediclaim policy" href="{{ asset('public/uploads/documents/BHARTI').'/Xeam Bharti Addition-01-02-2021.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>Mediclaim(3L) 9</a></li>
 
                         <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI _ONMember_AnnuextureAfter_Accounting.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 1</a></li>
                         <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI GTC addition1.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 2</a></li>
@@ -166,6 +167,8 @@ if(!empty($usser)) {
                         <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI POLICY.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 4</a></li>
                         <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI_ONMember_AnnuextureAfter_Accounting.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 5</a></li>
                         <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI_Life_Insurance_Policy.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 6</a></li>
+                        <li class=""><a title="Download life policy" href="{{ asset('public/uploads/documents/ICICI').'/ICICI Prudentails _Additions-01-02-2021.pdf' }}"  target=”_blank”><i class="fa fa-circle-o text-red"></i>ICICI Life insurance(10L) 7</a></li>
+
 
 
                     </ul>
