@@ -740,6 +740,7 @@ class LeaveController extends Controller
 //        return $year.'-'. $lastMonth;
 
 //        return $applied_leave;
+
         if(AttendanceVerification::where('user_id', $applied_leave->user_id)
             ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
             ->exists()){
