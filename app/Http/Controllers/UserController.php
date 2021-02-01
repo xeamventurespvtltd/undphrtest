@@ -635,23 +635,12 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-
-
-        /*if($user->hasRole('MD') || $user->hasRole('AGM')){*/
-
         $query = DB::table('employees as emp')
             ->join('users as u','emp.user_id','=','u.id');
 
-        //$query = $query->where('pu.project_id',$req['project_id']);
-        //}
         $employees_po = $query->select('u.*','emp.*')
             ->orderBy('emp.created_at','DESC')
             ->get();
-
-
-        //}
-
-
 
         $projects = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();
         $departments = Department::where(['isactive'=>1])->select('id','name')->get();
@@ -668,7 +657,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         if(empty($request->project_id)){
-            $req['project_id'] = 1;
+            $req['project_id'] = 'All';
         }else{
             $req['project_id'] = $request->project_id;
         }
@@ -679,6 +668,8 @@ class UserController extends Controller
             $req['department_id'] = $request->department_id;
         }
 
+
+//        return $req;
         if($user->hasRole('MD') || $user->hasRole('AGM')){
             if($req['project_id'] == 'All'){
                 $query = DB::table('employees as emp')
@@ -698,13 +689,10 @@ class UserController extends Controller
             $employees_po = $query->select('u.*','emp.*')
                 ->orderBy('emp.created_at','DESC')
                 ->get();
-
-
         }else{
 
 
-
-            $data = DB::table('employees as emp')
+              $data = DB::table('employees as emp')
 
                 ->join('users as u','emp.user_id','=','u.id')
 
@@ -716,7 +704,9 @@ class UserController extends Controller
 
                 ->orderBy('emp.created_at','DESC')
 
+
                 ->get();
+
             $userid = Auth::id();
             $designation_login_data = DB::table('designation_user as du')
 
@@ -728,6 +718,7 @@ class UserController extends Controller
             $token = 0;
             $employees_po = array();
             $i=0;
+
             foreach($data as $key=>$value){
 
 
@@ -823,6 +814,7 @@ class UserController extends Controller
 
                 }
             }
+
             if($designation_login_user==3){
 
                 $token=3;
@@ -877,15 +869,17 @@ class UserController extends Controller
 
                } */
             }
+
             if($designation_login_user==4){
                 $token=4;
                 $employees_po=array();
             }
+
             if($designation_login_user==1){
                 $token++;
                 $employees_po=$data;
-
             }
+
             //check for state if spo
             if($designation_login_user==2){
                 $token++;
@@ -905,12 +899,12 @@ class UserController extends Controller
                     $i++;
                 }
             }
+
             if((!isset($employees_po) OR empty($employees_po)) AND $token==0){
                 $employees_po=$data;
             }
 
         }
-
 
 
         $projects = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();

@@ -46,6 +46,7 @@ class SalaryController extends Controller
 
             return redirect()->back()->withErrors($validator);
         }
+
         else
         {
             try {
@@ -54,7 +55,7 @@ class SalaryController extends Controller
 
                 if(count($data)){
                     foreach($data[0] as $record) {
-                        if ($record['emp_code'] == 29338) {
+//                        if ($record['emp_code'] == 29338) {
                             $user_data = Employee::where("employee_id", $record['emp_code'])->first();
 
                             if (isset($user_data)) {
@@ -102,7 +103,7 @@ class SalaryController extends Controller
                                     ]);
                                 }
                             }
-                        }
+//                        }
                     }
                 }
 
@@ -113,7 +114,9 @@ class SalaryController extends Controller
                 return redirect()->back()->with('Error', 'There is some error.');
             }
         }
+
         return view('salary.upload_salary_slip', $data);
+
     }
 
     function viewSalarySlip()
