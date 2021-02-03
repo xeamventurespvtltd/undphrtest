@@ -63,12 +63,9 @@ strong {
                             <label>Year<sup class="ast">*</sup></label>
                             <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                                 <option value="" disabled>Please select Year</option>
-                                <option value="2021">2021</option>
-                                <option value="2020">2020</option>
-                                <option value="2019">2019</option>
-                                <option value="2018">2018</option>
-                                <option value="2017">2017</option>
-                                <option value="2016">2016</option>
+                                @for($year = date("Y"); $year >=2020; $year--)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
                             </select>
                         </div>
                     </div>

@@ -138,10 +138,12 @@ class SalaryController extends Controller
         $user = Auth::user();
 
         $salary_month = $request->salary_month;
+        $salary_year = $request->salary_year;
         if( $salary_month){
 
             $query = [];
-            $query['salary_detail'] = SalarySlip::where(['salary_month'=>$salary_month, 'user_id'=>$user->id])->first();
+            $query['salary_detail'] = SalarySlip::where(['salary_year'=>$salary_year, 'salary_month'=>$salary_month,
+                'user_id'=>$user->id])->first();
 
             if($query['salary_detail']){
 

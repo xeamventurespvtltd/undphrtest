@@ -40,12 +40,9 @@
                         <label>Year<sup class="ast">*</sup></label>
                         <select class="form-control input-sm basic-detail-input-style" id="year" name="year">
                             <option value="" selected disabled>Please select Year</option>
-                            <option value="2021" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2021) ? 'selected' : ''}}>2021</option>
-                            <option value="2020" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2020) ? 'selected' : ''}}>2020</option>
-                            <option value="2019" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2019) ? 'selected' : ''}}>2019</option>
-                            <option value="2018" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2018) ? 'selected' : ''}}>2018</option>
-                            <option value="2017" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2017) ? 'selected' : ''}}>2017</option>
-                            <option value="2016" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == 2016) ? 'selected' : ''}}>2016</option>
+                            @for($year = date("Y"); $year >=2020; $year--)
+                                <option value="{{ $year }}" {{ (isset($_REQUEST["year"]) && $_REQUEST["year"] == $year) ? 'selected' : ''}}>{{ $year }}</option>
+                            @endfor
                         </select>
                       </div>
 
