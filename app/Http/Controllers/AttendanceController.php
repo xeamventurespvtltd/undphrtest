@@ -1166,10 +1166,17 @@ class AttendanceController extends Controller
                     }
 
                     if ($emp->designation_id == 4) { //vccm
+
                         $user_district = DB::table('location_user as lu')
                             ->where('lu.user_id', '=', $emp->user_id)
                             ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
-                        $user_district_id = $user_district->location_id;
+
+                                    if(isset($user_district->location_id)){
+                                        $user_district_id = $user_district->location_id;
+                                    }else{
+                                        $userDonthaveLocation[] = $emp->employee_code;
+                                    }
+                        
 
                         if ($user_district_id != "") {
                             $employeesDistrict = DB::table('location_user as lu')
@@ -1489,7 +1496,7 @@ class AttendanceController extends Controller
             return Excel::download($export, 'attendance-punch.xlsx');
         }
 
-
+// return $userDonthaveLocation;
         return view('attendances.consolidated_attendance_sheets')->with(['data'=>$data,'employees'=>$employees_po,'req'=>$req, 'login_user'=>$userid]);
 
     }  //end of function
