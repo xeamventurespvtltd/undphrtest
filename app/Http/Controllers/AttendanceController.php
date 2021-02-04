@@ -735,8 +735,8 @@ class AttendanceController extends Controller
     */
     function consolidatedAttendanceSheets(Request $request)
     {
-        $user_with_no_designation = $has_no_designation = 0;
 
+        $user_with_no_designation = $has_no_designation = 0;
 
         $data['projects'] = Project::where(['isactive' => 1, 'approval_status' => '1'])->select('id', 'name')->get();
         $data['departments'] = Department::where(['isactive' => 1])->select('id', 'name')->get();
@@ -748,6 +748,7 @@ class AttendanceController extends Controller
         } else {
             $data['user_department'] = "";
         }
+
 
         $req['emp_records'] = '!=';
         $req['company_sign'] = '!=';
@@ -767,10 +768,10 @@ class AttendanceController extends Controller
             $req['emp_records'] = $request->emp_records;
         }
 
+
         if ($request->submit) {
             $req['submit'] = $request->submit;
         }
-
 
         if ($request->project) {
             $req['project'] = $request->project;
@@ -795,7 +796,6 @@ class AttendanceController extends Controller
         }
 
         if (!empty($request->all())) {
-
             $month_last_date = date("Y-m-t", strtotime($req['year'] . '-' . $req['month'] . '-01'));
             $employees = DB::table('projects as p')
                 ->join('project_user as pu', 'p.id', '=', 'pu.project_id')
@@ -982,6 +982,7 @@ class AttendanceController extends Controller
             $employees[$key]->state_id = $listed_user_state_id;
         }
 
+
         //check for district if po
         if ($designation_login_user == 5) {
             $token = 5;
@@ -1077,7 +1078,6 @@ class AttendanceController extends Controller
             foreach ($employees as $emp) {
                 if (isset($emp->designation_id) and ($emp->designation_id != "")) {
 
-
                     if ($emp->designation_id == 2) { //spo
                         $empDesg_NPA = DB::table('designation_user as du')
                             ->where('du.designation_id', '=', 1)
@@ -1090,7 +1090,6 @@ class AttendanceController extends Controller
                             $emp_data = Employee::where(['user_id' => $u_id])
                                 ->first();
                             $emp->reporting_head = $emp_data->fullname;
-
                             $user_data = User::where(['id' => $u_id])
                                 ->first();
                             $emp->reporting_head_uId = $user_data->employee_code;
@@ -1124,7 +1123,6 @@ class AttendanceController extends Controller
                                 $emp_data = Employee::where(['user_id' => $u_id])
                                     ->first();
                                 $emp->reporting_head = $emp_data->fullname;
-
                                 $user_data = User::where(['id' => $u_id])
                                     ->first();
                                 $emp->reporting_head_uId = $user_data->employee_code;
@@ -1212,8 +1210,6 @@ class AttendanceController extends Controller
                     }
 
                 }
-
-
             }
             $employees_po = $employees;
 
@@ -1262,7 +1258,6 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error_msg', 'Employee Code - ' . $user_with_no_designation . '. No designation found for some of your team members or your self.');
         }
 
-
         if ((!isset($employees_po) or empty($employees_po)) and $token == 0) {
             $employees_po = $employees;
         }
@@ -1279,15 +1274,19 @@ class AttendanceController extends Controller
             $data = [];
 
             $key=0;
+
             if($req['month']==1){
                 $start_year = $req['year']-1;
                 $last_month = 12;
-            }else{
+            }
+
+            else{
                 $start_year = $req['year'];
                 $last_month = $req['month']-1;
             }
 
             foreach($employees_po as $emp) {
+//                return $employees_po;
 
                 $user = $emp->user_id;
                 $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
@@ -1358,13 +1357,22 @@ class AttendanceController extends Controller
 
                 $user_data = User::where(['id' => $user])->with('designation')->first();
 
+
                 $data[$key]['fullname'] = $emp_data->fullname;
                 $data[$key]['employee_code'] = $user_data->employee_code;
                 $data[$key]['designation'] = $user_data->designation[0]->name;
                 $data[$key]['State'] = $emp_state;
-
-                $data[$key]['Reporting head'] = $logged_in_user->employee->fullname;
-                $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
+//                dd($emp);
+                if(isset($emp->reporting_head)){
+                    $data[$key]['Reporting head'] = $emp->reporting_head;
+                }else{
+                    $data[$key]['Reporting head'] = $logged_in_user->reporting_head;
+                }
+                if(isset($emp->reporting_head)){
+                    $data[$key]['Reporting head UId'] = $emp->reporting_head_uId;
+                }else{
+                    $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
+                }
 
                 $data[$key]['Verified'] = $verify_status;
                 $data[$key]['Month'] = $prev_month . "-" . $month;
