@@ -6,59 +6,59 @@
 
 
 
-<link rel="stylesheet" href="{{asset('public/admin_assets/plugins/dataTables/jquery.dataTables.min.css')}}">
+    <link rel="stylesheet" href="{{asset('public/admin_assets/plugins/dataTables/jquery.dataTables.min.css')}}">
 
-<style>
-  #filterFormSubmit {
-    margin-top: 2%;
-  }
-</style>
+    <style>
+        #filterFormSubmit {
+            margin-top: 2%;
+        }
+    </style>
 
-<!-- Content Wrapper. Contains page content -->
+    <!-- Content Wrapper. Contains page content -->
 
 
 
-  <div class="content-wrapper">
+    <div class="content-wrapper">
 
 
 
-    <!-- Content Header (Page header) -->
+        <!-- Content Header (Page header) -->
 
 
 
-    <section class="content-header">
+        <section class="content-header">
 
 
 
-      <h1>
+            <h1>
 
 
 
-        Employees List
+                Employees List
 
 
 
-        <!-- <small>Control panel</small> -->
+                <!-- <small>Control panel</small> -->
 
 
 
-      </h1>
+            </h1>
 
 
 
-      <ol class="breadcrumb">
+            <ol class="breadcrumb">
 
 
 
-        <li><a href="{{ url('employees/dashboard') }}"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li><a href="{{ url('employees/dashboard') }}"><i class="fa fa-dashboard"></i> Home</a></li>
 
 
 
-      </ol>
+            </ol>
 
 
 
-    </section>
+        </section>
 
 
 
@@ -66,368 +66,302 @@
 
 
 
-    <!-- Main content -->
+        <!-- Main content -->
 
 
 
-    <section class="content">
+        <section class="content">
 
 
 
-      <!-- Small boxes (Stat box) -->
+            <!-- Small boxes (Stat box) -->
 
 
 
-      <div class="row">
+            <div class="row">
 
 
 
-          <div class="box">
+                <div class="box">
 
 
 
-            <div class="box-header">
+                    <div class="box-header">
 
 
 
-              <h3 class="box-title">@can('create-employee')<a class="btn btn-info" href='{{ url("employees/create")}}'>Add</a>@endcan</h3>
+                        <h3 class="box-title">@can('create-employee')<a class="btn btn-info" href='{{ url("employees/create")}}'>Add</a>@endcan</h3>
 
 
 
-            </div>
+                    </div>
 
 
 
-            <!-- /.box-header -->
+                    <!-- /.box-header -->
 
 
 
-            <div class="box-body">
+                    <div class="box-body">
 
-            @if(auth()->user()->hasRole('MD') || auth()->user()->hasRole('AGM') || auth()->user()->id == 1)
-            <form id="filterForm">
-                <div class="form-group col-sm-3">
-                  <label>Project</label>
-                  <select class="form-control" name="project_id">
-                    <option value="" selected disabled>Select Project</option>
-                    <option value="All" @if($req['project_id'] == 'All'){{"selected"}}@endif>All</option>  
-                  @foreach($projects as $key => $value)
-                    <option value="{{$value->id}}" @if($req['project_id'] == $value->id){{"selected"}}@endif>{{$value->name}}</option>
-                  @endforeach  
-                  </select>
-                </div>
-
-                <div class="form-group col-sm-3">
-                  <label>Department</label>
-                  <select class="form-control" name="department_id">
-                    <option value="" selected disabled>Select Department</option>
-                    <option value="">None</option>
-                  @foreach($departments as $key => $value)
-                    <option value="{{$value->id}}" @if($req['department_id'] == $value->id){{"selected"}}@endif>{{$value->name}}</option>
-                  @endforeach  
-                  </select>
-                </div>
-
-              <button type="submit" class="btn btn-info" id="filterFormSubmit">Submit</button>
-              <a style="margin-top:2%" href="{{ url('employees/list-all') }}" class="btn btn-info">Show all</a>
-
-            </form>
-
-            @endif
-
-              <table id="employeesList" class="table table-bordered table-striped">
-
-
-
-                <thead class="table-heading-style">
-
-
-
-                <tr>
-
-
-
-                  <th>S.No.</th>
-
-
-
-                  <th>User Id</th>
-
-
-
-                  <th>Name</th>
-                  
-                  
-                  <th>Designation</th>
-                   
-
-                  <th>Mobile</th>
-
-
-
-                  <th>Email</th>
-
-
-
-                  <th>Approval Status</th>
-
-
-
-                @can('edit-employee')
-
-
-
-                  <th>Actions</th>
-
-
-
-                  <th>Status</th>
-
-
-
-                @endcan
-
-
-
-                </tr>
-
-
-
-                </thead>
-
-
-
-                <tbody>
-
-               
-
-                @foreach($data_emp as $key=>$employee)  
-
-
-
-                <tr>
-
-
-
-	                  <td>{{@$loop->iteration}}</td>
-
-
-
-	                  <td>{{$employee->employee_code}}</td>
-
-
-
-	                  <td>{{$employee->fullname}}</td>
-	                  
-	                  
-	                   <td>{{$employee->designation_name}}</td>
-
-
-
-	                  <td>{{$employee->mobile_number}}</td>
-
-
-
-	                  <td>{{$employee->email}}</td>
-
-
-
-                    <td>@if($employee->approval_status == '0')
-
-
-
-                        <span class="label label-danger">Not Approved</span>
-
-
-
-                        @else
-
-
-
-                        <span class="label label-success">Approved</span>
-
-
+                        @if(auth()->user()->hasRole('MD') || auth()->user()->hasRole('AGM') || auth()->user()->id == 1)
+                            <form id="filterForm">
+                                <div class="form-group col-sm-3">
+                                    <label>Project</label>
+                                    <select class="form-control" name="project_id">
+                                        <option value="" selected disabled>Select Project</option>
+                                        <option value="All" @if($req['project_id'] == 'All'){{"selected"}}@endif>All</option>
+                                        @foreach($projects as $key => $value)
+                                            <option value="{{$value->id}}" @if($req['project_id'] == $value->id){{"selected"}}@endif>{{$value->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-sm-3">
+                                    <label>Department</label>
+                                    <select class="form-control" name="department_id">
+                                        <option value="" selected disabled>Select Department</option>
+                                        <option value="">None</option>
+                                        @foreach($departments as $key => $value)
+                                            <option value="{{$value->id}}" @if($req['department_id'] == $value->id){{"selected"}}@endif>{{$value->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-info" id="filterFormSubmit">Submit</button>
+                                <a style="margin-top:2%" href="{{ url('employees/list-all') }}" class="btn btn-info">Show all</a>
+
+                            </form>
 
                         @endif
 
+                        <table id="employeesList" class="table table-bordered table-striped">
 
 
-                    </td>
 
+                            <thead class="table-heading-style">
 
 
-                  @can('edit-employee')
 
+                            <tr>
+                                <th>S.No.</th>
+                                <th>User Id</th>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>State</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Approval Status</th>
+                                @can('edit-employee')
 
+                                    <th>Actions</th>
+                                    <th>Status</th>
+                                @endcan
 
-	                  <td><a class="btn btn-success" target="_blank" href='{{ url("employees/edit/$employee->user_id")}}'>Edit</a> &nbsp;<a class="btn btn-primary" target="_blank" href='{{ url("employees/profile/$employee->user_id")}}'>View</a></td>
+                            </tr>
+                            </thead>
 
+                            <tbody>
 
+                            @foreach($data_emp as $key=>$employee)
+                                <tr>
+                                    <td>{{@$loop->iteration}}</td>
+                                    <td>{{$employee->employee_code}}</td>
+                                    <td>{{$employee->fullname}}</td>
+                                    <td>{{$employee->designation_name}}</td>
+                                    <td>{{ $employee->state }}</td>
+                                    <td>{{$employee->mobile_number}}</td>
+                                    <td>{{$employee->email}}</td>
+                                    <td>@if($employee->approval_status == '0')
+                                            <span class="label label-danger">Not Approved</span>
+                                        @else
+                                            <span class="label label-success">Approved</span>
+                                        @endif
+                                    </td>
+                                    @can('edit-employee')
 
-	                  <td>
+                                        <td><a class="btn btn-success" target="_blank" href='{{ url("employees/edit/$employee->user_id")}}'>Edit</a> &nbsp;<a class="btn btn-primary" target="_blank" href='{{ url("employees/profile/$employee->user_id")}}'>View</a></td>
 
+                                        <td>
 
 
-	                        <div class="dropdown">
 
+                                            <div class="dropdown">
 
 
-	                            @if($employee->isactive)
 
+                                                @if($employee->isactive)
 
 
-	                            <button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown">
 
+                                                    <button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown">
 
 
-	                             {{"Active"}}
 
+                                                        {{"Active"}}
 
 
-	                            @else
 
+                                                        @else
 
 
-	                            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
 
+                                                            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
 
 
-	                             {{"Inactive"}}
 
+                                                                {{"Inactive"}}
 
 
-	                            @endif
 
+                                                                @endif
 
 
-	                          <span class="caret"></span></button>
 
+                                                                <span class="caret"></span></button>
 
 
-	                          <ul class="dropdown-menu">
 
+                                                            <ul class="dropdown-menu">
 
 
-	                            <li>
 
+                                                                <li>
 
 
-	                                @if($employee->isactive)
 
+                                                                    @if($employee->isactive)
 
 
-	                                  <a href='javascript:void(0)' class="statusEmp" data-employee="{{$employee->user_id}}" data-status="0">De-activate</a>
 
+                                                                        <a href='javascript:void(0)' class="statusEmp" data-employee="{{$employee->user_id}}" data-status="0">De-activate</a>
 
 
-	                                @else
 
+                                                                    @else
 
 
-	                                   <a href='javascript:void(0)' class="statusEmp" data-employee="{{$employee->user_id}}" data-status="1">Activate</a>
 
+                                                                        <a href='javascript:void(0)' class="statusEmp" data-employee="{{$employee->user_id}}" data-status="1">Activate</a>
 
 
-	                                @endif
 
+                                                                    @endif
 
 
-	                            </li>
 
+                                                                </li>
 
 
-	                            
 
 
 
-	                          </ul>
 
 
+                                                            </ul>
 
-	                        </div>
 
 
+                                            </div>
 
-	                  </td>
 
 
+                                        </td>
 
-	                @endcan
 
 
+                                    @endcan
 
-                </tr>
 
 
+                                </tr>
 
-                @endforeach
 
 
+                            @endforeach
 
-                </tbody>
 
 
+                            </tbody>
 
-                <tfoot class="table-heading-style">
 
 
+                            <tfoot class="table-heading-style">
 
-                <tr>
 
 
+                            <tr>
 
-                  <th>S.No.</th>
 
 
+                                <th>S.No.</th>
 
-                  <th>User Id</th>
 
 
+                                <th>User Id</th>
 
-                  <th>Name</th>
-                  
-                  
-                  <th>Designation</th>
 
 
+                                <th>Name</th>
 
-                  <th>Mobile</th>
 
+                                <th>Designation</th>
 
+<th>State</th>
 
-                  <th>Email</th>
+                                <th>Mobile</th>
 
 
 
-                  <th>Approval Status</th>
+                                <th>Email</th>
 
 
 
-                @can('edit-employee')
+                                <th>Approval Status</th>
 
 
 
-                  <th>Actions</th>
+                                @can('edit-employee')
 
 
 
-                  <th>Status</th>
+                                    <th>Actions</th>
 
 
 
-                @endcan
+                                    <th>Status</th>
 
 
 
-                </tr>
+                                @endcan
 
 
 
-                </tfoot>
+                            </tr>
 
 
 
-              </table>
+                            </tfoot>
+
+
+
+                        </table>
+
+
+
+                    </div>
+
+
+
+                    <!-- /.box-body -->
+
+
+
+                </div>
+
+
+
+                <!-- /.box -->
 
 
 
@@ -435,404 +369,388 @@
 
 
 
-            <!-- /.box-body -->
+            <!-- /.row -->
 
 
 
-          </div>
+            <div class="modal fade" id="statusModal">
 
 
 
-          <!-- /.box -->
+                <div class="modal-dialog">
 
 
 
-      </div>
+                    <div class="modal-content">
 
 
 
-      <!-- /.row -->
+                        <div class="modal-header">
 
 
 
-      <div class="modal fade" id="statusModal">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 
 
 
-	      <div class="modal-dialog">
+                                <span aria-hidden="true">&times;</span></button>
 
 
 
-	        <div class="modal-content">
+                            <h4 class="modal-title">Default Modal</h4>
 
 
 
-	          <div class="modal-header">
+                        </div>
 
 
 
-	            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <div class="modal-body">
 
 
 
-	              <span aria-hidden="true">&times;</span></button>
+                            <form id="statusForm" action="{{url('employees/change-status')}}" method="POST">
 
 
 
-	            <h4 class="modal-title">Default Modal</h4>
+                                {{ csrf_field() }}
 
 
 
-	          </div>
+                                <div class="box-body">
 
 
 
-	          <div class="modal-body">
+                                    <div class="form-group">
 
 
 
-	            <form id="statusForm" action="{{url('employees/change-status')}}" method="POST">
+                                        <label for="actionDate" class="actionDate"></label>
 
 
 
-		            {{ csrf_field() }}
+                                        <input type="date" class="form-control" id="actionDate" name="action_date">
 
 
 
-		              <div class="box-body">
+                                    </div>
 
 
 
-		                <div class="form-group">
+                                    <div class="form-group">
 
 
 
-		                  <label for="actionDate" class="actionDate"></label>
+                                        <label for="description">Description</label>
 
 
 
-		                  <input type="date" class="form-control" id="actionDate" name="action_date">
+                                        <input type="text" class="form-control" id="description" name="description">
 
 
 
-		                </div>
+                                    </div>
 
 
 
-		                <div class="form-group">
+                                    <input type="hidden" name="action" id="modalAction">
 
+                                    <input type="hidden" name="user_id" id="modalUserId">
 
 
-		                  <label for="description">Description</label>
 
+                                </div>
 
 
-		                  <input type="text" class="form-control" id="description" name="description">
 
+                                <!-- /.box-body -->
 
 
-		                </div>
 
+                                <div class="box-footer">
 
 
-                    <input type="hidden" name="action" id="modalAction">
 
-                    <input type="hidden" name="user_id" id="modalUserId">
+                                    <button type="submit" class="btn btn-primary statusFormSubmit">Submit</button>
 
-		                             
 
-		              </div>
 
+                                </div>
 
 
-		              <!-- /.box-body -->
 
+                            </form>
 
 
-		              <div class="box-footer">
 
+                        </div>
 
 
-		                <button type="submit" class="btn btn-primary statusFormSubmit">Submit</button>
 
 
 
-		              </div>
 
 
+                    </div>
 
-		        </form>
 
 
+                    <!-- /.modal-content -->
 
-	          </div>
 
 
+                </div>
 
-	          
 
 
+                <!-- /.modal-dialog -->
 
-	        </div>
 
 
+            </div>
 
-	        <!-- /.modal-content -->
 
 
+            <!-- /.modal -->
 
-	      </div>
 
 
+            <!-- /.row (main row) -->
 
-      <!-- /.modal-dialog -->
 
 
 
-    	</div>
 
 
 
-        <!-- /.modal -->
+        </section>
 
 
 
-      <!-- /.row (main row) -->
+        <!-- /.content -->
 
 
 
+    </div>
 
 
 
+    <!-- /.content-wrapper -->
 
-    </section>
 
 
 
-    <!-- /.content -->
 
 
 
-  </div>
+    <script src="{{asset('public/admin_assets/plugins/dataTables/jquery.dataTables.min.js')}}"></script>
 
 
 
-  <!-- /.content-wrapper -->
+    <script type="text/javascript">
 
 
 
+        $(document).ready(function() {
 
 
 
+            $('.statusEmp').on('click',function(){
 
-  <script src="{{asset('public/admin_assets/plugins/dataTables/jquery.dataTables.min.js')}}"></script>
 
 
+                var employee = $(this).data("employee");
 
-  <script type="text/javascript">
 
 
+                var status = $(this).data("status");
 
-      $(document).ready(function() {
 
 
+                $("#modalUserId").val(employee);
 
-          $('.statusEmp').on('click',function(){
 
 
+                if(status == 0){
 
-          	var employee = $(this).data("employee");
 
 
+                    $("#modalAction").val("deactivate");
 
-          	var status = $(this).data("status");
 
 
+                    // var redirect = "{{url('/employees/status/deactivate')}}" + '/' + employee;
 
-            $("#modalUserId").val(employee);
 
 
+                    var modalTitle = "Deactivate Employee";
 
-          	if(status == 0){
 
 
+                    var actionDate = "Relieving Date";
 
-              $("#modalAction").val("deactivate");
 
 
+                }else{
 
-          		// var redirect = "{{url('/employees/status/deactivate')}}" + '/' + employee;	
 
 
+                    $("#modalAction").val("activate");
 
-          		var modalTitle = "Deactivate Employee";
 
 
+                    // var redirect = "{{url('/employees/status/activate')}}" + '/' + employee;
 
-          		var actionDate = "Relieving Date";
 
 
+                    var modalTitle = "Activate Employee";
 
-          	}else{
 
 
+                    var actionDate = "Rejoining Date";
 
-              $("#modalAction").val("activate");
 
 
+                }
 
-          		// var redirect = "{{url('/employees/status/activate')}}" + '/' + employee;
 
 
 
-          		var modalTitle = "Activate Employee";
 
 
 
-          		var actionDate = "Rejoining Date";
+                //$('#statusForm').attr("action",redirect);
 
 
 
-          	}
+                $('.modal-title').text(modalTitle);
 
 
 
-          	
+                $('.actionDate').text(actionDate);
 
 
 
-          	//$('#statusForm').attr("action",redirect);
+                $('#statusModal').modal('show');
 
 
 
-          	$('.modal-title').text(modalTitle);
 
 
 
-          	$('.actionDate').text(actionDate);
 
+            });
 
 
-          	$('#statusModal').modal('show');
 
+            $('#employeesList').DataTable({
 
+                scrollX: true,
 
+                responsive: true
 
+            });
 
 
 
-          });
+        });
 
 
 
-          $('#employeesList').DataTable({
+    </script>
 
-            scrollX: true,
 
-            responsive: true
 
-          });
 
 
 
-      });
 
+    <script src="{{asset('public/admin_assets/plugins/validations/jquery.validate.js')}}"></script>
 
 
-  </script>
 
+    <script src="{{asset('public/admin_assets/plugins/validations/additional-methods.js')}}"></script>
 
 
 
+    <script>
 
 
 
-  <script src="{{asset('public/admin_assets/plugins/validations/jquery.validate.js')}}"></script>
+        $("#statusForm").validate({
 
 
 
-  <script src="{{asset('public/admin_assets/plugins/validations/additional-methods.js')}}"></script>
+            rules :{
 
 
 
-  <script>
+                "action_date" : {
 
 
 
-    $("#statusForm").validate({
+                    required : true,
 
 
 
-      rules :{
+                },
 
 
 
-          "action_date" : {
+                "description" : {
 
 
 
-              required : true,
+                    required : true,
 
 
 
-          },
+                }
 
 
 
-          "description" : {
+            },
 
 
 
-              required : true,
+            messages :{
 
 
 
-          }
+                "action_date" : {
 
 
 
-      },
+                    required : 'Please select a date.',
 
 
 
-      messages :{
+                },
 
 
 
-          "action_date" : {
+                "description" : {
 
 
 
-              required : 'Please select a date.',
+                    required : "Please enter description.",
 
 
 
-          },
+                }
 
 
 
-          "description" : {
+            }
 
 
 
-              required : "Please enter description.",
+        });
 
 
 
-          }
+    </script>
 
 
 
-      }
-
-
-
-    });
-
-
-
-  </script>
-
-
-
-  @endsection
+@endsection

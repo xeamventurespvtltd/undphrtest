@@ -233,8 +233,22 @@ strong {
                                 <td><strong>{{$value->unpaid_leaves ?? '0'}}</strong></td>
 
 
-                                <td>
-                                <a title="View Attendance & Verify" target="_blank" href="{{url('attendances/view').$redirect_url}}"><i class="fa fa-calendar" aria-hidden="true"></i></a>
+                                <td style="min-width: 200px">
+                                    <div class="constants-container">
+                                        <a title="View Attendance & Verify" class="m-l-xs m-r-xs" target="_blank" href="{{url('attendances/view').$redirect_url}}">
+                                            <button class="btn btn-info btn-xs">
+                                                <i class="fa fa-calendar fa-sm" aria-hidden="true"></i>
+                                            </button>
+                                        </a>
+                                        <form method="post" action="{{ route('attendance.download') }}">
+                                            @csrf
+                                            <input type="hidden" value="{{ $value->user_id }}" name="user_id">
+                                            <input type="hidden" value="{{ $req['year'] }}" name="year">
+                                            <input type="hidden" value="{{ $req['month'] }}" name="month">
+                                            <button type="submit" class="btn btn-success btn-xs m-l-xs m-r-xs" ><i class="fa fa-download fa-xs" aria-hidden="true"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 <div>
                                   <!--@if($value->isverified)
                                     <span class="label label-success">Verified</span>

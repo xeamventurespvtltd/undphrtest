@@ -1,23 +1,20 @@
 <?php
 
 use App\Employee;
-use App\LeaveDetail;
-use App\Mail\GeneralMail;
 use App\SalarySlip;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 
-Route::get('test-mail', function(){
-    $mail_data['to_email'] = "xeam.php14@gmail.com";
-    $mail_data['subject'] = "test";
-    $mail_data['message'] = "test mail";
-
-    if(!empty($mail_data['to_email'])){
-        Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
-    }
-});
+//Route::get('test-mail', function(){
+//    $mail_data['to_email'] = "xeam.php14@gmail.com";
+//    $mail_data['subject'] = "test";
+//    $mail_data['message'] = "test mail";
+//
+//    if(!empty($mail_data['to_email'])){
+//        Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
+//    }
+//});
 
 Route::get('update-salary-slip', function(){
     $salarySlips = SalarySlip::whereNUll('user_id')->get();
@@ -38,42 +35,6 @@ Route::get('update-salary-slip', function(){
     }
     echo "Salary SLips Record Not Match".'=>';
     print_r($salarySlipIds);
-});
-
-Route::get('test', function () {
-    for($i = 1; $i < 31; $i++) {
-        \Illuminate\Support\Facades\DB::table('attendances')->insert([
-            'user_id' => '553',
-            'on_date' => '2020-11-' . $i,
-            'status' => 'Present'
-        ]);
-
-        \Illuminate\Support\Facades\DB::table('attendances')->insert([
-            'user_id' => '554',
-            'on_date' => '2020-11-' . $i,
-            'status' => 'Present'
-        ]);
-
-        \Illuminate\Support\Facades\DB::table('attendances')->insert([
-            'user_id' => '555',
-            'on_date' => '2020-11-' . $i,
-            'status' => 'Present'
-        ]);
-
-
-
-        \Illuminate\Support\Facades\DB::table('attendances')->insert([
-            'user_id' => '556',
-            'on_date' => '2020-11-' . $i,
-            'status' => 'Present'
-        ]);
-
-        \Illuminate\Support\Facades\DB::table('attendances')->insert([
-            'user_id' => '557',
-            'on_date' => '2020-11-' . $i,
-            'status' => 'Present'
-        ]);
-    }
 });
 
 Route::get('leave-detail/upload', function () {
@@ -354,17 +315,17 @@ Route::group(['prefix'=>'attendances', 'middleware'=>'App\Http\Middleware\Restri
 
     Route::get('change-offs-status', 'AttendanceController@changeAttendancOffeStatus');
     Route::post('change-status', 'AttendanceController@changeAttendanceStatus');
+
     Route::get('consolidated-attendance-sheets', 'AttendanceController@consolidatedAttendanceSheets');
+    Route::post('download', 'AttendanceController@singleAttendanceSheets')->name('attendance.download');
+
     Route::get('view', 'AttendanceController@viewEmployeeAttendance');
+
     Route::get('export-punches', 'AttendanceController@exportPunches');
 
     Route::post('verify-month-attendance', 'AttendanceController@verifyMonthAttendance');
 
     Route::group(['middleware' => ['permission:view-attendance']], function () {
-
-
-
-
 
         Route::get('verify-attendance-list', 'AttendanceController@verifyAttendanceList');
     }); //end of view-attendance group

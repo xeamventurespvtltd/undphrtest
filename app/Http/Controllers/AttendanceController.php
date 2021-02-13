@@ -730,6 +730,371 @@ class AttendanceController extends Controller
 
     }//end of function
 
+
+    function singleAttendanceSheets(Request $request)
+    {
+        $req['year'] = $request->year;
+        $req['month'] = $request->month;
+        $emp = Employee::where('user_id', $request->user_id)->first();
+
+        $users = [];
+        $heading_array = array('S. no', 'Employee Name', 'Employee Code', 'Designation', 'State', 'Reporting head', 'Reporting head Employee Code', 'Verified', 'Month');
+
+
+        array_push($users,$emp->user_id);
+
+        $data = [];
+
+        $key=0;
+
+        if($req['month']==1){
+            $start_year = $req['year']-1;
+            $last_month = 12;
+        }
+
+        else{
+            $start_year = $req['year'];
+            $last_month = $req['month']-1;
+        }
+
+
+        $start_month = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
+
+        $end_month = date("Y-m-d", strtotime($req['year'] . '-' . $req['month'] . '-25'));
+
+        $start_date = date("Y-m-d", strtotime($start_year . '-' . $last_month . '-26'));
+
+        $user = $emp->user_id;
+
+        $punches = Attendance::where('user_id', $user)
+            ->where('on_date', '>=', $start_month)
+            ->where('on_date', '<=', $end_month)
+            ->with('user')
+            ->with('user.employee')
+            ->with('user.designation')
+            ->orderBy('id', 'DESC')
+            ->get()->toArray();
+
+        $new_array = array();
+        foreach($punches as $value){
+            if(!isset($new_array[$value['on_date']])){
+                $new_array[$value['on_date']] = $value;
+            }
+        }
+
+        $new_array = array_values($new_array);
+
+        $punches = array_reverse($new_array);
+
+        $column = array_column($punches, 'on_date');
+
+        array_multisort($column, SORT_ASC, $punches);
+
+        $data[$key]['#'] = $key + 1;
+
+        $emp_data = Employee::where(['user_id' => $user])->first();
+        $emp_profile_data = EmployeeProfile::where(['user_id' => $user])->with('state')->first();
+
+        if (isset($emp_profile_data->state)) {
+            $emp_state = $emp_profile_data->state->name;
+        } else {
+            $emp_state = "NULL";
+        }
+
+        $prev_month = date("F", strtotime("-1 month", strtotime($end_month)));
+        $month = date('F', strtotime($end_month));
+
+        $verified_data = AttendanceVerification::where(['user_id' => $user])
+            ->whereYear('on_date', $req['year'])
+            ->whereMonth('on_date', $req['month'])
+            ->first();
+
+        if ($verified_data) {
+            $verified = $verified_data->isverified;
+            if ($verified == 1) {
+                $verify_status = "Yes";
+            } else {
+                $verify_status = "No";
+            }
+        } else {
+            $verify_status = "No";
+        }
+
+        // Get LoggedIn User Detailed...
+
+        $logged_in_user = User::where(['id' => Auth::id()]) ->with('employee')->first();
+
+        $user_data = User::where(['id' => $user])->with('designation')->first();
+
+
+        $data[$key]['fullname'] = $emp_data->fullname;
+        $data[$key]['employee_code'] = $user_data->employee_code;
+        $data[$key]['designation'] = $user_data->designation[0]->name;
+        $data[$key]['State'] = $emp_state;
+
+        $emp->designation_id = $user_data->designation[0]->id;
+        if ($emp->designation_id == 2) { //spo
+            $empDesg_NPA = DB::table('designation_user as du')
+                ->where('du.designation_id', '=', 1)
+                ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+            if ($empDesg_NPA != "") {
+
+                $u_id = $empDesg_NPA->user_id;
+
+                $emp_data = Employee::where(['user_id' => $u_id])->first();
+                $emp->reporting_head = $emp_data->fullname;
+                $user_data = User::where(['id' => $u_id])
+                    ->first();
+                $emp->reporting_head_uId = $user_data->employee_code;
+
+            }
+
+        }
+
+        if ($emp->designation_id == 3) { //po-op
+
+            $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                ->first();
+
+            $user_state_id = $User_state->state_id;
+            $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                ->get();
+
+            foreach ($employees_under_states as $employees_state) {
+                $employeeId_under_state = $employees_state->user_id;
+                $empDesg_under_state = DB::table('designation_user as du')
+                    ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                    ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                if ($empDesg_under_state != "") {
+
+                    $arr_underlaying_emp[] = $empDesg_under_state;
+
+                    $u_id = $empDesg_under_state->user_id;
+
+                    $emp_data = Employee::where(['user_id' => $u_id])
+                        ->first();
+                    $emp->reporting_head = $emp_data->fullname;
+                    $user_data = User::where(['id' => $u_id])
+                        ->first();
+                    $emp->reporting_head_uId = $user_data->employee_code;
+                }
+            }
+
+        }
+
+        if ($emp->designation_id == 5) { //po-it
+
+            $User_state = EmployeeProfile::where(['user_id' => $emp->user_id])
+                ->first();
+
+            $user_state_id = $User_state->state_id;
+            $employees_under_states = EmployeeProfile::where(['state_id' => $user_state_id])
+                ->get();
+
+            foreach ($employees_under_states as $employees_state) {
+                $employeeId_under_state = $employees_state->user_id;
+                $empDesg_under_state = DB::table('designation_user as du')
+                    ->where(['du.user_id' => $employeeId_under_state, 'du.designation_id' => 2])
+                    ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                if ($empDesg_under_state != "") {
+
+                    //$arr_underlaying_emp[] = $empDesg_under_state;
+
+                    $u_id = $empDesg_under_state->user_id;
+
+                    $emp_data = Employee::where(['user_id' => $u_id])
+                        ->first();
+                    $emp->reporting_head = $emp_data->fullname;
+
+                    $user_data = User::where(['id' => $u_id])
+                        ->first();
+                    $emp->reporting_head_uId = $user_data->employee_code;
+                }
+            }
+
+        }
+
+        if ($emp->designation_id == 4) { //vccm
+
+            $user_district = DB::table('location_user as lu')
+                ->where('lu.user_id', '=', $emp->user_id)
+                ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
+
+            if(isset($user_district->location_id)){
+                $user_district_id = $user_district->location_id;
+            }else{
+                $userDonthaveLocation[] = $emp->employee_code;
+            }
+
+
+            if ($user_district_id != "") {
+                $employeesDistrict = DB::table('location_user as lu')
+                    ->where(['lu.location_id' => $user_district_id])
+                    ->select('lu.id', 'lu.user_id', 'lu.location_id')->get();
+            }
+
+
+            if ($employeesDistrict) {
+                foreach ($employeesDistrict as $empDistrict) {
+                    $user_id = $empDistrict->user_id;
+                    $empDesg_under_district = DB::table('designation_user as du')
+                        ->where(['du.user_id' => $user_id])
+                        ->where(function ($query) {
+                            $query->where('du.designation_id', '=', 5)
+                                ->orWhere('du.designation_id', '=', 3);
+                        })
+                        ->select('du.id', 'du.user_id', 'du.designation_id')->first();
+
+
+                    if ($empDesg_under_district != "") {
+                        $u_id = $empDesg_under_district->user_id;
+
+                        $emp_data = Employee::where(['user_id' => $u_id])
+                            ->first();
+                        $emp->reporting_head = $emp_data->fullname;
+
+                        $user_data = User::where(['id' => $u_id])
+                            ->first();
+                        $emp->reporting_head_uId = $user_data->employee_code;
+                    }
+
+                }
+
+            }
+
+
+        }
+
+
+        if(isset($emp->reporting_head)){
+            $data[$key]['Reporting head'] = $emp->reporting_head;
+        }else{
+            $data[$key]['Reporting head'] = $logged_in_user->reporting_head;
+        }
+        if(isset($emp->reporting_head)){
+            $data[$key]['Reporting head UId'] = $emp->reporting_head_uId;
+        }else{
+            $data[$key]['Reporting head UId'] = $logged_in_user->employee->employee_id;
+        }
+
+        $data[$key]['Verified'] = $verify_status;
+        $data[$key]['Month'] = $prev_month . "-" . $month;
+
+
+
+        while (strtotime($start_date) <= strtotime($end_month)) {
+            $j = 1;
+
+            $presentstatus = false;
+
+            if (count($punches) != 0) {
+                $allPunches = $punches;
+
+                foreach ($allPunches as $punch) {
+                    $punch = (object)$punch;
+                    if(isset($punch->on_date)) {
+                        if ($start_date == date("Y-m-d", strtotime($punch->on_date))) {
+
+                            if ($punch->status == "Present") {
+
+                                $data[$key][$start_date] = "P";
+                                $presentstatus = true;
+                                break;
+                            } elseif ($punch->status == "Holiday") {
+                                $data[$key][$start_date] = "H";
+                                $presentstatus = true;
+                                break;
+                            } elseif ($punch->status == "Week-Off") {
+                                $data[$key][$start_date] = "WO";
+                                $presentstatus = true;
+                                break;
+                            } elseif ($punch->status == "Leave") {
+                                $punch_date = $punch->on_date;
+                                $leaves = DB::table('applied_leaves as al')
+                                    ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
+                                    ->where('al.user_id', $user)
+                                    ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
+                                    ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
+                                    ->where(function ($query) use ($punch_date) {
+                                        $query->where('al.from_date', '<=', $punch_date)
+                                            ->Where('al.to_date', '>=', $punch_date);
+                                    })->orderBY('al.id', 'DESC')->first();
+
+
+                                if ($leaves) {
+                                    if ($leaves->name == "Sick Leave") {
+                                        $data[$key][$start_date] = "SL";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($leaves->name == "Casual Leave") {
+                                        $data[$key][$start_date] = "CL";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($leaves->name == "Maternity Leave") {
+                                        $data[$key][$start_date] = "ML";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($leaves->name == "Paternity Leave") {
+                                        $data[$key][$start_date] = "PL";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($leaves->name == "Half Leave") {
+                                        $data[$key][$start_date] = "HL";
+                                        $presentstatus = true;
+                                        break;
+                                    } elseif ($leaves->name == "Compensatory Leave") {
+                                        $data[$key][$start_date] = "CompL";
+                                        $presentstatus = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $j++;
+                }
+
+            }
+
+
+            if (!$presentstatus) {
+                if ($start_date < date("Y-m-d", strtotime($req['year'] . '-04-01'))) {
+                    $data[$key][$start_date] = "NA";
+                } else {
+                    $data[$key][$start_date] = "A";
+                }
+
+            }
+            if ($key == 0) {
+                $start_date = date("d-m-Y", strtotime($start_date));
+                $start_date_heading = date("d", strtotime($start_date));
+//                        $heading_array[] = $start_date_heading;
+            }
+            $start_date = date("Y-m-d", strtotime("+1 day", strtotime($start_date)));
+
+        }
+
+        $key = $key + 1;
+
+
+
+
+        for($i = 26; $i <= cal_days_in_month(CAL_GREGORIAN, $last_month, $start_year); $i++){
+            $heading_array[] = $i;
+        }
+
+        for($i = 1; $i < 26; $i++){
+            $heading_array[] = $i;
+        }
+        $data = collect($data);
+        $export = new AttendanceExport($data, $heading_array);
+        return Excel::download($export, 'attendance-punch.xlsx');
+    }
     /*
      * For filtering, exporting and displaying the monthly attendance report of employees.
     */
@@ -1087,8 +1452,7 @@ class AttendanceController extends Controller
 
                             $u_id = $empDesg_NPA->user_id;
 
-                            $emp_data = Employee::where(['user_id' => $u_id])
-                                ->first();
+                            $emp_data = Employee::where(['user_id' => $u_id])->first();
                             $emp->reporting_head = $emp_data->fullname;
                             $user_data = User::where(['id' => $u_id])
                                 ->first();
@@ -1171,12 +1535,12 @@ class AttendanceController extends Controller
                             ->where('lu.user_id', '=', $emp->user_id)
                             ->select('lu.id', 'lu.user_id', 'lu.location_id')->first();
 
-                                    if(isset($user_district->location_id)){
-                                        $user_district_id = $user_district->location_id;
-                                    }else{
-                                        $userDonthaveLocation[] = $emp->employee_code;
-                                    }
-                        
+                        if(isset($user_district->location_id)){
+                            $user_district_id = $user_district->location_id;
+                        }else{
+                            $userDonthaveLocation[] = $emp->employee_code;
+                        }
+
 
                         if ($user_district_id != "") {
                             $employeesDistrict = DB::table('location_user as lu')

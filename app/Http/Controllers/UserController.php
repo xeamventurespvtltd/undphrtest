@@ -669,7 +669,6 @@ class UserController extends Controller
         }
 
 
-//        return $req;
         if($user->hasRole('MD') || $user->hasRole('AGM')){
             if($req['project_id'] == 'All'){
                 $query = DB::table('employees as emp')
@@ -691,20 +690,13 @@ class UserController extends Controller
                 ->get();
         }else{
 
-
-              $data = DB::table('employees as emp')
-
+             $data = DB::table('employees as emp')
                 ->join('users as u','emp.user_id','=','u.id')
-
                 ->join('employee_profiles as empp','empp.user_id','=','u.id')
-
+                 ->join('states as st','empp.state_id','=','st.id')
                 ->where(['emp.isactive'=>1])
-
-                ->select('u.*','emp.*')
-
+                ->select('u.*','emp.*','st.name as state')
                 ->orderBy('emp.created_at','DESC')
-
-
                 ->get();
 
             $userid = Auth::id();
