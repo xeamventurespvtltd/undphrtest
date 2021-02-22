@@ -184,7 +184,7 @@
                                             @endif
                                         @else
                                             @if($verify['isverified'] == 0)
-                                                <span  class="label label-info">Previous Month attendance not Verified.</span>
+                                                <span  class="label label-info">Attendance not Verified.</span>
                                             @else
                                                 <span class="verify-btn-calender attendance-verified label-success">Verified</span>
                                             @endif
