@@ -12,7 +12,7 @@ Route::get('test-mail', function(){
     $mail_data['message'] = "test mail";
 
     if(!empty($mail_data['to_email'])){
-        Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
+        Mail::to($mail_data['to_email'])->send(new \App\Mail\GeneralMail($mail_data));
     }
 });
 
