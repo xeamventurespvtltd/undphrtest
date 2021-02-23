@@ -721,7 +721,7 @@ class LeaveController extends Controller
         $leave_approval->leave_status = $request->leaveStatus;
 
         $currentYear = date('Y');
-        $year = date('Y', strtotime($applied_leave->from_date);
+        $year = date('Y', strtotime($applied_leave->from_date));
 
         $date = date('d', strtotime($applied_leave->from_date));
         $appliedLeaveMonth = date('m', strtotime($applied_leave->from_date));
