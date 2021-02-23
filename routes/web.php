@@ -6,15 +6,15 @@ use App\User;
 use Illuminate\Http\Request;
 
 
-//Route::get('test-mail', function(){
-//    $mail_data['to_email'] = "xeam.php14@gmail.com";
-//    $mail_data['subject'] = "test";
-//    $mail_data['message'] = "test mail";
-//
-//    if(!empty($mail_data['to_email'])){
-//        Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
-//    }
-//});
+Route::get('test-mail', function(){
+    $mail_data['to_email'] = "xeam.php14@gmail.com";
+    $mail_data['subject'] = "test";
+    $mail_data['message'] = "test mail";
+
+    if(!empty($mail_data['to_email'])){
+        Mail::to($mail_data['to_email'])->send(new GeneralMail($mail_data));
+    }
+});
 
 Route::get('update-salary-slip', function(){
     $salarySlips = SalarySlip::whereNUll('user_id')->get();
