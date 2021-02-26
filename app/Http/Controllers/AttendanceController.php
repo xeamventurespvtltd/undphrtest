@@ -985,8 +985,6 @@ class AttendanceController extends Controller
         $data[$key]['Verified'] = $verify_status;
         $data[$key]['Month'] = $prev_month . "-" . $month;
 
-
-
         while (strtotime($start_date) <= strtotime($end_month)) {
             $j = 1;
 
@@ -1015,16 +1013,25 @@ class AttendanceController extends Controller
                                 break;
                             } elseif ($punch->status == "Leave") {
                                 $punch_date = $punch->on_date;
+
+//                                echo $punch_date;
+//                                $leaves = DB::table('applied_leaves as al')
+//                                    ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
+//                                    ->where('al.user_id', $user)
+//                                    ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
+//                                    ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
+//                                    ->where(function ($query) use ($punch_date) {
+//                                        $query->where('al.from_date', '<=', $punch_date)
+//                                            ->Where('al.to_date', '>=', $punch_date);
+//                                    })->orderBY('al.id', 'DESC')->first();
+
                                 $leaves = DB::table('applied_leaves as al')
                                     ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
                                     ->where('al.user_id', $user)
-                                    ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
-                                    ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
                                     ->where(function ($query) use ($punch_date) {
                                         $query->where('al.from_date', '<=', $punch_date)
                                             ->Where('al.to_date', '>=', $punch_date);
                                     })->orderBY('al.id', 'DESC')->first();
-
 
                                 if ($leaves) {
                                     if ($leaves->name == "Sick Leave") {
@@ -1778,11 +1785,19 @@ class AttendanceController extends Controller
                                         break;
                                     } elseif ($punch->status == "Leave") {
                                         $punch_date = $punch->on_date;
+//                                        $leaves = DB::table('applied_leaves as al')
+//                                            ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
+//                                            ->where('al.user_id', $user)
+//                                            ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
+//                                            ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
+//                                            ->where(function ($query) use ($punch_date) {
+//                                                $query->where('al.from_date', '<=', $punch_date)
+//                                                    ->Where('al.to_date', '>=', $punch_date);
+//                                            })->orderBY('al.id', 'DESC')->first();
+
                                         $leaves = DB::table('applied_leaves as al')
                                             ->join('leave_types as lt', 'lt.id', '=', 'al.leave_type_id')
                                             ->where('al.user_id', $user)
-                                            ->whereMonth('al.from_date', date('m', strtotime($punch_date)))
-                                            ->orwhereMonth('al.to_date', date('m', strtotime($punch_date)))
                                             ->where(function ($query) use ($punch_date) {
                                                 $query->where('al.from_date', '<=', $punch_date)
                                                     ->Where('al.to_date', '>=', $punch_date);
