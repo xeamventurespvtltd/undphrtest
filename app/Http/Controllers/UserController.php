@@ -5765,4 +5765,3 @@ class UserController extends Controller
 
 
 }//end of class
-
