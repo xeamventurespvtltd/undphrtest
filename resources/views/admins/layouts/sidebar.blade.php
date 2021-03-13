@@ -91,6 +91,7 @@ if(!empty($usser)) {
                         @endif
 
                     <!-- <li class=""><a title="View leave report" href="{{ url('leaves/leave-report-form') }}"><i class="fa fa-circle-o text-red"></i>Leave Report</a></li>-->
+ <!-- <li class=""><a title="View leave report" href="{{ url('leaves/leave-report-form') }}"><i class="fa fa-circle-o text-red"></i>Leave Report</a></li>-->
 
                     <!-- <li class=""><a href="{{ url('leaves/policies') }}"><i class="fa fa-circle-o text-warning"></i>Leave Policies</a></li> -->
                         <!-- <li class=""><a href="javascript:void(0)"><i class="fa fa-circle-o text-primary"></i>Leave Allotment</a></li> -->
