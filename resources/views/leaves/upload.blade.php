@@ -12,7 +12,7 @@
             <li><a href="{{ url('leaves/leave-report-form') }}">Back</a></li>
         </ol>
     </section>
-
+    @include('admins.validation_errors')
     <!-- Main content -->
     <section class="content">
         <!-- Small boxes (Stat box) -->

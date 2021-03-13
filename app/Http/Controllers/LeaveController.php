@@ -1456,7 +1456,7 @@ class LeaveController extends Controller
             echo "<br/>";
         }
 
-            
+       return redirect('leave-detail/upload')->with("success", "Leave Pool Successfully Uploaded");      
         
     }
 
