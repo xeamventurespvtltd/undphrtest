@@ -13,7 +13,23 @@ Route::get('test-mail', function(){
 
     if(!empty($mail_data['to_email'])){
         Mail::to($mail_data['to_email'])->send(new \App\Mail\GeneralMail($mail_data));
-    }
+    }   
+});
+Route::group(['prefix' => 'LeavePoolDataEntrys'], function () {
+    
+    // Route::get('create', 'LeavePoolDataEntryController@create');
+    // Route::post('store', 'LeavePoolDataEntryController@store');
+    // Route::get('edit/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@edit');
+    // Route::post('update/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@update');
+    // Route::get('delete/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@destroy');
+
+
+// Route::get('', 'LeavePoolDataEntryController@index')->name('LeavePoolDataEntry.index');
+Route::get('create', 'LeavePoolDataEntryController@create')->name('LeavePoolDataEntry.create');
+Route::post('store', 'LeavePoolDataEntryController@store')->name('LeavePoolDataEntry.store');
+Route::get('edit/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@edit')->name('LeavePoolDataEntry.edit');
+Route::post('update/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@update')->name('LeavePoolDataEntry.update');
+Route::get('delete/{LeavePoolDataEntry}', 'LeavePoolDataEntryController@destroy')->name('LeavePoolDataEntry.delete');
 });
 
 Route::get('update-salary-slip', function(){
@@ -41,16 +57,13 @@ Route::get('leave-detail/upload', function () {
     return view('leaves.upload');
 });
 
-Route::post('upload', 'LeaveController@uploadLeavePool');
-
-
-
+Route::post('upload', 'LeaveController@addLeavePool');
 
 Route::get('leave-detail/export', function () {
     return view('leaves.export');
 });
-Route::post('export', 'LeaveController@exportLeavePool');
 
+Route::post('export', 'LeaveController@exportLeavePool');
 
 Route::get('local-claim-form', function () {
     return view('travel.local_claim_form');
@@ -58,7 +71,6 @@ Route::get('local-claim-form', function () {
 
 Route::get('profile-detail-form', 'UserController@profile_detail_form');
 Route::post('profile-detail-submit', 'UserController@profile_detail_submit');
-
 
 /**************JRF****************/
 Route::group(['prefix' => 'jrf', 'middleware' => 'App\Http\Middleware\RestrictEmployee'], function () {

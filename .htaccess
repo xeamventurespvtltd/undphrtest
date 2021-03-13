@@ -31,4 +31,3 @@ RewriteRule ^ index.php [L]
 
 </IfModule>
 # END cPanel-generated php ini directives, do not edit
-

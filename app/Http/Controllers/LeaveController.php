@@ -749,15 +749,15 @@ class LeaveController extends Controller
             return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
         }
 
-//       $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
-//            ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
-//            ->first();
-//        if(!isset($lastMonthAttendanceVerification) && empty($lastMonthAttendanceVerification)){
-//            $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
-//            return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
-//        }
+        //       $lastMonthAttendanceVerification = AttendanceVerification::where('user_id', $applied_leave->user_id)
+        //            ->whereYear('on_date', $year)->whereMonth('on_date', $lastMonth)
+        //            ->first();
+        //        if(!isset($lastMonthAttendanceVerification) && empty($lastMonthAttendanceVerification)){
+        //            $lastMonthAttendanceNotVerified = "Last Month Attendance Is not Verified. Kindly verified it first before approving leave.";
+        //            return redirect('leaves/approve-leaves')->with('error',$lastMonthAttendanceNotVerified);
+        //        }
 
-// Comment By Hitesh
+        // Comment By Hitesh
         $leave_approval->save();
         $applier = $leave_approval->user;
 
@@ -1174,12 +1174,12 @@ class LeaveController extends Controller
         $count = 0;
         if (count($data)) {
             foreach ($data[0] as $key => $record) {
-//                return $record;
+             //                return $record;
                 $empCode = $record['empcode'];
                 $accumulatedCl = $record['casual_leave'];
                 $accumulatedSl = $record['sick_leave'];
 
-//                if($key != 0) {
+              //                if($key != 0) {
                 if($empCode != ''){
                     $user = User::where("employee_code", $empCode)->with('designation')->first();
                     if(isset($user->designation[0])) {
@@ -1203,7 +1203,7 @@ class LeaveController extends Controller
 
                         if ($leaveDetail != '') {
                             $userOctLeavePoolUpdate[] = $user->employee_code;
-//                            return $leaveDetail->id;
+                           //                            return $leaveDetail->id;
                             LeaveDetail::where('id', $leaveDetail->id)->update([
                                 'accumalated_casual_leave' => $accumulatedCl,
                                 'accumalated_sick_leave' => $accumulatedSl,
@@ -1230,8 +1230,7 @@ class LeaveController extends Controller
                                     'month_info' => '2020-12-26',
                                     'accumalated_casual_leave' => isset($accumlated_casual) ? $accumlated_casual : 0,
                                     'accumalated_sick_leave' => isset($accumlated_sick) ? $accumlated_sick : 0,
-                                    'balance_casual_leave' => isset($balance_casual_leave) ?
-                                        $balance_casual_leave : 0,
+                                    'balance_casual_leave' => isset($balance_casual_leave) ?$balance_casual_leave : 0,
                                     'balance_sick_leave' => isset($balance_sick_leave) ? $balance_sick_leave : 0,
                                     'balance_maternity_leave' => '180',
                                     'balance_paternity_leave' => '15',
@@ -1253,7 +1252,7 @@ class LeaveController extends Controller
                             ->whereMonth('month_info', '01')->first();
                         if ($leaveDetail != '') {
                             if($designation==4){    // for vccm
-//                                return $accumulatedCl;
+                             //                                return $accumulatedCl;
                                 $accumlated_casual = $accumulatedCl + 1.5;
                                 $accumlated_sick = $accumulatedSl;
                             }elseif ($designation==3 || $designation==5) {  // for PO
@@ -1271,7 +1270,7 @@ class LeaveController extends Controller
 
                             $userNovLeavePoolUpdate[] = $user->employee_code;
 
-                        }else{
+                            }else{
                             $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
 
                             if($designation==4){    // for vccm
@@ -1347,6 +1346,119 @@ class LeaveController extends Controller
         }
     }
 
+      public function addLeavePool(Request $request)
+    {
+        $data = \Maatwebsite\Excel\Facades\Excel::toArray(new LeaveDetailImport,request()->file('leave_detail'));
+        
+        $count = 0;
+        if (count($data)) {
+            foreach ($data[0] as $key => $record) {
+             
+             //                return $record;
+                $empCode = $record['empcode'];
+                $accumulatedCl = $record['casual_leave'];
+                $accumulatedSl = $record['sick_leave'];
+                $balanceCasualLeave = $record['balance_casual_leave'];
+                $balanceSickLeave = $record['balance_sick_leave'];
+
+                $balanceMaternityLeave = $record['balance_maternity_leave'];
+                $balancePaternityLeave = $record['balance_paternity_leave'];
+                $balanceCompensatoryLeave = $record['compensatory_count'];
+
+              //                if($key != 0) {
+                if($empCode != ''){
+                    $user = User::where("employee_code", $empCode)->with('designation')->first();
+                    if(isset($user->designation[0])) {
+                        $designation = $user->designation[0]->id;
+                    }
+
+                    if(!isset($user)) {
+                        $employee = Employee::where('employee_id', $empCode)->first();
+                        if(isset($employee)){
+                            $user = User::where("id", $employee->user_id)->with('designation')->first();
+                            if(isset($user->designation[0])) {
+                                $designation = $user->designation[0]->id;
+                            }
+                        }
+                    }
+
+                    if (isset($user)) {
+                        $date = $request->year.'-'.$request->month.'-'.date('d');
+                     
+
+                        $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', $request->year)
+                            ->whereMonth('month_info', $request->month)->first();
+
+                        if ($leaveDetail != '') {
+
+                            $userOctLeavePoolUpdate[] = $user->employee_code;
+                            LeaveDetail::where('id', $leaveDetail->id)->update([
+                                    'accumalated_casual_leave' => isset($accumulatedCl) ? $accumulatedCl : 0,
+                                    'accumalated_sick_leave' => isset($accumulatedSl) ? $accumulatedSl : 0,
+                                    'balance_casual_leave' => isset($balanceCasualLeave) ? $balanceCasualLeave : 0,
+                                    'balance_sick_leave' => isset($balanceSickLeave) ? $balanceSickLeave : 0,
+
+                                    'balance_maternity_leave' => isset($balanceMaternityLeave) ? $balanceMaternityLeave : 0,
+                                    'balance_paternity_leave' => isset($balancePaternityLeave) ? $balancePaternityLeave : 0,
+                                    'compensatory_count' => isset($balanceCompensatoryLeave) ? $balanceCompensatoryLeave : 0,
+                            ]);
+                        }else{
+
+                            $previousMonthLeaveDetail = LeaveDetail::where('user_id', $user->id)->OrderBy('id', 'DESC')->first();
+                               
+                             $approval_data = [
+                                    'user_id' => $user->id,
+                                    'month_info' => $date,
+                                    'accumalated_casual_leave' => isset($accumulatedCl) ? $accumulatedCl : 0,
+                                    'accumalated_sick_leave' => isset($accumulatedSl) ? $accumulatedSl : 0,
+                                    'balance_casual_leave' => isset($balanceCasualLeave) ? $balanceCasualLeave : 0,
+                                    'balance_sick_leave' => isset($balanceSickLeave) ? $balanceSickLeave : 0,
+                                    'balance_maternity_leave' => isset($balanceMaternityLeave) ? $balanceMaternityLeave : 0,
+                                    'balance_paternity_leave' => isset($balancePaternityLeave) ? $balancePaternityLeave : 0,
+                                    'compensatory_count' => isset($balanceCompensatoryLeave) ? $balanceCompensatoryLeave : 0,
+                                    'unpaid_casual' => 0,
+                                    'paid_casual' => 0,
+                                    'unpaid_sick' => 0,
+                                    'paid_sick' => 0,
+                                    'isactive' => 1
+                                ];
+                                LeaveDetail::create($approval_data);
+                                $userOctLeavePoolCreate[] = $user->employee_code;
+
+                        }
+                    }
+                }
+            }
+        }
+                if(isset($userNotExist)) {
+            echo "User Not Exist" . '=>' . ' ';
+            print_r($userNotExist);
+            echo "<br/>";
+        }
+        if(isset($userOctLeavePoolUpdate)) {
+            echo "User Oct Leave Pool Update" . '=>'. ' ';
+            print_r($userOctLeavePoolUpdate);
+            echo "<br/>";
+        }
+        if(isset($userOctLeavePoolCreate)) {
+            echo "User Oct Leave Pool Create" . '=>' . ' ';
+            print_r($userOctLeavePoolCreate);
+            echo "<br/>";
+        }
+        if(isset($userNovLeavePoolUpdate)) {
+            echo "User Nov Leave Pool Update" . '=>' . ' ';
+            print_r($userNovLeavePoolUpdate);
+            echo "<br/>";
+        }
+        if(isset($userNovLeavePoolCreate)) {
+            echo "User Nov Leave Pool Create" . '=>' . ' ';
+            print_r($userNovLeavePoolCreate);
+            echo "<br/>";
+        }
+
+            
+        
+    }
 
     public function exportLeavePool(Request $request)
     {
@@ -1355,8 +1467,8 @@ class LeaveController extends Controller
         $count = 0;
         if (count($data)) {
             foreach ($data[0] as $key => $record) {
-//                if($key != 0) {
-                if($record['emp_code'] != ''){
+                  //                if($key != 0) {
+                 if($record['emp_code'] != ''){
                     $user = User::where("employee_code", $record['emp_code'])->with('employee')->first();
 
                     if (isset($user)) {

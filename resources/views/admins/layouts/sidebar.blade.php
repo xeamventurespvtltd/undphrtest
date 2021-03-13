@@ -85,8 +85,11 @@ if(!empty($usser)) {
                         @if($designation_login_user!=4)
                             <li class=""><a title="list of Approval Employee's leave" href="{{ url('leaves/approve-leaves') }}"><i class="fa fa-circle-o text-success"></i>Approve Leaves</a></li>
                             <li class=""><a title="list of Employee's leave Pool" href="{{ url('leaves/leave-pools') }}"><i class="fa fa-circle-o text-success"></i>Leaves Pool</a></li>
+                        @endif
+                        @if(Auth::user()->employee_code == 'XEAM001')
+                            <li class=""><a title="Upload leave Pool" href="{{ url('leave-detail/upload') }}"><i class="fa fa-circle-o text-success"></i>Leaves Pool Upload</a></li>
+                        @endif
 
-                    @endif
                     <!-- <li class=""><a title="View leave report" href="{{ url('leaves/leave-report-form') }}"><i class="fa fa-circle-o text-red"></i>Leave Report</a></li>-->
 
                     <!-- <li class=""><a href="{{ url('leaves/policies') }}"><i class="fa fa-circle-o text-warning"></i>Leave Policies</a></li> -->

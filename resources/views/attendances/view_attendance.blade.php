@@ -177,7 +177,8 @@
                                             @if($verify['isverified'] == 0 )
                                                 @if($verify['verifier']!=$user->id)
 
-                                                    <button type="button" class="btn btn-primary verify-btn-calender verifyMonthAttendance" data-userid="{{$user->id}}" data-managerid="{{$verify['verifier']}}" data-ondate="{{$cYear.'-'.$cMonth.'-'.'25'}}">Verify Attendance</button>
+                                                    <button type="button" class="btn btn-primary verify-btn-calender verifyMonthAttendance" data-userid="{{$user->id}}"
+                                                    data-managerid="{{$verify['verifier']}}" data-ondate="{{$cYear.'-'.$cMonth.'-'.'25'}}">Verify Attendance</button>
                                                 @endif
                                             @elseif($verify['isverified'] == 1)
                                                 <span class="verify-btn-calender attendance-verified label-success">Verified</span>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\User;
 use App\Employee;
 use App\Attendance;
@@ -38,7 +39,6 @@ use App\ShiftException;
 use App\Shift;
 use App\EmployeeProfile;
 use App\State;
-
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GeneralMail;
 
@@ -48,6 +48,7 @@ class AttendanceController extends Controller
         Get all the punches of a user marked from app of a given date
     */
     function viewMap(Request $request){
+
         if(!$request->has('id')){
             $user = Auth::user();
         }else{
@@ -74,6 +75,7 @@ class AttendanceController extends Controller
             ->get();
 
         return view('attendances.view_map')->with(['attendance'=>$attendance,'attendance_locations'=>$attendance_locations,'date' => $date,'username'=>$username]);
+   
     }
 
     /*
@@ -105,13 +107,11 @@ class AttendanceController extends Controller
             $applied_leave->created_at = $newdatetime;
             $applied_leave->updated_at = $newdatetime;
             $applied_leave->save();
-
             $applied_leave->appliedLeaveSegregations[0]->to_date = $newdate;
             $applied_leave->appliedLeaveSegregations[0]->created_at = $newdatetime;
             $applied_leave->appliedLeaveSegregations[0]->updated_at = $newdatetime;
             $applied_leave->appliedLeaveSegregations[0]->from_date = $newdate;
             $applied_leave->appliedLeaveSegregations[0]->save();
-
             $applied_leave->appliedLeaveApprovals[0]->created_at = $newdatetime;
             $applied_leave->appliedLeaveApprovals[0]->updated_at = $newdatetime;
             $applied_leave->appliedLeaveApprovals[0]->save();
@@ -230,23 +230,16 @@ class AttendanceController extends Controller
 
         $req['year'] = 0;
         $req['month'] = 0;
-
-
         if($request->year){
             $req['year'] = $request->year;
         }
-
         if($request->month){
             $req['month'] = $request->month;
         }
-
         $verify['isverified'] = 0; //not verified
         $verify['verifier'] = 0;
-
         $on_date = $req['year'].'-'.$req['month'].'-'.'25';
-
         $on_date = date('Y-m-d',strtotime($on_date));
-
         $verification = $user->attendanceVerifications()
             ->where(['on_date'=>$on_date])
             ->first();
@@ -256,7 +249,6 @@ class AttendanceController extends Controller
         }else{
             $verify['isverified'] = 0;  //not verified
         }
-
         /*  if(!$user->leaveAuthorities->isEmpty()){
              if($user->leaveAuthorities[0]->manager_id == Auth::id()){
                  $verify['verifier'] = $user->leaveAuthorities[0]->manager_id;
@@ -264,10 +256,8 @@ class AttendanceController extends Controller
          } */
 
         $verify['verifier'] = Auth::id();
-
         $leaveDetail = LeaveDetail::where('user_id', $user->id)->whereYear('month_info', $req['year'])->whereMonth
         ('month_info', $req['month'])->first();
-
         return view('attendances.view_attendance', compact('leaveDetail'))->with(['user'=>$user,'req'=>$req,
             'verify'=>$verify,
             'on_date'=>$on_date]);
@@ -304,12 +294,10 @@ class AttendanceController extends Controller
             }
             return redirect()->back()->withSuccess('Week-Off added successfully.');
         }
-
     }
 
     function changeAttendanceStatus(Request $request)
     {
-
         $date = date("Y-m-d",strtotime($request->on_date));
         $attendance = Attendance::where(['user_id'=>$request->user_id,'on_date'=>$date])->first();
 
@@ -324,16 +312,12 @@ class AttendanceController extends Controller
             $time = $date.' '.$request->on_time;
             $time = date("H:i:s",strtotime($time));
             $punch = $attendance->attendancePunches()->where(['on_time'=>$time])->first();
-
             if(empty($punch)){
                 $attendance->attendancePunches()->create(['on_time'=>$time,'punched_by'=>Auth::id()]);
             }
         }
-
         return redirect($request->url)->with('leave_success','Attendance has been added successfully.');
-
     }//end of function
-
     /*
      * Cron functionality for taking data from tblt timesheet table to
      * the attendance and attendance punches table. And also insert the
@@ -348,13 +332,10 @@ class AttendanceController extends Controller
                     $query->where('employee_id',$biometric->punchingcode)
                         ->where('isactive',1);
                 })->first();
-
                 if(!empty($user)){
                     $attendance = $user->attendances()->where(['on_date'=>$biometric->date])->first();
-
                     $datetimeString = $biometric->date.' '.$biometric->time;
                     $datetime = date("H:i:s",strtotime($datetimeString));
-
                     if(!empty($attendance)){
 
                         $attendance_punch = $attendance->attendancePunches()->create(['on_time'=>$datetime]);
@@ -394,7 +375,6 @@ class AttendanceController extends Controller
                                 }
                             }
                         }
-
                         if(!empty($attendance)){
                             $attendance_punch = $attendance->attendancePunches()
                                 ->create(['on_time'=>$datetime]);
@@ -405,11 +385,8 @@ class AttendanceController extends Controller
                 }
             }
         });
-
         echo "cron ran successfully!";
-
     }//end of cron function
-
     /*
      * Cron functionality for looping over the last month all dates and mark
      * the status Absent in attendance table. Also create an entry for month's
@@ -430,7 +407,6 @@ class AttendanceController extends Controller
             foreach ($period as $date) {
                 $dates[] = $date->format('Y-m-d');
             }
-
             User::whereHas('employee',function(Builder $query){
                 $query->where('isactive',1);
             })->chunk(50, function($users)use($dates){
@@ -465,7 +441,6 @@ class AttendanceController extends Controller
                                 ->where('holiday_to','>=',$date)
                                 ->where('isactive',1)
                                 ->first();
-
                             if(!empty($holiday) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
                                 $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Holiday']);
                             }else{
@@ -473,7 +448,6 @@ class AttendanceController extends Controller
                                     ->where('to_date','>=',$date)
                                     ->where(['final_status'=>'1','user_id'=>$user->id])
                                     ->first();
-
                                 if(!empty($leave) && strtotime(date("Y-m-d H:i:s")) > strtotime($date)){
                                     $attendance = $user->attendances()->create(['on_date'=>$date,'status'=>'Leave']);
                                 }else{

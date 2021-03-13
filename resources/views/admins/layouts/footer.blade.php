@@ -193,7 +193,7 @@
     <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
     <div class="control-sidebar-bg"></div>
     <!-- ./wrapper -->
-<!-- </div> -->
+    <!-- </div> -->
     <!-- /.modal -->
     <div class="modal fade comments-modal" id="comments_modal">
       <div class="modal-dialog">

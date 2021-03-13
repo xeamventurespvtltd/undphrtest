@@ -39,12 +39,12 @@ class TaskController extends Controller
             $data['projects'] = Project::where(['isactive'=>1,'approval_status'=>'1'])->get();
         }else{
             $data['departments'] = Department::where(['isactive'=>1])
-                                            ->where('id', $user->employeeProfile->department_id)
-                                            ->get();
+            ->where('id', $user->employeeProfile->department_id)
+            ->get();
 
             $data['projects'] = Project::where(['isactive'=>1,'approval_status'=>'1'])
-                                            ->whereIn('id',[$user->projects->pluck('id')])
-                                            ->get();                                
+            ->whereIn('id',[$user->projects->pluck('id')])
+            ->get();                                
         }
 
         return view('tasks.report_form')->with(['data' => $data]);
@@ -62,7 +62,6 @@ class TaskController extends Controller
             'weekends' => $request->weekends,
             'holidays' => $request->holidays
         ];
-
         if($request->department == '0'){
             $report_data['department_id'] = "";
             $report_data['department_sign'] = "!=";

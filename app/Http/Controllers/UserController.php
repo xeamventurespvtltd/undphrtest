@@ -62,7 +62,6 @@ use App\AttendanceResult;
 use App\LocationUser;
 use App\LeaveDetail;
 
-
 class UserController extends Controller
 
 {
@@ -653,7 +652,7 @@ class UserController extends Controller
         List the employees as per roles & other filters like department & project
     */
     function list(Request $request)
-    {
+    { 
         $user = Auth::user();
 
         if(empty($request->project_id)){
@@ -1019,8 +1018,6 @@ class UserController extends Controller
         $data['permissions'] = Permission::select('id','name')->get();
 
         $data['countries'] = Country::where(['isactive'=>1])->get();
-
-
 
         $data['states'] = State::where(['isactive'=>1])->orderBy('name')->get();
 
@@ -5651,14 +5648,11 @@ class UserController extends Controller
 
                 "isactive" => 1
             ];
-
             $project_data = DB::table('project_user')->insert($employee_project_data);
 
             /*$user_data = DB::table('users')
                         ->where('employee_code', $user->EMP_CODE)
                         ->first();*/
-
-
 
             $approval_data =   [
                 'user_id' => $user_id,
@@ -5695,7 +5689,6 @@ class UserController extends Controller
         exit;
         $i=0;
         foreach($users_data as $data){
-
             $emp_code = $data->emp_code;
 
             //$user_data = Employee::where(['employee_id'=>$emp_code])->first();
@@ -5710,8 +5703,6 @@ class UserController extends Controller
                 continue;
 
             }
-
-
 
             $emp_data = [
                 'father_name' => $data->father_name,
@@ -5755,13 +5746,6 @@ class UserController extends Controller
             }
 
             $i++;
-
         }
-
-
-
     }
-
-
-
 }//end of class
